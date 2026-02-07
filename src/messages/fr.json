@@ -1,0 +1,430 @@
+{
+    "Metadata": {
+        "title": "Cayn.ma - Vente et location de voitures au Maroc",
+        "description": "Le meilleur site pour acheter et vendre des voitures au Maroc. Simple, rapide et fiable."
+    },
+    "Errors": {
+        "notFound": {
+            "title": "404",
+            "heading": "Page introuvable",
+            "message": "La page que vous recherchez n'existe pas ou a été déplacée.",
+            "button": "Retour à l'accueil"
+        },
+        "general": {
+            "heading": "Une erreur s'est produite !",
+            "message": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+            "button": "Réessayer"
+        }
+    },
+    "Common": {
+        "search": "Rechercher",
+        "signIn": "Se connecter",
+        "postAd": "Vendre ma voiture",
+        "home": "Accueil",
+        "cars": "Voitures",
+        "menu": "Menu",
+        "call": "Appeler",
+        "whatsapp": "WhatsApp",
+        "next": "Suivant",
+        "previous": "Précédent",
+        "submit": "Publier",
+        "required": "Obligatoire",
+        "optional": "Optionnel",
+        "perDay": " / jour",
+        "perWeek": " / semaine",
+        "perMonth": " / mois",
+        "browseByBodyType": "Parcourir par type de carrosserie",
+        "browseByBrand": "Parcourir par marque",
+        "poster": "Publier",
+        "sale": "Vente",
+        "rent": "Location",
+        "viewAll": "Voir tout",
+        "BodyTypes": {
+            "sedan": "Berline",
+            "suv": "SUV",
+            "hatchback": "Hatchback",
+            "coupe": "Coupé",
+            "pickup": "Pick-up",
+            "van": "Van",
+            "minivan": "Monospace",
+            "truck": "Camion",
+            "bus": "Bus"
+        }
+    },
+    "Header": {
+        "searchPlaceholder": "Chercher une voiture...",
+        "language": "Français",
+        "loggedInAs": "Connecté en tant que",
+        "myListings": "Mes annonces",
+        "logout": "Déconnexion",
+        "rentAgencies": "Agences de location"
+    },
+    "Hero": {
+        "title": "Vente et location de voitures au Maroc en toute simplicité",
+        "subtitle": "Trouvez votre prochaine voiture ou vendez la vôtre en quelques clics",
+        "searchPlaceholder": "Rechercher une voiture...",
+        "selectCity": "Choisir une ville",
+        "allCities": "Toutes les villes",
+        "freeAds": "Annonces gratuites",
+        "directContact": "Contact direct",
+        "noCommission": "Sans commission"
+    },
+    "Categories": {
+        "title": "Catégories",
+        "carsForSale": "Voitures à vendre",
+        "usedCars": "Voitures d'occasion",
+        "agencies": "Agences",
+        "rental": "Location"
+    },
+    "Home": {
+        "latestListings": "Dernières Annonces",
+        "viewAll": "Voir tout",
+        "noListings": "Soyez le premier à publier votre annonce sur Cayn 🚗",
+        "postFreeAd": "Publier une annonce gratuite",
+        "carsByCity": "Voitures par ville",
+        "carsInCity": "Voitures à vendre à",
+        "Tabs": {
+            "sale": "Vente",
+            "rent": "Location",
+            "all": "Tout"
+        }
+    },
+    "Trust": {
+        "title": "Pourquoi Cayn.ma ?",
+        "noMiddleman": "Sans intermédiaire",
+        "directContact": "Contact direct",
+        "reportSystem": "Système de signalement"
+    },
+    "Footer": {
+        "description": "La plateforme de référence pour acheter et vendre des voitures au Maroc.",
+        "categories": "Catégories",
+        "cities": "Villes",
+        "about": "À propos",
+        "terms": "Conditions d'utilisation",
+        "privacy": "Politique de confidentialité",
+        "contact": "Contact",
+        "copyright": "Tous droits réservés"
+    },
+    "Badges": {
+        "new": "Neuve",
+        "used": "Occasion",
+        "verified": "Vérifié",
+        "negotiable": "Prix négociable",
+        "featured": "Vedette",
+        "goodPrice": "Bon Prix",
+        "sale": "À vendre",
+        "rent": "À louer"
+    },
+    "ListingCard": {
+        "individual": "Particulier",
+        "agency": "Agence",
+        "views": "vue",
+        "addToFavorites": "Ajouter aux favoris"
+    },
+    "ListingPage": {
+        "description": "Description",
+        "specifications": "Caractéristiques",
+        "seller": "Vendeur",
+        "memberSince": "Membre depuis",
+        "verifiedPhone": "Téléphone vérifié",
+        "callSeller": "Appeler",
+        "whatsappSeller": "WhatsApp",
+        "reportListing": "Signaler cette annonce",
+        "views": "vue",
+        "share": "Partager",
+        "brand": "Marque",
+        "model": "Modèle",
+        "year": "Année",
+        "mileage": "Kilométrage",
+        "fuel": "Carburant",
+        "transmission": "Transmission",
+        "individual": "Particulier",
+        "agency": "Agence",
+        "trustSafety": "Sécurité",
+        "backToListings": "Retour aux annonces",
+        "safetyWarning": "⚠️ Ne versez aucun acompte avant de voir le véhicule",
+        "similarListings": "Annonces Similaires",
+        "viewMore": "Voir plus",
+        "city": "Ville",
+        "bodyType": "Type de carrosserie"
+    },
+    "Favorites": {
+        "title": "Favoris",
+        "empty": "Aucune annonce sauvegardée",
+        "emptySubtitle": "Ajoutez des annonces à vos favoris pour les retrouver ici",
+        "browseCars": "Parcourir les voitures",
+        "savedCount": "{count} annonce(s) sauvegardée(s)"
+    },
+    "Search": {
+        "filters": "Filtrer",
+        "city": "Ville",
+        "allCities": "Toutes les villes",
+        "priceRange": "Prix",
+        "min": "Min",
+        "max": "Max",
+        "bodyType": "Type de carrosserie",
+        "brand": "Marque",
+        "allBrands": "Toutes les marques",
+        "yearRange": "Année",
+        "from": "De",
+        "to": "À",
+        "reset": "Réinitialiser",
+        "showResults": "Voir {count} résultats"
+    },
+    "PostAd": {
+        "title": "Publier votre annonce",
+        "step1": "Informations de base",
+        "step2": "Détails du véhicule",
+        "step3": "Photos",
+        "step4": "Aperçu",
+        "adType": "Type d'annonce",
+        "sale": "Vente",
+        "rental": "Location",
+        "adTitle": "Titre de l'annonce",
+        "adTitlePlaceholder": "Ex: Dacia Logan 2020 Diesel",
+        "city": "Ville",
+        "selectCity": "Sélectionnez une ville",
+        "price": "Prix (DH)",
+        "priceDay": "Prix (DH / jour)",
+        "priceWeek": "Prix (DH / semaine)",
+        "priceMonth": "Prix (DH / mois)",
+        "pricePlaceholder": "Ex: 300",
+        "pricePeriod": "Période de location",
+        "perDay": "Par jour",
+        "perWeek": "Par semaine",
+        "perMonth": "Par mois",
+        "phone": "Numéro de téléphone",
+        "phonePlaceholder": "Ex: 0612345678",
+        "whatsappOptional": "WhatsApp (optionnel)",
+        "brand": "Marque",
+        "selectBrand": "Sélectionnez une marque",
+        "model": "Modèle",
+        "modelPlaceholder": "Ex: Logan, Clio, Golf...",
+        "year": "Année",
+        "fuel": "Carburant",
+        "transmission": "Transmission",
+        "manual": "Manuelle",
+        "automatic": "Automatique",
+        "mileage": "Kilométrage",
+        "mileagePlaceholder": "Ex: 120000",
+        "description": "Description",
+        "descriptionPlaceholder": "Décrivez votre véhicule en détail...",
+        "uploadImages": "Ajouter des photos",
+        "dragDrop": "Glissez-déposez vos photos ici",
+        "or": "ou",
+        "browse": "Parcourir",
+        "maxImages": "Maximum 8 photos",
+        "firstImageCover": "La première photo sera la couverture",
+        "preview": "Aperçu de votre annonce",
+        "publishNow": "Publier maintenant",
+        "encouragement": "Votre annonce atteindra des milliers de personnes 🚀",
+        "almostDone": "Vous y êtes presque !",
+        "successMessage": "Votre annonce a été publiée avec succès !",
+        "myListings": "Mes annonces",
+        "next": "Suivant",
+        "back": "Précédent",
+        "uploading": "Téléchargement...",
+        "publishing": "Publication...",
+        "publish": "Publier",
+        "successTitle": "Félicitations !",
+        "viewAds": "Voir les annonces",
+        "postAnother": "Publier une autre",
+        "select": "Sélectionner"
+    },
+    "Auth": {
+        "loginTitle": "Bon retour parmi nous",
+        "signupTitle": "Créer un compte",
+        "loginSubtitle": "Connectez-vous pour gérer vos annonces",
+        "signupSubtitle": "Rejoignez Cayn.ma pour vendre plus vite",
+        "email": "Email",
+        "emailPlaceholder": "votre@email.com",
+        "password": "Mot de passe",
+        "continueWithGoogle": "Continuer avec Google",
+        "or": "ou",
+        "forgotPassword": "Mot de passe oublié ?",
+        "loginButton": "Se connecter",
+        "signupButton": "S'inscrire",
+        "noAccount": "Pas encore de compte ?",
+        "hasAccount": "Déjà un compte ?",
+        "signupLink": "S'inscrire gratuitement",
+        "loginLink": "Se connecter",
+        "backToHome": "Retour à l'accueil",
+        "errorUserNotFound": "Aucun utilisateur trouvé avec cet email.",
+        "errorWrongPassword": "Mot de passe incorrect.",
+        "errorEmailInUse": "Cet email est déjà utilisé.",
+        "errorWeakPassword": "Le mot de passe doit contenir au moins 6 caractères.",
+        "errorInvalidEmail": "Format d'email invalide.",
+        "errorGeneric": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "Follow": {
+        "follow": "Suivre",
+        "following": "Abonné",
+        "unfollow": "Se désabonner",
+        "followedSellers": "Vendeurs suivis",
+        "noFollowing": "Vous ne suivez aucun vendeur",
+        "noFollowingDesc": "Suivez des vendeurs pour voir leurs nouvelles annonces",
+        "latestListings": "Dernières annonces",
+        "cannotFollowSelf": "Vous ne pouvez pas vous suivre",
+        "unfollowConfirm": "Êtes-vous sûr de vouloir ne plus suivre ce vendeur ?",
+        "noListingsAvailable": "Aucune annonce disponible pour le moment"
+    },
+    "RentAgencies": {
+        "Landing": {
+            "title": "Trouvez des agences de location de confiance",
+            "subtitle": "Parcourez notre annuaire d'agences vérifiées partout au Maroc. Comparez les notes, les emplacements et les services.",
+            "browseAgencies": "Voir les agences",
+            "comingSoon": "Bientôt",
+            "moreCities": "Plus de villes bientôt",
+            "citiesList": "Casablanca, Tanger, Rabat...",
+            "Features": {
+                "verifiedTitle": "Agences Vérifiées",
+                "verifiedDesc": "Toutes les agences listées sont vérifiées manuellement pour garantir un service de qualité.",
+                "localTitle": "Experts Locaux",
+                "localDesc": "Trouvez des agences situées exactement là où vous en avez besoin.",
+                "ratingsTitle": "Évaluations Transparentes",
+                "ratingsDesc": "Consultez de vrais avis et notes basés sur des sources publiques."
+            }
+        },
+        "Listing": {
+            "breadcrumb": "Agences",
+            "title": "Agences de location à {city}",
+            "seoDescription": "Découvrez les meilleures agences de location de voitures à {city}. Que vous recherchiez des voitures économiques, des véhicules de luxe ou des 4x4, notre annuaire vous aide à trouver des entreprises locales fiables avec des avis vérifiés.",
+            "count": "Affichage de {count} agences",
+            "searchPlaceholder": "Rechercher par nom...",
+            "filter": "Filtrer",
+            "notFound": "Aucune agence trouvée",
+            "notFoundDesc": "Essayez d'ajuster vos filtres ou revenez plus tard.",
+            "marrakechOnly": "Note: Nous lançons actuellement à Marrakech. D'autres villes arrivent bientôt.",
+            "viewDetails": "Voir détails",
+            "filtered": "filtré",
+            "sortBy": "Trier par",
+            "sort": {
+                "recommended": "Recommandé",
+                "rating": "Mieux notés",
+                "reviews": "Plus avisés"
+            },
+            "relatedAgencies": "Agences similaires"
+        },
+        "Filters": {
+            "searchPlaceholder": "Rechercher une agence...",
+            "allRatings": "Toutes les notes",
+            "hasPhone": "Avec téléphone",
+            "hasReviews": "Avec avis",
+            "hideMixed": "Spécialistes Uniquement",
+            "hideMixedTitle": "Masquer les services mixtes (ex: transfert d'argent)",
+            "isOpenNow": "Ouvert maintenant",
+            "hasPhotos": "Avec photos",
+            "hasWebsite": "Site web"
+        },
+        "Card": {
+            "viewDetails": "Voir détails",
+            "callNow": "Appeler",
+            "reviews": "avis",
+            "mixedServices": "Services Mixtes",
+            "openNow": "Ouvert maintenant",
+            "website": "Site web"
+        },
+        "Detail": {
+            "address": "Adresse",
+            "phone": "Téléphone",
+            "website": "Site Web",
+            "services": "Services",
+            "openingHours": "Heures d'ouverture",
+            "callNow": "Appeler",
+            "visitWebsite": "Visiter",
+            "disclaimer": "Avis de non-responsabilité",
+            "disclaimerText": "Ces données sont collectées à partir de sources publiques. Nous ne garantissons pas l'exactitude à 100%. Veuillez vérifier directement auprès de l'agence.",
+            "reviews": "avis",
+            "directoryListing": "Liste de l'annuaire",
+            "location": "Emplacement",
+            "viewMap": "Voir sur Google Maps",
+            "hoursUnknown": "Non disponible",
+            "customerReviews": "Avis Clients",
+            "noText": "Aucun commentaire",
+            "directions": "Itinéraire",
+            "getDirections": "Obtenir l'itinéraire"
+        }
+    },
+    "MyListings": {
+        "title": "Mes annonces",
+        "subtitle": "Toutes les annonces que vous avez publiées ({count})",
+        "noListings": "Vous n'avez aucune annonce pour le moment",
+        "noListingsDesc": "Commencez à vendre maintenant et publiez votre première annonce sur Cayn.ma",
+        "errorFetching": "Erreur lors de la récupération des annonces",
+        "errorUpdating": "Erreur lors de la mise à jour",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette annonce ?",
+        "errorDeleting": "Erreur lors de la suppression",
+        "status": {
+            "published": "Publiée",
+            "paused": "En pause",
+            "sold": "Vendue"
+        },
+        "actions": {
+            "edit": "Modifier",
+            "pause": "Mettre en pause",
+            "resume": "Réactiver",
+            "delete": "Supprimer"
+        },
+        "add": "Publier une annonce"
+    },
+    "Terms": {
+        "title": "Conditions d'utilisation",
+        "lastUpdated": "Dernière mise à jour : {date}",
+        "introduction": {
+            "title": "Introduction",
+            "content": "Bienvenue sur Cayn.ma. En utilisant ce site, vous acceptez d'être lié par les conditions d'utilisation suivantes..."
+        },
+        "acceptance": {
+            "title": "Acceptation des conditions",
+            "content": "En créant un compte ou en naviguant sur les annonces, vous reconnaissez avoir lu et accepté ces conditions ainsi que notre politique de confidentialité."
+        },
+        "userResponsibilities": {
+            "title": "Responsabilités de l'utilisateur",
+            "content": "Vous êtes seul responsable de l'exactitude des informations que vous publiez dans vos annonces..."
+        },
+        "prohibitedContent": {
+            "title": "Contenu interdit",
+            "content": "Il est interdit de publier tout contenu illégal, trompeur ou violant les droits d'autrui..."
+        },
+        "contactUs": "Pour toute question, veuillez nous contacter via la page Contact."
+    },
+    "Contact": {
+        "title": "Contactez-nous",
+        "subtitle": "Une question ? Nous sommes là pour vous aider",
+        "form": {
+            "name": "Nom complet",
+            "email": "Email",
+            "subject": "Sujet",
+            "message": "Message",
+            "send": "Envoyer le message",
+            "success": "Message envoyé avec succès !"
+        },
+        "info": {
+            "title": "Nos coordonnées",
+            "email": "Email",
+            "phone": "Téléphone",
+            "address": "Adresse"
+        }
+    },
+    "Privacy": {
+        "title": "Politique de confidentialité",
+        "lastUpdated": "Dernière mise à jour : {date}",
+        "introduction": "Votre confidentialité est très importante pour nous. Cette politique explique comment nous recueillons et utilisons vos informations.",
+        "collection": {
+            "title": "Collecte des informations",
+            "content": "Nous recueillons les informations que vous nous fournissez lors de l'inscription ou de la publication d'une annonce (Nom, Téléphone, Email)..."
+        },
+        "usage": {
+            "title": "Utilisation des informations",
+            "content": "Nous utilisons ces informations pour fournir nos services et améliorer votre expérience utilisateur."
+        },
+        "cookies": {
+            "title": "Cookies",
+            "content": "Nous utilisons des cookies pour mémoriser vos préférences et améliorer les performances du site."
+        },
+        "rights": {
+            "title": "Droits de l'utilisateur",
+            "content": "Vous avez le droit de demander une copie de vos données ou leur suppression à tout moment."
+        }
+    }
+}

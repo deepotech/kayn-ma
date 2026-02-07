@@ -1,0 +1,23 @@
+export default function NotFound() {
+    return (
+        <html lang="en">
+            <body className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center p-4 font-sans text-slate-900 dark:text-slate-50">
+                <div className="text-center space-y-4">
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white">404</h1>
+                    <h2 className="text-xl text-gray-600 dark:text-gray-400">Page Not Found</h2>
+                    <p className="text-gray-500 dark:text-gray-500 max-w-md mx-auto">
+                        The page you are looking for does not exist or has been moved.
+                    </p>
+                    <div className="pt-4">
+                        <a
+                            href="/"
+                            className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            Return Home / Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </body>
+        </html>
+    );
+}

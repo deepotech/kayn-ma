@@ -1,0 +1,39 @@
+{
+  "name": "kayn-ma",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "axios": "^1.13.4",
+    "cloudinary": "^2.9.0",
+    "clsx": "^2.1.1",
+    "firebase": "^12.8.0",
+    "firebase-admin": "^13.6.0",
+    "lucide-react": "^0.563.0",
+    "mongoose": "^9.1.5",
+    "next": "14.2.35",
+    "next-intl": "^4.8.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.71.1",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss-rtl": "^0.9.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
