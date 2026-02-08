@@ -141,3 +141,22 @@ NODE_OPTIONS=--max_old_space_size=4096
 - [ ] SSL certificate active
 - [ ] Sitemap accessible
 - [ ] Google Search Console configured
+
+---
+
+## 7️⃣ Troubleshooting: Custom Domain Not Working
+
+### Symptom: `www.cayn.ma` redirects too many times or shows an error.
+**Cause:** The DNS record for `www` is pointing to an old server (e.g., `23.88.123.118`) instead of Railway.
+
+**Fix:**
+1. Login to your domain registrar (Namecheap, GoDaddy, etc.).
+2. Locate the DNS settings for `cayn.ma`.
+3. Find the **CNAME** record for **`www`**.
+4. Change the value to: `kayn-ma-production.up.railway.app`.
+   - **Type:** CNAME
+   - **Host:** www
+   - **Value:** kayn-ma-production.up.railway.app
+   - **TTL:** Automatic (or 1 min)
+5. Save changes and wait for propagation.
+
