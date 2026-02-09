@@ -1,64 +1,90 @@
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getAuth, Auth } from 'firebase-admin/auth';
 
-let app: App;
-let auth: Auth;
+// Lazy loading wrapper to prevent build-time initialization errors
+// Firebase Admin should only initialize when actually used at runtime, not during build.
 
-// Initialize Firebase Admin with environment variables or service account
-function initializeFirebaseAdmin() {
-    if (getApps().length === 0) {
-        // Option 1: Use FIREBASE_SERVICE_ACCOUNT_KEY JSON blob (Recommended for Vercel)
-        const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+let initializedApp: App | undefined;
+let initializedAuth: Auth | undefined;
 
-        if (serviceAccountKey) {
-            try {
-                const parsed = JSON.parse(serviceAccountKey);
-                app = initializeApp({
-                    credential: cert(parsed),
-                    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-                });
-                return { app, auth: getAuth(app) };
-            } catch (e) {
-                console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY:', e);
-            }
-        }
-
-        // Option 2: Use individual environment variables (Fallback)
-        const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
-        const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-        const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'); // Handle escaped newlines
-
-        if (projectId && clientEmail && privateKey) {
-            app = initializeApp({
-                credential: cert({
-                    projectId,
-                    clientEmail,
-                    privateKey,
-                }),
-                projectId,
-            });
-
-            // In development, avoid long timeouts from ADC (Application Default Credentials)
-            if (process.env.NODE_ENV === 'development') {
-                console.warn('⚠️ Firebase Admin initialization skipped to prevent timeouts. Admin features will not work until credentials are set in .env.local');
-                return { app: null as any, auth: null as any };
-            }
-
-            // In production, we must have credentials. Do NOT fallback to ADC (metadata server)
-            // because it causes 2-minute timeouts on Railway/Vercel/etc.
-            throw new Error('Firebase Admin: Missing credentials. Please set FIREBASE_SERVICE_ACCOUNT_KEY or (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY) in your environment variables.');
-        }
-    } else {
-        app = getApps()[0];
+function getFirebaseAdmin(): { app: App; auth: Auth } {
+    if (initializedApp && initializedAuth) {
+        return { app: initializedApp, auth: initializedAuth };
     }
 
-    auth = getAuth(app);
-    return { app, auth };
+    // Safety check: if already initialized by another call
+    if (getApps().length > 0) {
+        initializedApp = getApps()[0];
+        initializedAuth = getAuth(initializedApp);
+        return { app: initializedApp, auth: initializedAuth };
+    }
+
+    console.log('[Firebase Admin] Initializing...');
+
+    // Option 1: Use FIREBASE_SERVICE_ACCOUNT_KEY JSON blob (Recommended for Vercel/Railway)
+    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+
+    if (serviceAccountKey) {
+        try {
+            const parsed = JSON.parse(serviceAccountKey);
+            initializedApp = initializeApp({
+                credential: cert(parsed),
+                projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+            });
+            initializedAuth = getAuth(initializedApp);
+            console.log('[Firebase Admin] Initialized with Service Account JSON');
+            return { app: initializedApp, auth: initializedAuth };
+        } catch (e) {
+            console.error('[Firebase Admin] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY:', e);
+            // Fallthrough to Option 2
+        }
+    }
+
+    // Option 2: Use individual environment variables (Fallback)
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'); // Handle escaped newlines
+
+    if (projectId && clientEmail && privateKey) {
+        initializedApp = initializeApp({
+            credential: cert({
+                projectId,
+                clientEmail,
+                privateKey,
+            }),
+            projectId,
+        });
+        initializedAuth = getAuth(initializedApp);
+        console.log('[Firebase Admin] Initialized with Individual Env Vars');
+        return { app: initializedApp, auth: initializedAuth };
+    }
+
+    // Error Handling - Missing credentials
+    const missingVars = [];
+    if (!serviceAccountKey) missingVars.push('FIREBASE_SERVICE_ACCOUNT_KEY');
+    if (!projectId) missingVars.push('NEXT_PUBLIC_FIREBASE_PROJECT_ID');
+    if (!clientEmail) missingVars.push('FIREBASE_CLIENT_EMAIL');
+    if (!privateKey) missingVars.push('FIREBASE_PRIVATE_KEY');
+
+    const errorMsg = `[Firebase Admin] Missing credentials. Set FIREBASE_SERVICE_ACCOUNT_KEY or (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY). Missing: ${missingVars.join(', ')}`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
 }
 
-// Initialize on module load
-const initialized = initializeFirebaseAdmin();
-app = initialized.app;
-auth = initialized.auth;
+// Use Proxies for lazy loading - prevents build-time initialization
+// The actual initialization only happens when a property is accessed at runtime
+const app = new Proxy({} as App, {
+    get: (_target, prop) => {
+        const { app } = getFirebaseAdmin();
+        return (app as any)[prop];
+    }
+});
+
+const auth = new Proxy({} as Auth, {
+    get: (_target, prop) => {
+        const { auth } = getFirebaseAdmin();
+        return (auth as any)[prop];
+    }
+});
 
 export { app, auth };
