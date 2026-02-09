@@ -37,8 +37,6 @@ function initializeFirebaseAdmin() {
                 }),
                 projectId,
             });
-        } else {
-            console.error('Firebase Admin: Missing credentials. Please set FIREBASE_SERVICE_ACCOUNT_KEY or (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY).');
 
             // In development, avoid long timeouts from ADC (Application Default Credentials)
             if (process.env.NODE_ENV === 'development') {
@@ -46,8 +44,9 @@ function initializeFirebaseAdmin() {
                 return { app: null as any, auth: null as any };
             }
 
-            // For now, init with default application credentials (ADC) as last resort
-            app = initializeApp({ projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID });
+            // In production, we must have credentials. Do NOT fallback to ADC (metadata server)
+            // because it causes 2-minute timeouts on Railway/Vercel/etc.
+            throw new Error('Firebase Admin: Missing credentials. Please set FIREBASE_SERVICE_ACCOUNT_KEY or (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY) in your environment variables.');
         }
     } else {
         app = getApps()[0];
