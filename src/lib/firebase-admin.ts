@@ -39,7 +39,13 @@ function initializeFirebaseAdmin() {
             });
         } else {
             console.error('Firebase Admin: Missing credentials. Please set FIREBASE_SERVICE_ACCOUNT_KEY or (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY).');
-            // Allow app to crash or initialize in a limited state if desired, but better to fail fast for admin tools
+
+            // In development, avoid long timeouts from ADC (Application Default Credentials)
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('⚠️ Firebase Admin initialization skipped to prevent timeouts. Admin features will not work until credentials are set in .env.local');
+                return { app: null as any, auth: null as any };
+            }
+
             // For now, init with default application credentials (ADC) as last resort
             app = initializeApp({ projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID });
         }
