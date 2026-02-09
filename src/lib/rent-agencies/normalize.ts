@@ -126,8 +126,20 @@ function isMixedService(title: string, categories: string[]): boolean {
     return false;
 }
 
-export function normalizeAgency(raw: any, index: number): Agency {
+// City display name mapping
+const CITY_DISPLAY_NAMES: Record<string, string> = {
+    'marrakech': 'Marrakech',
+    'rabat': 'Rabat',
+    'casablanca': 'Casablanca',
+    'agadir': 'Agadir',
+    'fes': 'Fès',
+    'tanger': 'Tanger',
+};
+
+export function normalizeAgency(raw: any, index: number, citySlug: string = 'marrakech'): Agency {
     const name = raw.title || 'Unknown Agency';
+    const city = citySlug.toLowerCase();
+    const cityDisplayName = CITY_DISPLAY_NAMES[city] || city.charAt(0).toUpperCase() + city.slice(1);
 
     // 1. Slug Strategy
     const fullSlug = buildAgencySlug(name, raw.placeId, index);
@@ -203,8 +215,8 @@ export function normalizeAgency(raw: any, index: number): Agency {
         _id: raw.placeId || `local-${index}`,
         name: name,
         slug: fullSlug,
-        city: 'Marrakech', // Normalized Display Name
-        citySlug: 'marrakech', // URL safe
+        city: cityDisplayName, // Dynamic Display Name
+        citySlug: city, // URL safe
         address,
         phone,
         rating: rating || 0,
@@ -230,6 +242,7 @@ export function normalizeAgency(raw: any, index: number): Agency {
         priceLevel: (index % 10 === 0) ? 'luxury' : (index % 3 === 0 ? 'cheap' : 'standard'),
     };
 }
+
 
 export function calculateScore(agency: Agency): number {
     let score = 0;

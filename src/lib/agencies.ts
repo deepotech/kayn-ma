@@ -29,12 +29,12 @@ export interface PaginatedResult {
 import { getAgenciesByCity as loadAgenciesFromModule } from '@/lib/rent-agencies/getAgenciesByCity';
 
 async function loadAndProcessAgencies(city: string): Promise<Agency[]> {
-    if (city.toLowerCase() !== 'marrakech') return [];
-
     // Delegate to the robust loader (which handles Normalize + Score + Dedupe + Sort)
+    // The loader now supports multiple cities (marrakech, rabat, etc.)
     const agencies = await loadAgenciesFromModule(city);
     return agencies;
 }
+
 
 export async function getAgencies(options: GetAgenciesOptions = {}): Promise<PaginatedResult> {
     const {

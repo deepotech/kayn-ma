@@ -1,13 +1,32 @@
 // @ts-ignore
 import marrakechData from '@/data/marrakech.json';
+// @ts-ignore - Rabat data support
+import rabatData from '@/data/rabat.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
 
 // Coordinates for Airports (Hardcoded for now)
 const AIRPORTS: Record<string, { lat: number, lng: number }> = {
-    'marrakech': { lat: 31.6069, lng: -8.0363 } // Menara Airport
+    'marrakech': { lat: 31.6069, lng: -8.0363 }, // Menara Airport
+    'rabat': { lat: 34.0513, lng: -6.7515 }, // Rabat-Salé Airport
 };
+
+// Supported cities
+const SUPPORTED_CITIES = ['marrakech', 'rabat'];
+
+// City data mapping
+function getCityData(citySlug: string): any[] {
+    const city = citySlug.toLowerCase();
+    switch (city) {
+        case 'marrakech':
+            return marrakechData as any[];
+        case 'rabat':
+            return rabatData as any[];
+        default:
+            return [];
+    }
+}
 
 export function filterAgenciesByIntent(agencies: NormalizedAgency[], intent: SeoIntent, citySlug: string): NormalizedAgency[] {
     let filtered = [...agencies];
@@ -44,20 +63,32 @@ export function filterAgenciesByIntent(agencies: NormalizedAgency[], intent: Seo
     return filtered;
 }
 
-// In-memory cache
-let cachedAgencies: NormalizedAgency[] | null = null;
+// In-memory cache per city
+const cachedAgenciesByCity: Record<string, NormalizedAgency[]> = {};
 
 export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAgency[]> {
-    if (citySlug.toLowerCase() !== 'marrakech') return [];
+    const city = citySlug.toLowerCase();
 
-    if (cachedAgencies) return cachedAgencies;
+    // Check if city is supported
+    if (!SUPPORTED_CITIES.includes(city)) {
+        console.log(`[AgenciesLoader] City "${city}" is not supported. Supported: ${SUPPORTED_CITIES.join(', ')}`);
+        return [];
+    }
+
+    // Check cache
+    if (cachedAgenciesByCity[city]) {
+        return cachedAgenciesByCity[city];
+    }
 
     // 1. Load Raw Data
-    const rawData = marrakechData as any[];
-    if (!Array.isArray(rawData)) return [];
+    const rawData = getCityData(city);
+    if (!Array.isArray(rawData) || rawData.length === 0) {
+        console.log(`[AgenciesLoader] No data found for city: ${city}`);
+        return [];
+    }
 
     // 2. Normalize All
-    const normalized = rawData.map((item, index) => normalizeAgency(item, index));
+    const normalized = rawData.map((item, index) => normalizeAgency(item, index, city));
 
     // 3. Compute Scores (Bayesian + Qualities)
     // First, get dataset stats for Bayesian average
@@ -104,9 +135,9 @@ export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAge
     // 5. Final Sort by Score
     result.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    console.log(`[AgenciesLoader] Loaded ${rawData.length} raw, returned ${result.length} unique agencies for ${citySlug}.`);
+    console.log(`[AgenciesLoader] Loaded ${rawData.length} raw, returned ${result.length} unique agencies for ${city}.`);
 
-    cachedAgencies = result;
+    cachedAgenciesByCity[city] = result;
     return result;
 }
 
@@ -128,4 +159,9 @@ export async function getAgencyBySlug(citySlug: string, slug: string): Promise<N
     }
 
     return null;
+}
+
+// Export supported cities list for use in other modules
+export function getSupportedCities(): string[] {
+    return [...SUPPORTED_CITIES];
 }

@@ -87,11 +87,19 @@ export default async function sitemap({ id }: { id: string }): Promise<MetadataR
     // --- 2. Agencies & Intent Pages ---
     // SEO Strategy: High-value city landing pages + programmatic SEO intent pages
     else if (id === 'agencies') {
-        // Fetch all agencies (assuming count < 50k, otherwise we'd need to chunk this too)
-        const { agencies } = await getAgencies({ limit: 10000 });
+        // Supported cities for agency data
+        const supportedCities = ['marrakech', 'rabat'];
+
+        // Fetch agencies from all supported cities
+        const allAgencies: any[] = [];
+        for (const city of supportedCities) {
+            const { agencies } = await getAgencies({ city, limit: 10000 });
+            allAgencies.push(...agencies);
+        }
+
         const intents = getAllIntents();
 
-        const agencyCities = Array.from(new Set(agencies.map(a => a.citySlug)));
+        const agencyCities = Array.from(new Set(allAgencies.map(a => a.citySlug)));
         const predefinedCities = Object.keys(CITY_NAMES_AR);
         const allCities = Array.from(new Set([...agencyCities, ...predefinedCities]));
 
@@ -121,7 +129,7 @@ export default async function sitemap({ id }: { id: string }): Promise<MetadataR
         });
 
         // Agency Detail Pages: /rent-agencies/[city]/[slug]
-        agencies.forEach(agency => {
+        allAgencies.forEach(agency => {
             LOCALES.forEach(locale => {
                 sitemapEntries.push({
                     url: `${BASE_URL}/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
@@ -132,6 +140,7 @@ export default async function sitemap({ id }: { id: string }): Promise<MetadataR
             });
         });
     }
+
 
     // --- 3. SEO Landing Pages (Programmatic Car Pages) ---
     // SEO Strategy: Brand, city, and brand+city combination pages for organic traffic
