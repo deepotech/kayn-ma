@@ -13,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
                 '/*?*', // Block all query parameters (filters, pagination, search)
             ],
         },
-        sitemap: 'https://kayn.ma/sitemap.xml',
+        sitemap: 'https://www.cayn.ma/sitemap.xml',
     };
 }

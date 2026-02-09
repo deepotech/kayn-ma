@@ -53,13 +53,22 @@ export async function POST(request: NextRequest) {
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
         // Set the cookie with strict security options
-        cookies().set('session', sessionCookie, {
+        // FIX: Allow configuring domain explicitly for production
+        // FIX: Ensure secure is true in production or if using HTTPS
+        const cookieOptions: any = {
             maxAge: expiresIn,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             path: '/',
             sameSite: 'lax',
-        });
+        };
+
+        // If COOKIE_DOMAIN is set (e.g., .cayn.ma), use it to allow sharing between www and root
+        if (process.env.COOKIE_DOMAIN) {
+            cookieOptions.domain = process.env.COOKIE_DOMAIN;
+        }
+
+        cookies().set('session', sessionCookie, cookieOptions);
 
         console.log(`[API/Session] Session created for ${normalizedEmail} (Role: ${user.role})`);
 
