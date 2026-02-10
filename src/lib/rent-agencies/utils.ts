@@ -109,7 +109,7 @@ export function generateBreadcrumbSchema(items: { name: string; url: string }[])
             '@type': 'ListItem',
             position: index + 1,
             name: item.name,
-            item: `https://kayn.ma${item.url}`
+            item: `https://www.cayn.ma${item.url}`
         }))
     };
 }

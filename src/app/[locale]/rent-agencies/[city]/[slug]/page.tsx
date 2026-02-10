@@ -36,17 +36,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             title: `${title} | Kayn.ma`,
             description,
             alternates: {
-                canonical: `https://kayn.ma/${locale}/rent-agencies/${city}/${slug}`,
+                canonical: `https://www.cayn.ma/${locale}/rent-agencies/${city}/${slug}`,
                 languages: {
-                    'ar': `https://kayn.ma/ar/rent-agencies/${city}/${slug}`,
-                    'fr': `https://kayn.ma/fr/rent-agencies/${city}/${slug}`,
+                    'ar': `https://www.cayn.ma/ar/rent-agencies/${city}/${slug}`,
+                    'fr': `https://www.cayn.ma/fr/rent-agencies/${city}/${slug}`,
                 }
             },
             openGraph: {
                 title,
                 description,
                 type: 'website',
-                url: `https://kayn.ma/${locale}/rent-agencies/${city}/${slug}`,
+                url: `https://www.cayn.ma/${locale}/rent-agencies/${city}/${slug}`,
                 siteName: 'Kayn.ma',
                 locale: locale === 'ar' ? 'ar_MA' : 'fr_MA',
             }
@@ -74,10 +74,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: titleBase,
         description,
         alternates: {
-            canonical: `https://kayn.ma/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
+            canonical: `https://www.cayn.ma/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
             languages: {
-                'ar': `https://kayn.ma/ar/rent-agencies/${agency.citySlug}/${agency.slug}`,
-                'fr': `https://kayn.ma/fr/rent-agencies/${agency.citySlug}/${agency.slug}`,
+                'ar': `https://www.cayn.ma/ar/rent-agencies/${agency.citySlug}/${agency.slug}`,
+                'fr': `https://www.cayn.ma/fr/rent-agencies/${agency.citySlug}/${agency.slug}`,
             }
         },
         openGraph: {
@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             description,
             images: agency.photos.length > 0 ? [{ url: agency.photos[0] }] : [],
             type: 'profile',
-            url: `https://kayn.ma/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
+            url: `https://www.cayn.ma/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
             siteName: 'Kayn.ma',
             locale: locale === 'ar' ? 'ar_MA' : 'fr_MA',
         }
@@ -178,7 +178,7 @@ export default async function Page({ params }: Props) {
                 itemListElement: agencies.slice(0, 20).map((agency, index) => ({
                     '@type': 'ListItem',
                     position: index + 1,
-                    url: `https://kayn.ma${buildAgencyHref(locale, agency.citySlug, agency.slug)}`,
+                    url: `https://www.cayn.ma${buildAgencyHref(locale, agency.citySlug, agency.slug)}`,
                     name: agency.name
                 }))
             }
@@ -252,8 +252,8 @@ export default async function Page({ params }: Props) {
         '@type': 'AutoRental',
         name: agency.name,
         image: agency.photos,
-        '@id': `https://kayn.ma${buildAgencyHref(locale, city, agency.slug)}`,
-        url: `https://kayn.ma${buildAgencyHref(locale, city, agency.slug)}`,
+        '@id': `https://www.cayn.ma${buildAgencyHref(locale, city, agency.slug)}`,
+        url: `https://www.cayn.ma${buildAgencyHref(locale, city, agency.slug)}`,
         telephone: agency.phone,
         address: {
             '@type': 'PostalAddress',

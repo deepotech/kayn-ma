@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ? `اكتشف أفضل وكالات كراء السيارات في ${cityName} مع تقييمات حقيقية، مواقع دقيقة، وأرقام الاتصال المباشر. قارن واختر بسهولة.`
         : `Discover the best car rental agencies in ${cityName} with real reviews, precise locations, and direct contact numbers. Compare and choose easily.`;
 
-    const baseUrl = 'https://kayn.ma';
+    const baseUrl = 'https://www.cayn.ma';
     const path = `/rent-agencies/${params.city}`;
 
     return {
@@ -78,7 +78,7 @@ export default async function CityAgenciesPage({ params }: Props) {
         itemListElement: allAgencies.slice(0, 20).map((agency, index) => ({
             '@type': 'ListItem',
             position: index + 1,
-            url: `https://kayn.ma${buildAgencyHref(locale, agency.citySlug, agency.slug)}`,
+            url: `https://www.cayn.ma${buildAgencyHref(locale, agency.citySlug, agency.slug)}`,
             name: agency.name
         }))
     };

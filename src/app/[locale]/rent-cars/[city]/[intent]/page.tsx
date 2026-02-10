@@ -81,7 +81,7 @@ export default async function IntentPage({ params }: Props) {
             itemListElement: filteredAgencies.slice(0, 10).map((agency, index) => ({
                 '@type': 'ListItem',
                 position: index + 1,
-                url: `https://kayn.ma/${params.locale}/rent-agencies/${params.city}/${agency.slug}`,
+                url: `https://www.cayn.ma/${params.locale}/rent-agencies/${params.city}/${agency.slug}`,
                 name: agency.name
             }))
         }
