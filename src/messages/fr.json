@@ -303,7 +303,8 @@
                 "rating": "Mieux notés",
                 "reviews": "Plus avisés"
             },
-            "relatedAgencies": "Agences similaires"
+            "relatedAgencies": "Agences similaires",
+            "reset": "Réinitialiser"
         },
         "Filters": {
             "searchPlaceholder": "Rechercher une agence...",

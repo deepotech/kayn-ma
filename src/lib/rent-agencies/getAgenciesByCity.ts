@@ -38,8 +38,8 @@ export function filterAgenciesByIntent(agencies: NormalizedAgency[], intent: Seo
             filtered = filtered.filter(a => {
                 if (!a.location || !a.location.lat) return false;
                 const dist = getDistance(a.location, airport);
-                // Within 5km of airport
-                return dist <= 5000;
+                // Within 15km of airport (increased for Rabat/Salé distance)
+                return dist <= 15000;
             });
             // Sort by distance to airport
             filtered.sort((a, b) => {

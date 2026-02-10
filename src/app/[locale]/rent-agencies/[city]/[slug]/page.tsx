@@ -149,7 +149,8 @@ function formatOpeningHours(hours: string, locale: string): { text: string; dir:
 }
 
 export default async function Page({ params }: Props) {
-    const { city, slug, locale } = params;
+    const { slug, locale } = params;
+    const city = params.city.toLowerCase();
 
     // ==========================================
     // CASE 1: Intent Landing Page (e.g. /marrakech/airport)

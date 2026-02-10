@@ -275,7 +275,7 @@
       "browseAgencies": "تصفح الوكالات",
       "comingSoon": "قريباً",
       "moreCities": "مدن أخرى قريباً",
-      "citiesList": "الدار البيضاء، طنجة، الرباط...",
+      "citiesList": "الدار البيضاء، طنجة، أكادير...",
       "Features": {
         "verifiedTitle": "وكالات موثقة",
         "verifiedDesc": "جميع الوكالات المدرجة تم التحقق منها يدوياً لضمان جودة الخدمة.",
@@ -303,7 +303,8 @@
         "rating": "الأعلى تقييماً",
         "reviews": "الأكثر مراجعة"
       },
-      "relatedAgencies": "وكالات مشابهة"
+      "relatedAgencies": "وكالات مشابهة",
+      "reset": "إعادة تعيين البحث"
     },
     "Filters": {
       "searchPlaceholder": "ابحث عن وكالة...",

@@ -9,9 +9,10 @@ export const metadata: Metadata = {
 };
 
 const CITIES = [
-    { name: 'Marrakech', slug: 'marrakech', active: true, image: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&q=80&w=600' },
-    // { name: 'Casablanca', slug: 'casablanca', active: false, image: null }, // Future
-    // { name: 'Agadir', slug: 'agadir', active: false, image: null }, // Future
+    { name: 'Marrakech', nameAr: 'مراكش', slug: 'marrakech', active: true, image: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Rabat', nameAr: 'الرباط', slug: 'rabat', active: true, image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=80&w=600' },
+    // { name: 'Casablanca', nameAr: 'الدار البيضاء', slug: 'casablanca', active: false, image: null }, // Future
+    // { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: false, image: null }, // Future
 ];
 
 import { useTranslations } from 'next-intl';
@@ -57,7 +58,7 @@ export default function RentAgenciesPage({ params: { locale } }: Props) {
                         )}
 
                         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white">
-                            <h2 className="text-2xl font-bold mb-2">{city.name}</h2>
+                            <h2 className="text-2xl font-bold mb-2">{locale === 'ar' ? city.nameAr : city.name}</h2>
                             {city.active ? (
                                 <span className="flex items-center text-sm font-medium bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full group-hover:bg-white/30 transition-colors">
                                     {t('browseAgencies')} <ArrowRight className="w-4 h-4 ms-1" />

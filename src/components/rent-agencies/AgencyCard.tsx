@@ -1,8 +1,57 @@
 import { NormalizedAgency } from '@/lib/rent-agencies/normalize';
 import { Link } from '@/navigation';
 import { MapPin, Phone, Star, Image as ImageIcon, ExternalLink, Clock, Navigation, Globe } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
+
+// Category name translations for Arabic
+const CATEGORY_AR: Record<string, string> = {
+    'Car rental agency': 'وكالة كراء السيارات',
+    'Car Rental Agency': 'وكالة كراء السيارات',
+    'car rental agency': 'وكالة كراء السيارات',
+    'Used Car Dealer': 'تاجر سيارات مستعملة',
+    'Used car dealer': 'تاجر سيارات مستعملة',
+    'Car dealer': 'وكيل سيارات',
+    'Car Dealer': 'وكيل سيارات',
+    'BMW dealer': 'وكيل BMW',
+    'Audi dealer': 'وكيل Audi',
+    'Mercedes-Benz dealer': 'وكيل Mercedes-Benz',
+    'Toyota dealer': 'وكيل Toyota',
+    'Hyundai dealer': 'وكيل Hyundai',
+    'Renault dealer': 'وكيل Renault',
+    'Dacia dealer': 'وكيل Dacia',
+    'Peugeot dealer': 'وكيل Peugeot',
+    'Citroën dealer': 'وكيل Citroën',
+    'Volkswagen dealer': 'وكيل Volkswagen',
+    'Volvo dealer': 'وكيل Volvo',
+    'Auto bodywork mechanic': 'ميكانيكي هياكل السيارات',
+    'Auto parts store': 'متجر قطع غيار السيارات',
+    'Auto repair shop': 'ورشة إصلاح السيارات',
+    'Car repair and maintenance service': 'خدمة إصلاح وصيانة السيارات',
+    'Car repair and maintenance': 'إصلاح وصيانة السيارات',
+    'Real estate agency': 'وكالة عقارية',
+    'Insurance agency': 'وكالة تأمين',
+    'Travel agency': 'وكالة أسفار',
+    'Motorcycle dealer': 'وكيل دراجات نارية',
+    'Truck rental agency': 'وكالة كراء الشاحنات',
+    'Vehicle inspection': 'فحص السيارات',
+    'Parking garage': 'مرآب سيارات',
+    'Parking lot': 'موقف سيارات',
+    'Gas station': 'محطة وقود',
+    'Taxi service': 'خدمة سيارات الأجرة',
+    'Transport service': 'خدمة النقل',
+    'Maintenance service': 'خدمة الصيانة',
+    'Car wash': 'غسيل السيارات',
+    'Towing service': 'خدمة السحب',
+    'Driving school': 'مدرسة لتعليم السياقة',
+};
+
+function translateCategory(category: string, locale: string): string {
+    if (locale === 'ar' && CATEGORY_AR[category]) {
+        return CATEGORY_AR[category];
+    }
+    return category;
+}
 
 interface AgencyCardProps {
     agency: NormalizedAgency;
@@ -11,6 +60,7 @@ interface AgencyCardProps {
 export default function AgencyCard({ agency }: AgencyCardProps) {
     const t = useTranslations('RentAgencies.Card');
     const tCommon = useTranslations('Common');
+    const locale = useLocale();
 
     // Thumbnail logic: prefer first photo, fallback to placeholder
     const thumbnail = agency.photos && agency.photos.length > 0 ? agency.photos[0] : null;
@@ -93,7 +143,7 @@ export default function AgencyCard({ agency }: AgencyCardProps) {
                     <div className="flex flex-wrap gap-1.5 mb-4">
                         {agency.categories.slice(0, 3).map((tag, i) => (
                             <span key={i} className="px-2 py-0.5 bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 rounded text-xs border border-slate-200 dark:border-zinc-700 truncate max-w-[120px]">
-                                {tag}
+                                {translateCategory(tag, locale)}
                             </span>
                         ))}
                         {agency.categories.length > 3 && (

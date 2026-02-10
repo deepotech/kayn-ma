@@ -87,8 +87,8 @@ export default async function sitemap({ id }: { id: string }): Promise<MetadataR
     // --- 2. Agencies & Intent Pages ---
     // SEO Strategy: High-value city landing pages + programmatic SEO intent pages
     else if (id === 'agencies') {
-        // Supported cities for agency data
-        const supportedCities = ['marrakech', 'rabat'];
+        const { getSupportedCities } = await import('@/lib/rent-agencies/getAgenciesByCity');
+        const supportedCities = getSupportedCities();
 
         // Fetch agencies from all supported cities
         const allAgencies: any[] = [];
