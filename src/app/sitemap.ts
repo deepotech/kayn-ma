@@ -11,156 +11,129 @@ import {
     getSeoLandingUrls,
 } from '@/lib/sitemap-utils';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
-export async function generateSitemaps() {
-    // 1. Calculate how many listing sitemaps we need
-    const totalListings = await getTotalListingsCount();
-    const listingChunks = Math.ceil(totalListings / SITEMAP_CHUNK_SIZE);
-
-    const sitemaps = [
-        { id: 'static' },
-        { id: 'agencies' },
-        { id: 'seo' },
-    ];
-
-    for (let i = 0; i < listingChunks; i++) {
-        sitemaps.push({ id: `listings-${i}` });
-    }
-
-    return sitemaps;
-}
-
-export default async function sitemap({ id }: { id: string }): Promise<MetadataRoute.Sitemap> {
+// Simplified single sitemap function (no generateSitemaps) for better stability
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const sitemapEntries: MetadataRoute.Sitemap = [];
 
-    // --- 1. Static Pages ---
-    // SEO Strategy: Prioritize high-traffic entry points and SEO landing pages
-    if (id === 'static') {
-        LOCALES.forEach(locale => {
-            // Homepage - Critical entry point
+    console.log('[Sitemap] Generating full sitemap...');
+
+    // 1. Static Pages
+    LOCALES.forEach(locale => {
+        // Homepage
+        sitemapEntries.push({
+            url: `${BASE_URL}/${locale}`,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 1.0,
+        });
+
+        // Listings Index
+        sitemapEntries.push({
+            url: `${BASE_URL}/${locale}/cars`,
+            lastModified: new Date(),
+            changeFrequency: 'hourly',
+            priority: 0.9,
+        });
+
+        // Agencies Index
+        sitemapEntries.push({
+            url: `${BASE_URL}/${locale}/rent-agencies`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.8,
+        });
+
+        // Post Ad
+        sitemapEntries.push({
+            url: `${BASE_URL}/${locale}/post`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.6,
+        });
+
+        // Legal & Info pages
+        const infoPages = ['terms', 'privacy', 'contact'];
+        infoPages.forEach(page => {
             sitemapEntries.push({
-                url: `${BASE_URL}/${locale}`,
+                url: `${BASE_URL}/${locale}/${page}`,
+                lastModified: new Date(),
+                changeFrequency: 'yearly',
+                priority: 0.3,
+            });
+        });
+    });
+
+    // 2. Agencies & Intent Pages
+    const { getSupportedCities } = await import('@/lib/rent-agencies/getAgenciesByCity');
+    const supportedCities = getSupportedCities();
+
+    // Fetch agencies from all supported cities
+    const allAgencies: any[] = [];
+    for (const city of supportedCities) {
+        const { agencies } = await getAgencies({ city, limit: 10000 });
+        allAgencies.push(...agencies);
+    }
+
+    const intents = getAllIntents();
+    const agencyCities = Array.from(new Set(allAgencies.map(a => a.citySlug)));
+    const predefinedCities = Object.keys(CITY_NAMES_AR);
+    const allCities = Array.from(new Set([...agencyCities, ...predefinedCities]));
+
+    // City Pages & Intent Pages
+    allCities.forEach(city => {
+        if (!city) return;
+
+        LOCALES.forEach(locale => {
+            // Agency City Page
+            sitemapEntries.push({
+                url: `${BASE_URL}/${locale}/rent-agencies/${city}`,
                 lastModified: new Date(),
                 changeFrequency: 'daily',
-                priority: 1.0,
+                priority: 0.85,
             });
 
-            // Listings Index (Cars for sale/rent) - High-frequency updates
-            // Note: Google ignores 'always', using 'hourly' instead
-            sitemapEntries.push({
-                url: `${BASE_URL}/${locale}/cars`,
-                lastModified: new Date(),
-                changeFrequency: 'hourly',
-                priority: 0.9,
+            // Intent Pages
+            intents.forEach(intent => {
+                sitemapEntries.push({
+                    url: `${BASE_URL}/${locale}/rent-agencies/${city}/${intent.slug}`,
+                    lastModified: new Date(),
+                    changeFrequency: 'weekly',
+                    priority: 0.8,
+                });
             });
+        });
+    });
 
-            // Agencies Index - Weekly updates typical
+    // Agency Detail Pages
+    allAgencies.forEach(agency => {
+        LOCALES.forEach(locale => {
             sitemapEntries.push({
-                url: `${BASE_URL}/${locale}/rent-agencies`,
+                url: `${BASE_URL}/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
                 lastModified: new Date(),
                 changeFrequency: 'weekly',
-                priority: 0.8,
-            });
-
-            // Post Ad - CTA page, lower SEO priority
-            sitemapEntries.push({
-                url: `${BASE_URL}/${locale}/post`,
-                lastModified: new Date(),
-                changeFrequency: 'monthly',
-                priority: 0.6,
-            });
-
-            // Legal & Info pages - Low SEO priority
-            const infoPages = ['terms', 'privacy', 'contact'];
-            infoPages.forEach(page => {
-                sitemapEntries.push({
-                    url: `${BASE_URL}/${locale}/${page}`,
-                    lastModified: new Date(),
-                    changeFrequency: 'yearly',
-                    priority: 0.3,
-                });
+                priority: 0.7,
             });
         });
-    }
+    });
 
-    // --- 2. Agencies & Intent Pages ---
-    // SEO Strategy: High-value city landing pages + programmatic SEO intent pages
-    else if (id === 'agencies') {
-        const { getSupportedCities } = await import('@/lib/rent-agencies/getAgenciesByCity');
-        const supportedCities = getSupportedCities();
+    // 3. SEO Landing Pages (Programmatic Car Pages)
+    getSeoLandingUrls().forEach(url => {
+        sitemapEntries.push(url as any);
+    });
 
-        // Fetch agencies from all supported cities
-        const allAgencies: any[] = [];
-        for (const city of supportedCities) {
-            const { agencies } = await getAgencies({ city, limit: 10000 });
-            allAgencies.push(...agencies);
-        }
+    // 4. Listings
+    // Load ALL listings (pagination loop)
+    const totalListings = await getTotalListingsCount();
+    const batchSize = 1000;
+    const batches = Math.ceil(totalListings / batchSize);
 
-        const intents = getAllIntents();
-
-        const agencyCities = Array.from(new Set(allAgencies.map(a => a.citySlug)));
-        const predefinedCities = Object.keys(CITY_NAMES_AR);
-        const allCities = Array.from(new Set([...agencyCities, ...predefinedCities]));
-
-        // City Pages & Intent Pages
-        allCities.forEach(city => {
-            if (!city) return;
-
-            LOCALES.forEach(locale => {
-                // Agency City Page: /rent-agencies/[city] - High-value SEO landing page
-                sitemapEntries.push({
-                    url: `${BASE_URL}/${locale}/rent-agencies/${city}`,
-                    lastModified: new Date(),
-                    changeFrequency: 'daily',
-                    priority: 0.85,
-                });
-
-                // Intent Pages: /rent-agencies/[city]/[intent]
-                intents.forEach(intent => {
-                    sitemapEntries.push({
-                        url: `${BASE_URL}/${locale}/rent-agencies/${city}/${intent.slug}`,
-                        lastModified: new Date(),
-                        changeFrequency: 'weekly',
-                        priority: 0.8,
-                    });
-                });
-            });
-        });
-
-        // Agency Detail Pages: /rent-agencies/[city]/[slug]
-        allAgencies.forEach(agency => {
-            LOCALES.forEach(locale => {
-                sitemapEntries.push({
-                    url: `${BASE_URL}/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`,
-                    lastModified: new Date(), // Ideally create At or update At
-                    changeFrequency: 'weekly',
-                    priority: 0.7,
-                });
-            });
-        });
-    }
-
-
-    // --- 3. SEO Landing Pages (Programmatic Car Pages) ---
-    // SEO Strategy: Brand, city, and brand+city combination pages for organic traffic
-    else if (id === 'seo') {
-        // Generates /cars/[brand], /cars/[city], /cars/[brand]/[city]
-        getSeoLandingUrls().forEach(url => {
-            sitemapEntries.push(url as any);
-        });
-    }
-
-    // --- 4. Listings Chunks ---
-    // SEO Strategy: Individual car listings with actual update timestamps
-    else if (id.startsWith('listings-')) {
-        const chunkIndex = parseInt(id.split('-')[1]);
-        const listings = await getListingBatch(chunkIndex, SITEMAP_CHUNK_SIZE);
-
+    for (let i = 0; i < batches; i++) {
+        const listings = await getListingBatch(i, batchSize);
         listings.forEach((listing: any) => {
             LOCALES.forEach(locale => {
                 sitemapEntries.push({
-                    // Listings use ID in URL: /cars/[id]
                     url: `${BASE_URL}/${locale}/cars/${listing._id.toString()}`,
                     lastModified: listing.updatedAt ? new Date(listing.updatedAt) : new Date(),
                     changeFrequency: 'weekly',
@@ -170,5 +143,6 @@ export default async function sitemap({ id }: { id: string }): Promise<MetadataR
         });
     }
 
+    console.log(`[Sitemap] Generated ${sitemapEntries.length} entries.`);
     return sitemapEntries;
 }
