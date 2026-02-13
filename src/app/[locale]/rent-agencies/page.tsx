@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const CITIES = [
     { name: 'Marrakech', nameAr: 'مراكش', slug: 'marrakech', active: true, image: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&q=80&w=600' },
     { name: 'Rabat', nameAr: 'الرباط', slug: 'rabat', active: true, image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=80&w=600' },
-    { name: 'Casablanca', nameAr: 'الدار البيضاء', slug: 'casablanca', active: true, image: 'https://images.unsplash.com/photo-1539281534-118c4e0b0292?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Casablanca', nameAr: 'الدار البيضاء', slug: 'casablanca', active: true, image: 'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?auto=format&fit=crop&q=80&w=600' },
     // { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: false, image: null }, // Future
 ];
 
