@@ -2,6 +2,8 @@
 import marrakechData from '@/data/marrakech.json';
 // @ts-ignore - Rabat data support
 import rabatData from '@/data/rabat.json';
+// @ts-ignore - Casablanca data support
+import casablancaData from '@/data/casablanca.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
@@ -10,10 +12,11 @@ import { SeoIntent } from './seo-intents';
 const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'marrakech': { lat: 31.6069, lng: -8.0363 }, // Menara Airport
     'rabat': { lat: 34.0513, lng: -6.7515 }, // Rabat-Salé Airport
+    'casablanca': { lat: 33.3675, lng: -7.5899 }, // Mohammed V Airport
 };
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca'];
 
 // City data mapping
 function getCityData(citySlug: string): any[] {
@@ -23,6 +26,8 @@ function getCityData(citySlug: string): any[] {
             return marrakechData as any[];
         case 'rabat':
             return rabatData as any[];
+        case 'casablanca':
+            return casablancaData as any[];
         default:
             return [];
     }
@@ -71,7 +76,7 @@ export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAge
 
     // Check if city is supported
     if (!SUPPORTED_CITIES.includes(city)) {
-        console.log(`[AgenciesLoader] City "${city}" is not supported. Supported: ${SUPPORTED_CITIES.join(', ')}`);
+        // City not supported
         return [];
     }
 
@@ -80,12 +85,15 @@ export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAge
         return cachedAgenciesByCity[city];
     }
 
-    // 1. Load Raw Data
+    // 1. Load Raw Data from JSON
     const rawData = getCityData(city);
+
     if (!Array.isArray(rawData) || rawData.length === 0) {
-        console.log(`[AgenciesLoader] No data found for city: ${city}`);
+        // No data found for city
         return [];
     }
+
+
 
     // 2. Normalize All
     const normalized = rawData.map((item, index) => normalizeAgency(item, index, city));
@@ -135,7 +143,7 @@ export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAge
     // 5. Final Sort by Score
     result.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    console.log(`[AgenciesLoader] Loaded ${rawData.length} raw, returned ${result.length} unique agencies for ${city}.`);
+
 
     cachedAgenciesByCity[city] = result;
     return result;

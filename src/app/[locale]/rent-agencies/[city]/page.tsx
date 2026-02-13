@@ -22,15 +22,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const cityName = getLocalizedCityName(params.city, params.locale);
     const { locale } = params;
 
+    const year = new Date().getFullYear();
+
     const title = locale === 'ar'
-        ? `أفضل وكالات كراء السيارات في ${cityName} | أسعار رخيصة وتقييمات حقيقية`
-        : `Best car rental agencies in ${cityName} | Cheap prices & real reviews`;
+        ? `وكالات كراء السيارات في ${cityName} | أفضل الشركات ${year}`
+        : `Car Rental Agencies in ${cityName} | Best Companies ${year}`;
 
     const description = locale === 'ar'
         ? `اكتشف أفضل وكالات كراء السيارات في ${cityName} مع تقييمات حقيقية، مواقع دقيقة، وأرقام الاتصال المباشر. قارن واختر بسهولة.`
         : `Discover the best car rental agencies in ${cityName} with real reviews, precise locations, and direct contact numbers. Compare and choose easily.`;
 
-    const baseUrl = 'https://www.cayn.ma';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cayn.ma';
     const path = `/rent-agencies/${params.city}`;
 
     return {
@@ -48,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             title,
             description,
             url: `${baseUrl}/${locale}${path}`,
-            siteName: 'Kayn.ma',
+            siteName: 'Cayn.ma',
             locale: locale === 'ar' ? 'ar_MA' : 'fr_MA',
         }
     };

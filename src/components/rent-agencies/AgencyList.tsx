@@ -130,9 +130,7 @@ export default function AgencyList({ initialAgencies, cityName }: AgencyListProp
         return sortedAgencies.slice(start, start + limit);
     }, [sortedAgencies, page, limit]);
 
-    // Debug logging (remove after fixing)
-    console.log('[AgencyList] filters:', JSON.stringify(filters));
-    console.log('[AgencyList] filteredAgencies:', filteredAgencies.length, 'sortedAgencies:', sortedAgencies.length, 'paginatedAgencies:', paginatedAgencies.length);
+
 
     return (
         <div>

@@ -21,6 +21,8 @@ export interface IRentAgency extends Document {
     claimed: boolean;
     createdAt: Date;
     updatedAt: Date;
+    reviews: any[];
+    openingHours: any[];
 }
 
 const RentAgencySchema = new Schema<IRentAgency>(
@@ -41,6 +43,8 @@ const RentAgencySchema = new Schema<IRentAgency>(
         photos: { type: [String], default: [] },
         source: { type: String, enum: ['apify', 'manual'], default: 'apify' },
         status: { type: String, enum: ['active', 'pending', 'suspended', 'rejected'], default: 'active', index: true },
+        reviews: { type: [], default: [] }, // Store raw review objects
+        openingHours: { type: [], default: [] },
         claimed: { type: Boolean, default: false },
     },
     {

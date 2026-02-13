@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAgencies } from '@/lib/agencies';
 import { getAllIntents } from '@/lib/rent-agencies/seo-intents';
-import { CITY_NAMES_AR } from '@/lib/rent-agencies/utils';
+
 import {
     BASE_URL,
     LOCALES,
@@ -17,7 +17,7 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const sitemapEntries: MetadataRoute.Sitemap = [];
 
-    console.log('[Sitemap] Generating full sitemap...');
+
 
     // 1. Static Pages
     LOCALES.forEach(locale => {
@@ -77,9 +77,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     const intents = getAllIntents();
-    const agencyCities = Array.from(new Set(allAgencies.map(a => a.citySlug)));
-    const predefinedCities = Object.keys(CITY_NAMES_AR);
-    const allCities = Array.from(new Set([...agencyCities, ...predefinedCities]));
+    // Use getSupportedCities() as single source of truth
+    const allCities = supportedCities;
 
     // City Pages & Intent Pages
     allCities.forEach(city => {
@@ -143,6 +142,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         });
     }
 
-    console.log(`[Sitemap] Generated ${sitemapEntries.length} entries.`);
+
     return sitemapEntries;
 }

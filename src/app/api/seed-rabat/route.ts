@@ -71,7 +71,24 @@ function calculateRating(reviews: any[]): number | null {
 }
 
 export async function GET(req: NextRequest) {
+    // SECURITY: Block in production
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+            { success: false, error: 'Seed endpoint is disabled in production.' },
+            { status: 403 }
+        );
+    }
+
+    // SECURITY: Require secret token
     const { searchParams } = new URL(req.url);
+    const token = searchParams.get('token');
+    if (process.env.SEED_SECRET && token !== process.env.SEED_SECRET) {
+        return NextResponse.json(
+            { success: false, error: 'Invalid or missing seed token.' },
+            { status: 401 }
+        );
+    }
+
     const dryRun = searchParams.get('dry') === 'true';
     const clearExisting = searchParams.get('clear') === 'true';
 

@@ -58,6 +58,11 @@ export function getAgencyImages(raw: any): string[] {
         photos = [...photos, ...raw.images];
     }
 
+    // Check for DB 'photos' field
+    if (raw.photos && Array.isArray(raw.photos)) {
+        photos = [...photos, ...raw.photos];
+    }
+
     // Deduplicate and filter empty/invalid
     return Array.from(new Set(photos)).filter(url => {
         return url && typeof url === 'string' && url.length > 5 && url.startsWith('http');

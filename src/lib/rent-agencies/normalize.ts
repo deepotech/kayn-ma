@@ -137,7 +137,7 @@ const CITY_DISPLAY_NAMES: Record<string, string> = {
 };
 
 export function normalizeAgency(raw: any, index: number, citySlug: string = 'marrakech'): Agency {
-    const name = raw.title || 'Unknown Agency';
+    const name = raw.name || raw.title || 'Unknown Agency';
     const city = citySlug.toLowerCase();
     const cityDisplayName = CITY_DISPLAY_NAMES[city] || city.charAt(0).toUpperCase() + city.slice(1);
 
