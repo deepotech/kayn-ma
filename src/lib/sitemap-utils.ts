@@ -48,45 +48,98 @@ export async function getListingBatch(page: number, limit: number): Promise<any[
  *   - slug 2: city -> found
  *   - so /cars/dacia/casablanca is valid.
  */
-export function getSeoLandingUrls(): SitemapUrl[] {
+/**
+ * Get existing brand/city combinations from DB
+ */
+async function getExistingData() {
+    await dbConnect();
+
+    // Aggregate to get all brands and cities that have at least one public approved listing
+    const stats = await Listing.aggregate([
+        { $match: { status: 'approved', visibility: 'public' } },
+        {
+            $group: {
+                _id: {
+                    brand: "$brand.slug",
+                    city: "$city.slug"
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                brand: "$_id.brand",
+                city: "$_id.city"
+            }
+        }
+    ]);
+
+    const activeBrands = new Set<string>();
+    const activeCities = new Set<string>();
+    const activeCombinations = new Set<string>();
+
+    stats.forEach(stat => {
+        if (stat.brand) activeBrands.add(stat.brand.toLowerCase());
+        if (stat.city) activeCities.add(stat.city.toLowerCase());
+        if (stat.brand && stat.city) activeCombinations.add(`${stat.brand.toLowerCase()}|${stat.city.toLowerCase()}`);
+    });
+
+    return { activeBrands, activeCities, activeCombinations };
+}
+
+/**
+ * Generate SEO Landing Page URLs
+ * Only generates URLs for brands/cities/combinations that actually have listings.
+ */
+export async function getSeoLandingUrls(): Promise<SitemapUrl[]> {
     const urls: SitemapUrl[] = [];
+    const { activeBrands, activeCities, activeCombinations } = await getExistingData();
 
     // 1. Brands - Individual brand pages
+    // Only generate if brand has at least one active listing
     carCatalog.forEach(brand => {
-        LOCALES.forEach(locale => {
-            urls.push({
-                url: `${BASE_URL}/${locale}/cars/${brand.slug}`,
-                changeFrequency: 'weekly',
-                priority: 0.75,
-                lastModified: new Date()
-            });
-        });
-    });
-
-    // 2. Cities - Individual city pages
-    CITIES.forEach(city => {
-        LOCALES.forEach(locale => {
-            urls.push({
-                url: `${BASE_URL}/${locale}/cars/${city.slug}`,
-                changeFrequency: 'weekly',
-                priority: 0.75,
-                lastModified: new Date()
-            });
-        });
-    });
-
-    // 3. Brand + City Combinations - Long-tail SEO pages
-    // ~30 brands × ~50 cities × 2 locales = ~3000 URLs (manageable)
-    carCatalog.forEach(brand => {
-        CITIES.forEach(city => {
+        if (activeBrands.has(brand.slug.toLowerCase())) {
             LOCALES.forEach(locale => {
                 urls.push({
-                    url: `${BASE_URL}/${locale}/cars/${brand.slug}/${city.slug}`,
+                    url: `${BASE_URL}/${locale}/cars/${brand.slug}`,
                     changeFrequency: 'weekly',
                     priority: 0.75,
                     lastModified: new Date()
                 });
             });
+        }
+    });
+
+    // 2. Cities - Individual city pages
+    // Only generate if city has at least one active listing AND is in supported list
+    CITIES.forEach(city => {
+        if (activeCities.has(city.slug.toLowerCase())) {
+            LOCALES.forEach(locale => {
+                urls.push({
+                    url: `${BASE_URL}/${locale}/cars/${city.slug}`,
+                    changeFrequency: 'weekly',
+                    priority: 0.75,
+                    lastModified: new Date()
+                });
+            });
+        }
+    });
+
+    // 3. Brand + City Combinations - Long-tail SEO pages
+    // Only generate if specific combination exists
+    carCatalog.forEach(brand => {
+        CITIES.forEach(city => {
+            const key = `${brand.slug.toLowerCase()}|${city.slug.toLowerCase()}`;
+            if (activeCombinations.has(key)) {
+                LOCALES.forEach(locale => {
+                    urls.push({
+                        url: `${BASE_URL}/${locale}/cars/${brand.slug}/${city.slug}`,
+                        changeFrequency: 'weekly',
+                        priority: 0.75,
+                        lastModified: new Date()
+                    });
+                });
+            }
         });
     });
 

@@ -1,5 +1,6 @@
 import { BRANDS, BODY_TYPES } from '@/constants/data';
 import { CITIES } from '@/constants/cities';
+import { carCatalog } from '@/constants/car-brands-models';
 // import { getBrandName, getModelName } from '@/constants/car-brands-models';
 
 /**
@@ -35,14 +36,15 @@ export function parseSeoSlugs(slugs: string[]): SeoFilters {
         const lowerSlug = slug.toLowerCase();
         let found = false;
 
-        // 1. Check Brand
-        const brand = BRANDS.find(b => b.id === lowerSlug);
+        // 1. Check Brand (Check carCatalog first as it is the comprehensive list)
+        const brand = BRANDS.find(b => b.id === lowerSlug) || carCatalog.find(b => b.slug === lowerSlug);
         if (brand) {
             if (usedCategories.has('brand')) {
                 filters.isValid = false;
                 break;
             }
-            filters.brand = brand.id;
+            // Use 'id' if it exists (BRANDS), otherwise 'slug' (carCatalog)
+            filters.brand = (brand as any).id || (brand as any).slug;
             usedCategories.add('brand');
             found = true;
         }
@@ -112,9 +114,17 @@ export function getSeoPageTitle(filters: SeoFilters, locale: string): string {
 
     // Brand
     if (filters.brand) {
-        const brand = BRANDS.find(b => b.id === filters.brand);
-        if (brand) {
-            parts.push(brand.name); // Brand name is usually universal or has name field
+        const brandFromCatalog = carCatalog.find(b => b.slug === filters.brand);
+        const brandFromData = BRANDS.find(b => b.id === filters.brand);
+
+        if (brandFromCatalog) {
+            // Use localized name from catalog if available
+            parts.push(locale === 'ar' ? brandFromCatalog.ar : brandFromCatalog.fr);
+        } else if (brandFromData) {
+            parts.push(brandFromData.name);
+        } else {
+            // Fallback to capitalizing the slug if somehow neither found (unlikely if valid)
+            parts.push(filters.brand.charAt(0).toUpperCase() + filters.brand.slice(1));
         }
     }
 

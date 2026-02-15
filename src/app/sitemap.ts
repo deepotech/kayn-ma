@@ -118,7 +118,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     // 3. SEO Landing Pages (Programmatic Car Pages)
-    getSeoLandingUrls().forEach(url => {
+    // 3. SEO Landing Pages (Programmatic Car Pages)
+    const seoLandingUrls = await getSeoLandingUrls();
+    seoLandingUrls.forEach(url => {
         sitemapEntries.push(url as any);
     });
 
