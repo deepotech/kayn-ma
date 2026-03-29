@@ -15,6 +15,7 @@ const CITIES = [
     { name: 'Safi', nameAr: 'آسفي', slug: 'safi', active: true, image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&q=80&w=600' },
     { name: 'Berrechid', nameAr: 'برشيد', slug: 'berrechid', active: true, image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=600' },
     { name: 'Settat', nameAr: 'سطات', slug: 'settat', active: true, image: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Khemisset', nameAr: 'الخميسات', slug: 'khemisset', active: true, image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=600' },
     // { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: false, image: null }, // Future
 ];
 

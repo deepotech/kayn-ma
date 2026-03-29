@@ -10,6 +10,8 @@ import safiData from '@/data/safi.json';
 import berrechidData from '@/data/berrechid.json';
 // @ts-ignore - Settat data support
 import settatData from '@/data/settat.json';
+// @ts-ignore - Khemisset data support
+import khemissetData from '@/data/khemisset.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
@@ -22,10 +24,11 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'safi': { lat: 32.2994, lng: -9.2372 }, // Safi Center
     'berrechid': { lat: 33.2677, lng: -7.5811 }, // Central Berrechid (Close to Med V)
     'settat': { lat: 33.0010, lng: -7.6166 }, // Settat Center
+    'khemisset': { lat: 33.8150, lng: -6.0660 }, // Khemisset Center
 };
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset'];
 
 // City data mapping
 function getCityData(citySlug: string): any[] {
@@ -43,6 +46,8 @@ function getCityData(citySlug: string): any[] {
             return berrechidData as any[];
         case 'settat':
             return settatData as any[];
+        case 'khemisset':
+            return khemissetData as any[];
         default:
             return [];
     }
