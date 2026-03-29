@@ -6,6 +6,8 @@ import rabatData from '@/data/rabat.json';
 import casablancaData from '@/data/casablanca.json';
 // @ts-ignore - Safi data support
 import safiData from '@/data/safi.json';
+// @ts-ignore - Berrechid data support
+import berrechidData from '@/data/berrechid.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
@@ -16,10 +18,11 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'rabat': { lat: 34.0513, lng: -6.7515 }, // Rabat-Salé Airport
     'casablanca': { lat: 33.3675, lng: -7.5899 }, // Mohammed V Airport
     'safi': { lat: 32.2994, lng: -9.2372 }, // Safi Center
+    'berrechid': { lat: 33.2677, lng: -7.5811 }, // Central Berrechid (Close to Med V)
 };
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid'];
 
 // City data mapping
 function getCityData(citySlug: string): any[] {
@@ -33,6 +36,8 @@ function getCityData(citySlug: string): any[] {
             return casablancaData as any[];
         case 'safi':
             return safiData as any[];
+        case 'berrechid':
+            return berrechidData as any[];
         default:
             return [];
     }

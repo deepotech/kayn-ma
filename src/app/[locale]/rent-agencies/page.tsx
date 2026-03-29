@@ -13,6 +13,7 @@ const CITIES = [
     { name: 'Rabat', nameAr: 'الرباط', slug: 'rabat', active: true, image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&q=80&w=600' },
     { name: 'Casablanca', nameAr: 'الدار البيضاء', slug: 'casablanca', active: true, image: 'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?auto=format&fit=crop&q=80&w=600' },
     { name: 'Safi', nameAr: 'آسفي', slug: 'safi', active: true, image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Berrechid', nameAr: 'برشيد', slug: 'berrechid', active: true, image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=600' }, // valid car/city image
     // { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: false, image: null }, // Future
 ];
 

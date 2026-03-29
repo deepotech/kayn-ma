@@ -135,6 +135,7 @@ const CITY_DISPLAY_NAMES: Record<string, string> = {
     'fes': 'Fès',
     'tanger': 'Tanger',
     'safi': 'Safi',
+    'berrechid': 'Berrechid',
 };
 
 export function normalizeAgency(raw: any, index: number, citySlug: string = 'marrakech'): Agency {

@@ -194,6 +194,7 @@ export default async function CityAgenciesPage({ params }: Props) {
                         { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
                         { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                         { slug: 'safi', ar: 'آسفي', fr: 'Safi' },
+                        { slug: 'berrechid', ar: 'برشيد', fr: 'Berrechid' },
                     ].filter(c => c.slug !== params.city.toLowerCase()).map(c => (
                         <Link
                             key={c.slug}
