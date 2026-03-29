@@ -4,6 +4,8 @@ import marrakechData from '@/data/marrakech.json';
 import rabatData from '@/data/rabat.json';
 // @ts-ignore - Casablanca data support
 import casablancaData from '@/data/casablanca.json';
+// @ts-ignore - Safi data support
+import safiData from '@/data/safi.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
@@ -13,10 +15,11 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'marrakech': { lat: 31.6069, lng: -8.0363 }, // Menara Airport
     'rabat': { lat: 34.0513, lng: -6.7515 }, // Rabat-Salé Airport
     'casablanca': { lat: 33.3675, lng: -7.5899 }, // Mohammed V Airport
+    'safi': { lat: 32.2994, lng: -9.2372 }, // Safi Center
 };
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi'];
 
 // City data mapping
 function getCityData(citySlug: string): any[] {
@@ -28,6 +31,8 @@ function getCityData(citySlug: string): any[] {
             return rabatData as any[];
         case 'casablanca':
             return casablancaData as any[];
+        case 'safi':
+            return safiData as any[];
         default:
             return [];
     }
