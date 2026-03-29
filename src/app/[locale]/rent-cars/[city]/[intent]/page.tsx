@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { getAgenciesByCity, filterAgenciesByIntent } from '@/lib/rent-agencies/getAgenciesByCity';
+import { getAgenciesByCity, filterAgenciesByIntent, getSupportedCities } from '@/lib/rent-agencies/getAgenciesByCity';
 import { getIntent, getAllIntents } from '@/lib/rent-agencies/seo-intents';
 import AgencyList from '@/components/rent-agencies/AgencyList';
 import IntentLinks from '@/components/rent-agencies/IntentLinks';
@@ -45,8 +45,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function IntentPage({ params }: Props) {
     const intentConfig = getIntent(params.intent);
 
-    // Validate Intent & City (For now only Marrakech supported heavily, but code works generic)
-    if (!intentConfig || params.city.toLowerCase() !== 'marrakech') {
+    // Validate Intent & City
+    const supportedCities = getSupportedCities();
+    if (!intentConfig || !supportedCities.includes(params.city.toLowerCase())) {
         notFound();
     }
 
