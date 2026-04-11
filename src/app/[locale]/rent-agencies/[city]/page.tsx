@@ -57,7 +57,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CityAgenciesPage({ params }: Props) {
-    const { city, locale } = params;
+    const { locale } = params;
+    const city = params.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const t = await getTranslations({ locale, namespace: 'RentAgencies.Listing' });
 
     // Fetch Full Dataset (Server-Side)

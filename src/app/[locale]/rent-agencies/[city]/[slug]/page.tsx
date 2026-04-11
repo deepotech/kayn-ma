@@ -150,7 +150,7 @@ function formatOpeningHours(hours: string, locale: string): { text: string; dir:
 
 export default async function Page({ params }: Props) {
     const { slug, locale } = params;
-    const city = params.city.toLowerCase();
+    const city = params.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     // ==========================================
     // CASE 1: Intent Landing Page (e.g. /marrakech/airport)
@@ -571,7 +571,7 @@ export default async function Page({ params }: Props) {
 
             {/* Internal Linking */}
             <div className="mt-12 pt-10 border-t border-slate-200 dark:border-zinc-800">
-                <IntentLinks currentIntent="detail" city={agency.city} locale={locale} />
+                <IntentLinks currentIntent="detail" city={agency.citySlug} locale={locale} />
             </div>
         </div>
     );

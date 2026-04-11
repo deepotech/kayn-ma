@@ -107,7 +107,7 @@ export function filterAgenciesByIntent(agencies: NormalizedAgency[], intent: Seo
 const cachedAgenciesByCity: Record<string, NormalizedAgency[]> = {};
 
 export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAgency[]> {
-    const city = citySlug.toLowerCase();
+    const city = citySlug.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     // Check if city is supported
     if (!SUPPORTED_CITIES.includes(city)) {

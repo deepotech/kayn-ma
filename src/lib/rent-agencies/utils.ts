@@ -100,10 +100,11 @@ export const CITY_NAMES_AR: Record<string, string> = {
 };
 
 export function getLocalizedCityName(citySlug: string, locale: string): string {
-    if (locale === 'ar' && CITY_NAMES_AR[citySlug.toLowerCase()]) {
-        return CITY_NAMES_AR[citySlug.toLowerCase()];
+    const normalized = citySlug.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (locale === 'ar' && CITY_NAMES_AR[normalized]) {
+        return CITY_NAMES_AR[normalized];
     }
-    return citySlug.charAt(0).toUpperCase() + citySlug.slice(1);
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
 export function generateBreadcrumbSchema(items: { name: string; url: string }[]) {
