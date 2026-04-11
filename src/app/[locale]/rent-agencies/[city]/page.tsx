@@ -192,11 +192,13 @@ export default async function CityAgenciesPage({ params }: Props) {
                     {[
                         { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
                         { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                        { slug: 'salé', ar: 'سلا', fr: 'Salé' },
                         { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                         { slug: 'safi', ar: 'آسفي', fr: 'Safi' },
                         { slug: 'berrechid', ar: 'برشيد', fr: 'Berrechid' },
                         { slug: 'settat', ar: 'سطات', fr: 'Settat' },
                         { slug: 'khemisset', ar: 'الخميسات', fr: 'Khémisset' },
+                        { slug: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
                     ].filter(c => c.slug !== params.city.toLowerCase()).map(c => (
                         <Link
                             key={c.slug}
