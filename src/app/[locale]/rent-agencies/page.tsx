@@ -17,7 +17,7 @@ const CITIES = [
     { name: 'Settat', nameAr: 'سطات', slug: 'settat', active: true, image: 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&q=80&w=600' },
     { name: 'Khemisset', nameAr: 'الخميسات', slug: 'khemisset', active: true, image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=600' },
     { name: 'Kenitra', nameAr: 'القنيطرة', slug: 'kenitra', active: true, image: 'https://images.unsplash.com/photo-1510662145379-13537db782dc?auto=format&fit=crop&q=80&w=600' },
-    { name: 'Oujda', nameAr: 'وجدة', slug: 'oujda', active: true, image: 'https://images.unsplash.com/photo-1555529733-0e67056058ab?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Oujda', nameAr: 'وجدة', slug: 'oujda', active: true, image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=600' },
     // { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: false, image: null }, // Future
 ];
 
