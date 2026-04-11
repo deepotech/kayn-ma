@@ -33,7 +33,7 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'khemisset': { lat: 33.8150, lng: -6.0660 }, // Khemisset Center
     'kenitra': { lat: 34.2610, lng: -6.5802 }, // Kenitra Center
     'oujda': { lat: 34.6814, lng: -1.9086 }, // Oujda Center
-    'fes': { lat: 34.0331, lng: -5.0003 }, // Fes Center
+    'fes': { lat: 34.0371, lng: -4.9998 }, // Fes-Saïss Airport / Center
 };
 
 // Supported cities
