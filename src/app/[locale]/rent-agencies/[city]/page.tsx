@@ -199,6 +199,7 @@ export default async function CityAgenciesPage({ params }: Props) {
                         { slug: 'settat', ar: 'سطات', fr: 'Settat' },
                         { slug: 'khemisset', ar: 'الخميسات', fr: 'Khémisset' },
                         { slug: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
+                        { slug: 'oujda', ar: 'وجدة', fr: 'Oujda' },
                     ].filter(c => c.slug !== params.city.toLowerCase()).map(c => (
                         <Link
                             key={c.slug}
