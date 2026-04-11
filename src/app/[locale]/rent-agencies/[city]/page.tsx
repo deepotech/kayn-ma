@@ -190,16 +190,11 @@ export default async function CityAgenciesPage({ params }: Props) {
                 </h2>
                 <div className="flex flex-wrap gap-3">
                     {[
-                        { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                        { slug: 'nador', ar: 'الناظور', fr: 'Nador' },
+                        { slug: 'berkane', ar: 'بركان', fr: 'Berkane' },
+                        { slug: 'fes', ar: 'فاس', fr: 'Fès' },
                         { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
-                        { slug: 'salé', ar: 'سلا', fr: 'Salé' },
                         { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
-                        { slug: 'safi', ar: 'آسفي', fr: 'Safi' },
-                        { slug: 'berrechid', ar: 'برشيد', fr: 'Berrechid' },
-                        { slug: 'settat', ar: 'سطات', fr: 'Settat' },
-                        { slug: 'khemisset', ar: 'الخميسات', fr: 'Khémisset' },
-                        { slug: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
-                        { slug: 'oujda', ar: 'وجدة', fr: 'Oujda' },
                     ].filter(c => c.slug !== params.city.toLowerCase()).map(c => (
                         <Link
                             key={c.slug}
