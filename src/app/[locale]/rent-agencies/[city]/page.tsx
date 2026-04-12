@@ -190,13 +190,51 @@ export default async function CityAgenciesPage({ params }: Props) {
                     {locale === 'ar' ? 'وكالات كراء السيارات في مدن أخرى' : 'Agences de location dans d\'autres villes'}
                 </h2>
                 <div className="flex flex-wrap gap-3">
-                    {[
-                        { slug: 'meknes', ar: 'مكناس', fr: 'Meknès' },
-                        { slug: 'oujda', ar: 'وجدة', fr: 'Oujda' },
-                        { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
-                        { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
-                        { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
-                    ].filter(c => c.slug !== params.city.toLowerCase()).map(c => (
+                    {((): { slug: string; ar: string; fr: string }[] => {
+                        const currentCity = params.city.toLowerCase();
+                        // City-specific related cities for better topical relevance
+                        const cityRelations: Record<string, { slug: string; ar: string; fr: string }[]> = {
+                            tanger: [
+                                { slug: 'tetouan', ar: 'تطوان', fr: 'Tétouan' },
+                                { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                                { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                                { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                            ],
+                            fes: [
+                                { slug: 'meknes', ar: 'مكناس', fr: 'Meknès' },
+                                { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                                { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                                { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                            ],
+                            rabat: [
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                                { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                                { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                                { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                                { slug: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
+                            ],
+                            casablanca: [
+                                { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                                { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                                { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                                { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
+                                { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                            ],
+                        };
+                        // Default list shown on all other cities — always includes tanger
+                        const defaultList = [
+                            { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                            { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                            { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                            { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                            { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                            { slug: 'meknes', ar: 'مكناس', fr: 'Meknès' },
+                        ];
+                        const list = cityRelations[currentCity] || defaultList;
+                        return list.filter(c => c.slug !== currentCity);
+                    })().map(c => (
                         <Link
                             key={c.slug}
                             href={`/${locale}/rent-agencies/${c.slug}`}

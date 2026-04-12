@@ -18,6 +18,8 @@ import kenitraData from '@/data/kenitra.json';
 import oujdaData from '@/data/oujda.json';
 // @ts-ignore - Fes data support
 import fesData from '@/data/fes.json';
+// @ts-ignore - Tanger data support
+import tangerData from '@/data/tanger.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
@@ -34,10 +36,11 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'kenitra': { lat: 34.2610, lng: -6.5802 }, // Kenitra Center
     'oujda': { lat: 34.6814, lng: -1.9086 }, // Oujda Center
     'fes': { lat: 34.0371, lng: -4.9998 }, // Fes-Saïss Airport / Center
+    'tanger': { lat: 35.7269, lng: -5.9169 }, // Ibn Battuta Airport
 };
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset', 'kenitra', 'oujda', 'fes'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset', 'kenitra', 'oujda', 'fes', 'tanger'];
 
 // City data mapping
 function getCityData(citySlug: string): any[] {
@@ -63,6 +66,8 @@ function getCityData(citySlug: string): any[] {
             return oujdaData as any[];
         case 'fes':
             return fesData as any[];
+        case 'tanger':
+            return tangerData as any[];
         default:
             return [];
     }
