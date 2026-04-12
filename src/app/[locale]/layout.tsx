@@ -19,7 +19,10 @@ export const metadata: Metadata = {
   description: "Clasifieds in Morocco",
   openGraph: {
     siteName: "كاين السيارات",
-  }
+  },
+  verification: {
+    google: "545f43635a6220b3",
+  },
 };
 
 export default async function RootLayout({
