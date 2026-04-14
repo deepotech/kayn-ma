@@ -200,6 +200,7 @@ export default async function CityAgenciesPage({ params }: Props) {
                                 { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                                 { slug: 'fes', ar: 'فاس', fr: 'Fès' },
                                 { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                                { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
                             ],
                             fes: [
                                 { slug: 'meknes', ar: 'مكناس', fr: 'Meknès' },
@@ -207,6 +208,7 @@ export default async function CityAgenciesPage({ params }: Props) {
                                 { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
                                 { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                                 { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                                { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
                             ],
                             rabat: [
                                 { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
@@ -222,15 +224,29 @@ export default async function CityAgenciesPage({ params }: Props) {
                                 { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
                                 { slug: 'fes', ar: 'فاس', fr: 'Fès' },
                             ],
+                            marrakech: [
+                                { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                                { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                                { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                                { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                            ],
+                            agadir: [
+                                { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                                { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                                { slug: 'essaouira', ar: 'الصويرة', fr: 'Essaouira' },
+                                { slug: 'tiznit', ar: 'تيزنيت', fr: 'Tiznit' },
+                            ],
                         };
-                        // Default list shown on all other cities — always includes tanger
+                        // Default list shown on all other cities — always includes main hubs + agadir
                         const defaultList = [
                             { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
                             { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
                             { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                             { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                            { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
                             { slug: 'fes', ar: 'فاس', fr: 'Fès' },
-                            { slug: 'meknes', ar: 'مكناس', fr: 'Meknès' },
                         ];
                         const list = cityRelations[currentCity] || defaultList;
                         return list.filter(c => c.slug !== currentCity);

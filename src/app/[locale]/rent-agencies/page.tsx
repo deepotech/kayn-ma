@@ -19,7 +19,8 @@ const CITIES = [
     { name: 'Kenitra', nameAr: 'القنيطرة', slug: 'kenitra', active: true, image: 'https://images.unsplash.com/photo-1510662145379-13537db782dc?auto=format&fit=crop&q=80&w=600' },
     { name: 'Oujda', nameAr: 'وجدة', slug: 'oujda', active: true, image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=600' },
     { name: 'Fès', nameAr: 'فاس', slug: 'fes', active: true, image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=600' },
-    // { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: false, image: null }, // Future
+    { name: 'Tanger', nameAr: 'طنجة', slug: 'tanger', active: true, image: 'https://images.unsplash.com/photo-1589365252845-092198ba5334?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: true, image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=600' },
 ];
 
 import { useTranslations } from 'next-intl';
