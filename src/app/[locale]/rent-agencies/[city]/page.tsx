@@ -238,6 +238,13 @@ export default async function CityAgenciesPage({ params }: Props) {
                                 { slug: 'essaouira', ar: 'الصويرة', fr: 'Essaouira' },
                                 { slug: 'tiznit', ar: 'تيزنيت', fr: 'Tiznit' },
                             ],
+                            meknes: [
+                                { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                                { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                                { slug: 'settat', ar: 'سطات', fr: 'Settat' },
+                                { slug: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                            ],
                         };
                         // Default list shown on all other cities — always includes main hubs + agadir
                         const defaultList = [
