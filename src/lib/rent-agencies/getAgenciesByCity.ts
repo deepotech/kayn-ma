@@ -24,6 +24,8 @@ import tangerData from '@/data/tanger.json';
 import agadirData from '@/data/agadir.json';
 // @ts-ignore - Meknes data support
 import meknesData from '@/data/meknes.json';
+// @ts-ignore - Tetouan data support
+import tetouanData from '@/data/tetouan.json';
 import { NormalizedAgency, normalizeAgency, getDistance } from './normalize';
 import { getCityStats, computeAgencyScore } from './ranking';
 import { SeoIntent } from './seo-intents';
@@ -43,10 +45,11 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'tanger': { lat: 35.7269, lng: -5.9169 }, // Ibn Battuta Airport
     'agadir': { lat: 30.3238, lng: -9.4132 }, // Al Massira Airport
     'meknes': { lat: 33.8789, lng: -5.5186 }, // Bassatine / Meknes
+    'tetouan': { lat: 35.5785, lng: -5.3686 }, // Sania Ramel Airport / Tetouan Center
 };
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset', 'kenitra', 'oujda', 'fes', 'tanger', 'agadir', 'meknes'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset', 'kenitra', 'oujda', 'fes', 'tanger', 'agadir', 'meknes', 'tetouan'];
 
 // City data mapping
 function getCityData(citySlug: string): any[] {
@@ -78,6 +81,8 @@ function getCityData(citySlug: string): any[] {
             return agadirData as any[];
         case 'meknes':
             return meknesData as any[];
+        case 'tetouan':
+            return tetouanData as any[];
         default:
             return [];
     }

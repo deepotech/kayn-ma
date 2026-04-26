@@ -245,6 +245,13 @@ export default async function CityAgenciesPage({ params }: Props) {
                                 { slug: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
                                 { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                             ],
+                            tetouan: [
+                                { slug: 'tanger', ar: 'طنجة', fr: 'Tanger' },
+                                { slug: 'ksar-el-kebir', ar: 'القصر الكبير', fr: 'Ksar El Kebir' },
+                                { slug: 'rabat', ar: 'الرباط', fr: 'Rabat' },
+                                { slug: 'fes', ar: 'فاس', fr: 'Fès' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                            ],
                         };
                         // Default list shown on all other cities — always includes main hubs + agadir
                         const defaultList = [

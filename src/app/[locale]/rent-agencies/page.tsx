@@ -22,6 +22,7 @@ const CITIES = [
     { name: 'Meknès', nameAr: 'مكناس', slug: 'meknes', active: true, image: 'https://images.unsplash.com/photo-1596700813955-46743387b998?auto=format&fit=crop&q=80&w=600' },
     { name: 'Tanger', nameAr: 'طنجة', slug: 'tanger', active: true, image: 'https://images.unsplash.com/photo-1589365252845-092198ba5334?auto=format&fit=crop&q=80&w=600' },
     { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: true, image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Tétouan', nameAr: 'تطوان', slug: 'tetouan', active: true, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=600' },
 ];
 
 import { useTranslations } from 'next-intl';
