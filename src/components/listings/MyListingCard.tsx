@@ -24,7 +24,7 @@ export default function MyListingCard({
     const locale = useLocale();
     const t = useTranslations('MyListings');
     const tCard = useTranslations('ListingCard');
-    const listingId = listing._id || '';
+    const listingId = listing.id || listing._id || '';
 
     // Get relative time
     const timeAgo = listing.createdAt ? getRelativeTime(listing.createdAt, locale) : '';
@@ -46,15 +46,14 @@ export default function MyListingCard({
 
     return (
         <div className="group flex flex-col sm:flex-row overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md dark:bg-zinc-900 dark:border-zinc-800">
-            {/* Image (Small on mobile, specific aspect on desktop) */}
             <Link
-                href={`/cars/${listing._id}`}
+                href={`/cars/${listingId}`}
                 className="relative aspect-video sm:w-48 sm:aspect-[4/3] bg-gray-100 dark:bg-zinc-800 overflow-hidden shrink-0"
             >
                 {listing.images && listing.images.length > 0 ? (
                     <Image
                         src={listing.images[0].url}
-                        alt={`${listing.brand?.label || listing.brand || ''} ${listing.carModel?.label || listing.carModel || ''}`}
+                        alt={`${listing.brandLabel || listing.brand || ''} ${listing.carModelLabel || listing.carModel || ''}`}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, 200px"
@@ -77,9 +76,9 @@ export default function MyListingCard({
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <div className="hidden sm:block mb-2">{getStatusBadge()}</div>
-                            <Link href={`/cars/${listing._id}`}>
+                            <Link href={`/cars/${listingId}`}>
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 hover:text-blue-600">
-                                    {listing.title || `${typeof listing.brand === 'object' ? listing.brand.label : listing.brand} ${typeof listing.carModel === 'object' ? listing.carModel.label : listing.carModel} ${listing.year}`}
+                                    {listing.title || `${listing.brandLabel || listing.brand} ${listing.carModelLabel || listing.carModel} ${listing.year}`}
                                 </h3>
                             </Link>
                             <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">

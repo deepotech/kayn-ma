@@ -38,10 +38,13 @@ export default function ListingCard({
     const isRtl = locale === 'ar';
 
     const phoneNumber = listing.phone || "0612345678";
+    const brandNameStr = listing.brandLabel || (typeof listing.brand === 'object' ? listing.brand?.label : listing.brand) || '';
+    const modelNameStr = listing.carModelLabel || (typeof listing.carModel === 'object' ? listing.carModel?.label : listing.carModel) || '';
+
     const whatsappUrl = `https://wa.me/212${phoneNumber.substring(1)}?text=${encodeURIComponent(
         locale === 'ar'
-            ? `مرحبا، أنا مهتم بـ: ${listing.brand.label} ${listing.carModel.label} ${listing.year}`
-            : `Bonjour, je suis intéressé par: ${listing.brand.label} ${listing.carModel.label} ${listing.year}`
+            ? `مرحبا، أنا مهتم بـ: ${brandNameStr} ${modelNameStr} ${listing.year}`
+            : `Bonjour, je suis intéressé par: ${brandNameStr} ${modelNameStr} ${listing.year}`
     )}`;
     const telUrl = `tel:${phoneNumber}`;
 
@@ -72,15 +75,15 @@ export default function ListingCard({
     };
 
     // Safe Title Access
-    const brandName = typeof listing.brand === 'object' ? listing.brand.label : listing.brand;
-    const modelName = typeof listing.carModel === 'object' ? listing.carModel.label : listing.carModel;
+    const brandName = brandNameStr;
+    const modelName = modelNameStr;
     const computedTitle = listing.title || [brandName, modelName, listing.year].filter(Boolean).join(" ");
 
     return (
         <div className="group flex flex-col h-full overflow-hidden rounded-2xl border bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:bg-zinc-900 dark:border-zinc-800 dir-rtl">
             {/* Image Container: Aspect Ratio 4/3 */}
             <div className="relative w-full aspect-[4/3] bg-gray-100 dark:bg-zinc-800 overflow-hidden">
-                <Link href={`/cars/${listing._id}`} className="block w-full h-full">
+                <Link href={`/cars/${listing.id || listing._id}`} className="block w-full h-full">
                     <Image
                         src={imageSrc}
                         alt={computedTitle}
@@ -132,7 +135,7 @@ export default function ListingCard({
 
             {/* Card Content - Flex Column with Footer Pushed Down */}
             <div className="flex flex-col flex-1 p-3 sm:p-4">
-                <Link href={`/cars/${listing._id}`} className="block">
+                <Link href={`/cars/${listing.id || listing._id}`} className="block">
                     {/* Title: Line Clamp 2 + Fixed Height */}
                     <h3
                         className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2 min-h-[3rem] sm:min-h-[3.5rem] leading-snug mb-1"
