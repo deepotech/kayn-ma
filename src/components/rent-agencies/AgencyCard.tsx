@@ -135,7 +135,7 @@ export default function AgencyCard({ agency }: AgencyCardProps) {
                     <div className="flex items-start mb-3">
                         <MapPin className="w-4 h-4 text-slate-400 mt-0.5 me-1.5 shrink-0" />
                         <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 md:line-clamp-1">
-                            {agency.address}
+                            {typeof agency.address === 'string' ? agency.address : JSON.stringify(agency.address)}
                         </p>
                     </div>
 
