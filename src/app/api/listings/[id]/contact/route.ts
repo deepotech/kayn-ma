@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 
-// POST /api/listings/[id]/contact
-// Track contact clicks (whatsapp/call)
-export async function POST(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
         const { type } = await request.json();
@@ -16,14 +10,12 @@ export async function POST(
             return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
         }
 
-        await dbConnect();
-
-        // Increment the appropriate counter
-        const update = type === 'whatsapp'
-            ? { $inc: { whatsappClicks: 1 } }
-            : { $inc: { callClicks: 1 } };
-
-        await Listing.findByIdAndUpdate(id, update);
+        await prisma.listing.update({
+            where: { id },
+            data: type === 'whatsapp'
+                ? { whatsappClicks: { increment: 1 } }
+                : { callClicks: { increment: 1 } }
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {

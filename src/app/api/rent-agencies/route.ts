@@ -1,37 +1,42 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import RentAgency from '@/models/RentAgency';
+import prisma from '@/lib/db';
 
 export async function GET(req: NextRequest) {
-    await dbConnect();
-
     const { searchParams } = new URL(req.url);
     const city = searchParams.get('city');
     const rating = searchParams.get('rating');
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    const query: any = {};
+    const where: any = {};
 
     if (city) {
-        query.city = city.toLowerCase();
+        where.city = { slug: city.toLowerCase() };
     }
 
     if (rating) {
-        // Filter by rating greater than or equal to provided value
-        query.rating = { $gte: parseFloat(rating) };
+        where.rating = { gte: parseFloat(rating) };
     }
 
     if (search) {
-        query.name = { $regex: search, $options: 'i' };
+        where.name = { contains: search, mode: 'insensitive' };
     }
 
     try {
-        const agencies = await RentAgency.find(query)
-            .sort({ rating: -1, reviewsCount: -1 }) // Sort by best rated first
-            .limit(limit);
+        const agencies = await prisma.business.findMany({
+            where,
+            orderBy: [
+                { rating: 'desc' },
+                { reviewsCount: 'desc' }
+            ],
+            take: limit,
+            include: {
+                city: true,
+                categories: { include: { category: true } }
+            }
+        });
 
         return NextResponse.json(agencies);
     } catch (error) {

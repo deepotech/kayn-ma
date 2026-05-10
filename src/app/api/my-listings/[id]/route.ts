@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
-// Helper to revalidate paths
 const revalidateListingPaths = (id: string) => {
     ['ar', 'fr'].forEach(locale => {
         revalidatePath(`/${locale}`);
@@ -13,24 +11,13 @@ const revalidateListingPaths = (id: string) => {
     });
 };
 
-// GET /api/my-listings/[id] - Get single listing
-export async function GET(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
+        if (!id) return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
 
-        if (!id) {
-            return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
-        }
-
-        await dbConnect();
-        const listing = await Listing.findById(id).lean();
-
-        if (!listing) {
-            return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
-        }
+        const listing = await prisma.listing.findUnique({ where: { id }, include: { city: true } });
+        if (!listing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
 
         return NextResponse.json(listing);
     } catch (error) {
@@ -39,44 +26,27 @@ export async function GET(
     }
 }
 
-// PATCH /api/my-listings/[id] - Update listing
-export async function PATCH(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
         const body = await request.json();
+        if (!id) return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
 
-        if (!id) {
-            return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
-        }
+        const existingListing = await prisma.listing.findUnique({ where: { id } });
+        if (!existingListing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
 
-        await dbConnect();
-
-        // Check listing exists
-        const existingListing = await Listing.findById(id);
-        if (!existingListing) {
-            return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
-        }
-
-        // Verify ownership if userId provided
         if (body.userId && existingListing.userId !== body.userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        // Remove userId from update data
         const { userId, ...updateData } = body;
-        updateData.updatedAt = new Date();
 
-        const updatedListing = await Listing.findByIdAndUpdate(
-            id,
-            { $set: updateData },
-            { new: true, runValidators: true }
-        ).lean();
+        const updatedListing = await prisma.listing.update({
+            where: { id },
+            data: { ...updateData, updatedAt: new Date() }
+        });
 
         revalidateListingPaths(id);
-
         return NextResponse.json({ success: true, data: updatedListing });
     } catch (error) {
         console.error('Error updating listing:', error);
@@ -84,36 +54,22 @@ export async function PATCH(
     }
 }
 
-// DELETE /api/my-listings/[id] - Delete listing
-export async function DELETE(
-    request: NextRequest,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get('userId');
+        if (!id) return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
 
-        if (!id) {
-            return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
-        }
+        const existingListing = await prisma.listing.findUnique({ where: { id } });
+        if (!existingListing) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
 
-        await dbConnect();
-
-        const existingListing = await Listing.findById(id);
-        if (!existingListing) {
-            return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
-        }
-
-        // Verify ownership if userId provided
         if (userId && existingListing.userId !== userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        await Listing.findByIdAndDelete(id);
-
+        await prisma.listing.delete({ where: { id } });
         revalidateListingPaths(id);
-
         return NextResponse.json({ success: true, message: 'Listing deleted' });
     } catch (error) {
         console.error('Error deleting listing:', error);

@@ -2,8 +2,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { getListings } from '@/lib/listings';
 import JsonLd from '@/components/seo/JsonLd';
 import { notFound } from 'next/navigation';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 import ListingDetail from '@/components/listings/ListingDetail';
 import ListingCard from '@/components/listings/ListingCard';
 import SearchFilters from '@/components/search/SearchFilters';
@@ -42,9 +41,7 @@ export async function generateMetadata({ params, searchParams }: any) {
     // CASE 1: Listing Detail
     if (isValidObjectId(idOrFirstSlug) && slug.length === 1) {
         try {
-            await dbConnect();
-            const rawListing = await Listing.findById(idOrFirstSlug).select('brand carModel year price city purpose description images condition fuelType transmission mileage createdAt sellerType').lean();
-
+            const rawListing = await prisma.listing.findUnique({ where: { id: idOrFirstSlug }, include: { city: true } });
             if (!rawListing) return { title: 'Not Found' };
             const l = normalizeListing(rawListing) as any;
 
@@ -114,8 +111,7 @@ export default async function DynamicCarPage({
     // 1. Check if it's a Listing Detail Page
     if (isValidObjectId(idOrFirstSlug) && slug.length === 1) {
         // Fetch data specifically for JSON-LD generation effectively duplicating fetch but cleaner separation
-        await dbConnect();
-        const rawListing = await Listing.findById(idOrFirstSlug).select('brand carModel year price city purpose description images condition fuelType transmission mileage createdAt sellerType').lean() as any;
+        const rawListing = await prisma.listing.findUnique({ where: { id: idOrFirstSlug }, include: { city: true } }) as any;
 
         if (rawListing) {
             const l = normalizeListing(rawListing) as any;

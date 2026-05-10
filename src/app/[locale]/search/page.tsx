@@ -1,36 +1,23 @@
 import { getTranslations } from 'next-intl/server';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 import ListingCard from '@/components/listings/ListingCard';
 import SearchFilters from '@/components/search/SearchFilters';
 
 async function getListings(searchParams: any) {
-    await dbConnect();
-
-    const query: any = { status: 'approved', visibility: 'public' };
-
-    // City Filter
-    if (searchParams.city) query.city = searchParams.city;
-
-    // Brand Filter
-    if (searchParams.brand) query.brand = searchParams.brand;
-
-    // Price Filter
+    const where: any = { status: 'approved', visibility: 'public' };
+    if (searchParams.city) where.city = { slug: searchParams.city };
+    if (searchParams.brand) where.brandSlug = searchParams.brand;
     if (searchParams.minPrice || searchParams.maxPrice) {
-        query.price = {};
-        if (searchParams.minPrice) query.price.$gte = Number(searchParams.minPrice);
-        if (searchParams.maxPrice) query.price.$lte = Number(searchParams.maxPrice);
+        where.price = {};
+        if (searchParams.minPrice) where.price.gte = Number(searchParams.minPrice);
+        if (searchParams.maxPrice) where.price.lte = Number(searchParams.maxPrice);
     }
-
-    // Year Filter
     if (searchParams.minYear || searchParams.maxYear) {
-        query.year = {};
-        if (searchParams.minYear) query.year.$gte = Number(searchParams.minYear);
-        if (searchParams.maxYear) query.year.$lte = Number(searchParams.maxYear);
+        where.year = {};
+        if (searchParams.minYear) where.year.gte = Number(searchParams.minYear);
+        if (searchParams.maxYear) where.year.lte = Number(searchParams.maxYear);
     }
-
-    const listings = await Listing.find(query).sort({ createdAt: -1 }).lean();
-    return JSON.parse(JSON.stringify(listings));
+    return prisma.listing.findMany({ where, orderBy: { createdAt: 'desc' }, include: { city: true } });
 }
 
 export default async function SearchPage({

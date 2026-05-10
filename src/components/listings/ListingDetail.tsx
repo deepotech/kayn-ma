@@ -1,7 +1,6 @@
 import { getFormatter, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 import { Link } from '@/navigation';
 import { Phone, MessageCircle, MapPin, Eye, ArrowLeft, Share2, Shield, Settings } from 'lucide-react';
 import ImageGallery from '@/components/listings/ImageGallery';
@@ -18,10 +17,9 @@ import { normalizeListing } from '@/lib/listings/normalizeListing';
 
 async function getListing(id: string) {
     try {
-        await dbConnect();
-        const listing = await Listing.findById(id).lean();
+        const listing = await prisma.listing.findUnique({ where: { id }, include: { city: true } });
         if (!listing) return null;
-        return JSON.parse(JSON.stringify(listing));
+        return listing;
     } catch (e) {
         return null;
     }

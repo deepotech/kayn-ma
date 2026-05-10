@@ -2,8 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/Button';
 import { Search, BadgeCheck, MessageCircle, Banknote, ChevronDown, Car, RefreshCw, Building2, Key, Shield, Phone, AlertTriangle, Plus } from 'lucide-react';
 import { Link } from '@/navigation';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+
 import ListingCard from '@/components/listings/ListingCard';
 import { CITIES, getCityName } from '@/constants/cities';
 import TopAgenciesTeaser from '@/components/home/TopAgenciesTeaser';
@@ -19,24 +18,26 @@ import LatestListingsTabs from '@/components/home/LatestListingsTabs';
 import BodyTypeSection from '@/components/home/BodyTypeSection';
 import BrandSection from '@/components/home/BrandSection';
 
+import prisma from '@/lib/db';
+
 async function getListingsByType(type: 'sale' | 'rent' | 'all') {
   try {
-    await dbConnect();
     const query: any = { status: 'approved', visibility: 'public' };
 
     if (type !== 'all') {
       const isRent = type === 'rent';
-      // Handle backward compatibility + new 'purpose' field
-      query.$or = [
+      query.OR = [
         { purpose: type },
         { adType: isRent ? 'rental' : 'sale' },
-        // If purpose/adType missing, assume sale for 'sale' query
-        ...(type === 'sale' ? [{ purpose: { $exists: false }, adType: { $exists: false } }] : [])
       ];
     }
 
-    const listings = await Listing.find(query).sort({ createdAt: -1 }).limit(8).lean();
-    return JSON.parse(JSON.stringify(listings));
+    const listings = await prisma.listing.findMany({
+      where: query,
+      orderBy: { createdAt: 'desc' },
+      take: 8
+    });
+    return listings;
   } catch (error) {
     console.error(`Failed to fetch ${type} listings:`, error);
     return [];
