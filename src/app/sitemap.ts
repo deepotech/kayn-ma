@@ -11,7 +11,8 @@ import {
     getSeoLandingUrls,
 } from '@/lib/sitemap-utils';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Simplified single sitemap function (no generateSitemaps) for better stability
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -66,10 +67,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     // 2. Agencies & Intent Pages
+    try {
     const { getSupportedCities } = await import('@/lib/rent-agencies/getAgenciesByCity');
     const supportedCities = getSupportedCities();
 
-    // Fetch agencies from all supported cities
     const allAgencies: any[] = [];
     for (const city of supportedCities) {
         const { agencies } = await getAgencies({ city, limit: 10000 });
@@ -116,32 +117,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             });
         });
     });
+    } catch (e) {
+        console.warn('Sitemap: skipping agency pages (DB unavailable):', e);
+    }
 
     // 3. SEO Landing Pages (Programmatic Car Pages)
-    // 3. SEO Landing Pages (Programmatic Car Pages)
-    const seoLandingUrls = await getSeoLandingUrls();
-    seoLandingUrls.forEach(url => {
-        sitemapEntries.push(url as any);
-    });
+    try {
+        const seoLandingUrls = await getSeoLandingUrls();
+        seoLandingUrls.forEach(url => { sitemapEntries.push(url as any); });
+    } catch (e) {
+        console.warn('Sitemap: skipping SEO landing pages (DB unavailable):', e);
+    }
 
     // 4. Listings
-    // Load ALL listings (pagination loop)
-    const totalListings = await getTotalListingsCount();
-    const batchSize = 1000;
-    const batches = Math.ceil(totalListings / batchSize);
-
-    for (let i = 0; i < batches; i++) {
-        const listings = await getListingBatch(i, batchSize);
-        listings.forEach((listing: any) => {
-            LOCALES.forEach(locale => {
-                sitemapEntries.push({
-                    url: `${BASE_URL}/${locale}/cars/${listing._id.toString()}`,
-                    lastModified: listing.updatedAt ? new Date(listing.updatedAt) : new Date(),
-                    changeFrequency: 'weekly',
-                    priority: 0.65,
+    try {
+        const totalListings = await getTotalListingsCount();
+        const batchSize = 1000;
+        const batches = Math.ceil(totalListings / batchSize);
+        for (let i = 0; i < batches; i++) {
+            const listings = await getListingBatch(i, batchSize);
+            listings.forEach((listing: any) => {
+                LOCALES.forEach(locale => {
+                    sitemapEntries.push({
+                        url: `${BASE_URL}/${locale}/cars/${listing.id}`,
+                        lastModified: listing.updatedAt ? new Date(listing.updatedAt) : new Date(),
+                        changeFrequency: 'weekly',
+                        priority: 0.65,
+                    });
                 });
             });
-        });
+        }
+    } catch (e) {
+        console.warn('Sitemap: skipping listings (DB unavailable):', e);
     }
 
 
