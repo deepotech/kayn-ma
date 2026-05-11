@@ -5,7 +5,8 @@ import { getTranslations } from 'next-intl/server';
 
 interface SimilarListingsProps {
     currentListing: {
-        _id: string;
+        _id?: string;
+        id?: string;
         brandSlug?: string;
         bodyTypeSlug?: string;
         price: number;
@@ -19,14 +20,16 @@ interface SimilarListingsProps {
 export default async function SimilarListings({ currentListing, locale }: SimilarListingsProps) {
     const t = await getTranslations('ListingPage');
 
+    // Safely resolve listing id (Prisma uses `id`, legacy MongoDB used `_id`)
+    const listingId = currentListing.id || currentListing._id || '';
+    if (!listingId) return null;
+
     // Safely extract slugs or strings
     const brandSlug = currentListing.brandSlug || (typeof currentListing.brand === 'object' ? (currentListing.brand as any).slug : currentListing.brand?.toLowerCase());
     const citySlug = typeof currentListing.city === 'object' ? (currentListing.city as any).slug : currentListing.city?.toLowerCase();
-    const bodyTypeSlug = currentListing.bodyTypeSlug || (typeof currentListing.bodyType === 'object' ? (currentListing.bodyType as any).slug : currentListing.bodyType?.toLowerCaseLiteral?.());
-    // Typescript safe extraction
-    const safeBodySlug = currentListing.bodyTypeSlug || (typeof (currentListing as any).bodyType === 'object' ? (currentListing as any).bodyType.slug : undefined);
+    const safeBodySlug = currentListing.bodyTypeSlug || (typeof (currentListing as any).bodyType === 'object' ? (currentListing as any).bodyType?.slug : undefined);
 
-    const similar = await getSimilarListings(currentListing._id, {
+    const similar = await getSimilarListings(listingId, {
         brandSlug: brandSlug,
         bodyTypeSlug: safeBodySlug,
         price: currentListing.price,
@@ -51,7 +54,7 @@ export default async function SimilarListings({ currentListing, locale }: Simila
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {similar.map((listing: any) => (
-                    <ListingCard key={listing._id} listing={listing} />
+                    <ListingCard key={listing.id || listing._id} listing={listing} />
                 ))}
             </div>
         </div>

@@ -101,12 +101,13 @@ export async function getSimilarListings(
 
     // 2. Fallback: Same Brand (Any City)
     if (similar.length < 6) {
-        const foundIds = similar.map(l => l.id);
+        const foundIds = similar.map(l => l.id).filter(Boolean);
+        const excludeIds = [listingId, ...foundIds].filter(Boolean) as string[];
         const moreBrand = await prisma.listing.findMany({
             where: {
                 ...baseWhere,
                 ...(brandSlug ? { brandSlug } : {}),
-                NOT: { id: { in: [listingId, ...foundIds] } },
+                NOT: { id: { in: excludeIds } },
             },
             orderBy: { publishedAt: 'desc' },
             take: 6 - similar.length,
@@ -117,13 +118,14 @@ export async function getSimilarListings(
 
     // 3. Fallback: Same Body Type + Price Range
     if (similar.length < 6) {
-        const foundIds = similar.map(l => l.id);
+        const foundIds = similar.map(l => l.id).filter(Boolean);
+        const excludeIds = [listingId, ...foundIds].filter(Boolean) as string[];
         const more = await prisma.listing.findMany({
             where: {
                 ...baseWhere,
                 ...(criteria.bodyTypeSlug ? { bodyTypeSlug: criteria.bodyTypeSlug } : {}),
                 price: { gte: criteria.price * 0.7, lte: criteria.price * 1.3 },
-                NOT: { id: { in: [listingId, ...foundIds] } },
+                NOT: { id: { in: excludeIds } },
             },
             orderBy: { publishedAt: 'desc' },
             take: 6 - similar.length,

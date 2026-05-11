@@ -51,7 +51,7 @@ export async function generateMetadata({ params, searchParams }: any) {
 
             const brandLabel = typeof l.brand === 'object' ? l.brand?.label : l.brand;
             const modelLabel = typeof l.carModel === 'object' ? l.carModel?.label : l.carModel;
-            const cityLabel = typeof l.city === 'object' ? l.city?.label : l.city;
+            const cityLabel = typeof l.city === 'object' ? (l.city?.label || l.city?.name || l.city?.slug || '') : (l.city || '');
 
             // Format: Brand Model Year - City | Cayn.ma
             const title = `${brandLabel} ${modelLabel} ${l.year} - ${cityLabel} | Cayn.ma`;
@@ -115,8 +115,8 @@ export default async function DynamicCarPage({
 
         if (rawListing) {
             const l = normalizeListing(rawListing) as any;
-            const brandLabel = typeof l.brand === 'object' ? l.brand?.label : l.brand;
-            const modelLabel = typeof l.carModel === 'object' ? l.carModel?.label : l.carModel;
+            const brandLabel = (typeof l.brand === 'object' ? (l.brand?.label || l.brand?.name) : l.brand) || '';
+            const modelLabel = (typeof l.carModel === 'object' ? (l.carModel?.label || l.carModel?.name) : l.carModel) || '';
 
             const productJsonLd = {
                 "@context": "https://schema.org/",

@@ -50,7 +50,7 @@ export default async function ListingDetail({ id, locale, initialData }: Listing
     // Safely extract labels
     const brandLabel = l.brand?.label || l.brand || '';
     const modelLabel = l.carModel?.label || l.carModel || '';
-    const cityLabel = l.city?.label || l.city || '';
+    const cityLabel = (typeof l.city === 'object' ? (l.city?.label || l.city?.name || l.city?.slug) : l.city) || '';
 
     const whatsappMessage = locale === 'ar'
         ? `مرحبا، أنا مهتم بإعلانك على Cayn.ma: ${brandLabel} ${modelLabel} ${l.year}`
