@@ -28,6 +28,47 @@ const nextConfig = {
                 hostname: 'images.unsplash.com',
                 pathname: '/**',
             },
+            // Google Maps / Places photo CDN domains
+            {
+                protocol: 'https',
+                hostname: 'streetviewpixels-pa.googleapis.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'maps.googleapis.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: '*.googleusercontent.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'lh5.googleusercontent.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'geo0.ggpht.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'geo1.ggpht.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'geo2.ggpht.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'geo3.ggpht.com',
+                pathname: '/**',
+            },
         ],
     },
 };

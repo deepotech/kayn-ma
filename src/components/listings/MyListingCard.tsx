@@ -7,6 +7,7 @@ import { Eye, Edit, Trash2, PauseCircle, PlayCircle, Building2, User } from 'luc
 import { getRelativeTime, formatViews } from '@/lib/timeUtils';
 import { Button } from '@/components/ui/Button';
 import { getCityDisplayName } from '@/lib/cityUtils';
+import { useState } from 'react';
 
 interface MyListingCardProps {
     listing: any;
@@ -25,6 +26,8 @@ export default function MyListingCard({
     const t = useTranslations('MyListings');
     const tCard = useTranslations('ListingCard');
     const listingId = listing.id || listing._id || '';
+    const firstImageUrl = listing.images && listing.images.length > 0 ? (listing.images[0].url || listing.images[0]) : null;
+    const [imgSrc, setImgSrc] = useState<string | null>(firstImageUrl);
 
     // Get relative time
     const timeAgo = listing.createdAt ? getRelativeTime(listing.createdAt, locale) : '';
@@ -50,17 +53,23 @@ export default function MyListingCard({
                 href={`/cars/${listingId}`}
                 className="relative aspect-video sm:w-48 sm:aspect-[4/3] bg-gray-100 dark:bg-zinc-800 overflow-hidden shrink-0"
             >
-                {listing.images && listing.images.length > 0 ? (
+                {imgSrc ? (
                     <Image
-                        src={listing.images[0].url}
+                        src={imgSrc}
                         alt={`${listing.brandLabel || listing.brand || ''} ${listing.carModelLabel || listing.carModel || ''}`}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                         sizes="(max-width: 640px) 100vw, 200px"
+                        onError={() => setImgSrc('/images/placeholder-car.jpg')}
                     />
                 ) : (
                     <div className="flex h-full items-center justify-center text-gray-400">
-                        <span className="text-2xl">🚗</span>
+                        <Image
+                            src="/images/placeholder-car.jpg"
+                            alt="placeholder"
+                            fill
+                            className="object-cover opacity-40"
+                        />
                     </div>
                 )}
 

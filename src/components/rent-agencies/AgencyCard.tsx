@@ -1,8 +1,11 @@
+'use client';
+
 import { NormalizedAgency } from '@/lib/rent-agencies/normalize';
 import { Link } from '@/navigation';
 import { MapPin, Phone, Star, Image as ImageIcon, ExternalLink, Clock, Navigation, Globe } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
+import { useState } from 'react';
 
 // Category name translations for Arabic
 const CATEGORY_AR: Record<string, string> = {
@@ -57,13 +60,16 @@ interface AgencyCardProps {
     agency: NormalizedAgency;
 }
 
+const AGENCY_PLACEHOLDER = '/images/placeholder-car.jpg';
+
 export default function AgencyCard({ agency }: AgencyCardProps) {
     const t = useTranslations('RentAgencies.Card');
     const tCommon = useTranslations('Common');
     const locale = useLocale();
 
     // Thumbnail logic: prefer first photo, fallback to placeholder
-    const thumbnail = agency.photos && agency.photos.length > 0 ? agency.photos[0] : null;
+    const rawThumbnail = agency.photos && agency.photos.length > 0 ? agency.photos[0] : null;
+    const [thumbnail, setThumbnail] = useState<string | null>(rawThumbnail);
 
     // Build google maps direction link
     // Build google maps direction link
@@ -83,10 +89,17 @@ export default function AgencyCard({ agency }: AgencyCardProps) {
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, 300px"
                         loading="lazy"
+                        onError={() => setThumbnail(AGENCY_PLACEHOLDER)}
                     />
                 ) : (
-                    <div className="flex items-center justify-center h-full text-slate-400">
-                        <ImageIcon className="w-12 h-12 opacity-50" />
+                    <div className="flex items-center justify-center h-full text-slate-400 relative">
+                        <Image
+                            src={AGENCY_PLACEHOLDER}
+                            alt="placeholder"
+                            fill
+                            className="object-cover opacity-30"
+                        />
+                        <ImageIcon className="w-12 h-12 opacity-50 relative z-10" />
                     </div>
                 )}
 
