@@ -427,5 +427,21 @@
             "title": "Droits de l'utilisateur",
             "content": "Vous avez le droit de demander une copie de vos données ou leur suppression à tout moment."
         }
+    },
+    "About": {
+        "title": "À propos de nous",
+        "introduction": "Bienvenue sur Cayn.ma, la plateforme de référence pour l'achat, la vente et la location de voitures au Maroc. Notre objectif est de simplifier vos transactions automobiles en toute sécurité.",
+        "mission": {
+            "title": "Notre Mission",
+            "content": "Notre mission est d'offrir un espace numérique sécurisé et convivial reliant vendeurs, acheteurs et locataires à travers tout le Royaume. Nous nous engageons à fournir des guides complets et des données précises sur le marché local."
+        },
+        "services": {
+            "title": "Nos Services",
+            "content": "Nous proposons un annuaire complet des agences de location de voitures, un moteur de recherche performant de véhicules neufs et d'occasion, et une mise en relation directe sans intermédiaire ni commission."
+        },
+        "whyUs": {
+            "title": "Pourquoi Cayn.ma ?",
+            "content": "Parce que nous prônons une transparence totale, vérifions manuellement la qualité des informations et fournissons des guides de référence locaux pour vous aider à prendre les meilleures décisions."
+        }
     }
 }

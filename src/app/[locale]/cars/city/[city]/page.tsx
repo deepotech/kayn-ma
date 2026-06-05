@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import Link from 'next/link';
+import prisma from '@/lib/db';
 import ListingCard from '@/components/listings/ListingCard';
 import SeoHeader from '@/components/seo/SeoHeader';
 import InternalLinks from '@/components/seo/InternalLinks';
 import { CITIES } from '@/constants/data';
 import { getTranslations } from 'next-intl/server';
+import { getCityCarGuide } from '@/data/seo-guides/index';
 
 // Generate static params for all cities to enable SSG (Static Site Generation)
 export async function generateStaticParams() {
@@ -40,15 +41,24 @@ export async function generateMetadata({ params: { city, locale } }: any) {
 }
 
 async function getCityListings(cityId: string) {
-    await dbConnect();
-    // Case insensitive search for city
-    const listings = await Listing.find({
-        city: { $regex: new RegExp(`^${cityId}$`, 'i') },
-        status: 'active'
-    })
-        .sort({ isFeatured: -1, createdAt: -1 }) // Featured first
-        .limit(20)
-        .lean();
+    const listings = await prisma.listing.findMany({
+        where: {
+            city: {
+                slug: {
+                    equals: cityId,
+                    mode: 'insensitive'
+                }
+            },
+            status: 'approved',
+            visibility: 'public'
+        },
+        orderBy: [
+            { isFeatured: 'desc' },
+            { publishedAt: 'desc' },
+            { createdAt: 'desc' }
+        ],
+        take: 20
+    });
 
     return JSON.parse(JSON.stringify(listings));
 }
@@ -100,11 +110,26 @@ export default async function CityPage({ params: { city, locale } }: any) {
         }
     };
 
+    const breadcrumbJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((crumb, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: crumb.label,
+            item: `https://cayn.ma${crumb.href}`
+        }))
+    };
+
     return (
         <>
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
             />
 
             <SeoHeader
@@ -149,7 +174,114 @@ export default async function CityPage({ params: { city, locale } }: any) {
                     </div>
                 </div>
 
+                {/* Dynamic SEO Guide Block — rendered for any city that has a guide in the registry */}
+                {(() => {
+                    const guide = getCityCarGuide(city);
+                    if (!guide) return null;
+                    const lang = locale === 'ar' ? guide.ar : guide.fr;
+                    const faqSchema = {
+                        '@context': 'https://schema.org',
+                        '@type': 'FAQPage',
+                        mainEntity: lang.faqs.map((faq: { question: string; answer: string }) => ({
+                            '@type': 'Question',
+                            name: faq.question,
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: faq.answer
+                            }
+                        }))
+                    };
+                    return (
+                        <>
+                            {/* FAQPage JSON-LD */}
+                            <script
+                                type="application/ld+json"
+                                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+                            />
+                            <div className="mt-16 bg-white dark:bg-zinc-900 rounded-xl p-8 border border-slate-200 dark:border-zinc-800 shadow-sm max-w-4xl mx-auto">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{lang.title}</h2>
+                                <div className="flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500 mb-6 pb-4 border-b border-slate-100 dark:border-zinc-800/50">
+                                    <span>
+                                        {locale === 'ar' ? 'آخر تحديث: يونيو 2026' : 'Dernière mise à jour : Juin 2026'}
+                                    </span>
+                                    <span>•</span>
+                                    <span>
+                                        {locale === 'ar' ? 'بقلم: فريق Cayn.ma' : 'Par : L\'équipe Cayn.ma'}
+                                    </span>
+                                </div>
+                                <div className="space-y-8">
+                                    {lang.sections.map((section: { title: string; content: string | string[] }, i: number) => (
+                                        <section key={i}>
+                                            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-3">{section.title}</h3>
+                                            {Array.isArray(section.content) ? (
+                                                <ul className="list-disc list-inside space-y-2 ms-2 text-slate-600 dark:text-slate-400">
+                                                    {section.content.map((item: string, j: number) => (
+                                                        <li key={j}>{item}</li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{section.content}</p>
+                                            )}
+                                        </section>
+                                    ))}
+                                </div>
+                                {/* FAQ Section */}
+                                <div className="mt-10 border-t border-slate-200 dark:border-zinc-800 pt-8">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
+                                        {locale === 'ar' ? 'الأسئلة الشائعة' : 'Questions fréquentes'}
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {lang.faqs.map((faq: { question: string; answer: string }, i: number) => (
+                                            <div key={i} className="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-xl">
+                                                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">{faq.question}</h4>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400">{faq.answer}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                {/* Related Guides Section */}
+                                <div className="mt-10 border-t border-slate-200 dark:border-zinc-800 pt-8">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                                        {locale === 'ar' ? 'قد يهمك أيضاً:' : 'Vous aimerez aussi :'}
+                                    </h3>
+                                    <ul className="space-y-2 text-sm text-blue-600 dark:text-blue-400">
+                                        <li>
+                                            <Link href={`/${locale}/rent-agencies/${city}`} className="hover:underline">
+                                                {locale === 'ar'
+                                                    ? `دليل كراء السيارات في ${cityName}`
+                                                    : `Guide de location de voiture à ${cityName}`}
+                                            </Link>
+                                        </li>
+                                        {city !== 'marrakech' && (
+                                            <li>
+                                                <Link href={`/${locale}/cars/city/marrakech`} className="hover:underline">
+                                                    {locale === 'ar' ? 'دليل السيارات المستعملة في مراكش' : 'Guide de voitures d\'occasion à Marrakech'}
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {city !== 'casablanca' && (
+                                            <li>
+                                                <Link href={`/${locale}/cars/city/casablanca`} className="hover:underline">
+                                                    {locale === 'ar' ? 'دليل السيارات المستعملة في الدار البيضاء' : 'Guide de voitures d\'occasion à Casablanca'}
+                                                </Link>
+                                            </li>
+                                        )}
+                                        {city !== 'rabat' && (
+                                            <li>
+                                                <Link href={`/${locale}/cars/city/rabat`} className="hover:underline">
+                                                    {locale === 'ar' ? 'دليل السيارات المستعملة في الرباط' : 'Guide de voitures d\'occasion à Rabat'}
+                                                </Link>
+                                            </li>
+                                        )}
+                                    </ul>
+                                </div>
+                            </div>
+                        </>
+                    );
+                })()}
+
                 <InternalLinks />
+
             </div>
         </>
     );

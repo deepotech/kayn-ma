@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 import ListingCard from '@/components/listings/ListingCard';
 import SeoHeader from '@/components/seo/SeoHeader';
 import InternalLinks from '@/components/seo/InternalLinks';
@@ -10,10 +9,10 @@ const VALID_RANGES = ['under-50000', '50000-100000', '100000-200000', 'over-2000
 
 // Parse range string to mongo query
 function parseRange(range: string) {
-    if (range === 'under-50000') return { $lt: 50000 };
-    if (range === '50000-100000') return { $gte: 50000, $lte: 100000 };
-    if (range === '100000-200000') return { $gte: 100000, $lte: 200000 };
-    if (range === 'over-200000') return { $gt: 200000 };
+    if (range === 'under-50000') return { lt: 50000 };
+    if (range === '50000-100000') return { gte: 50000, lte: 100000 };
+    if (range === '100000-200000') return { gte: 100000, lte: 200000 };
+    if (range === 'over-200000') return { gt: 200000 };
     return null;
 }
 
@@ -33,15 +32,20 @@ export async function generateMetadata({ params: { range, locale } }: any) {
 export default async function BudgetPage({ params: { range, locale } }: any) {
     if (!VALID_RANGES.includes(range)) notFound();
 
-    await dbConnect();
     const priceQuery = parseRange(range);
-    const listings = await Listing.find({
-        price: priceQuery,
-        status: 'active'
-    })
-        .sort({ price: 1 }) // Sort by price asc for budget pages usually
-        .limit(30)
-        .lean();
+    if (!priceQuery) notFound();
+
+    const listings = await prisma.listing.findMany({
+        where: {
+            price: priceQuery,
+            status: 'approved',
+            visibility: 'public'
+        },
+        orderBy: {
+            price: 'asc'
+        },
+        take: 30
+    });
 
     const count = listings.length;
 

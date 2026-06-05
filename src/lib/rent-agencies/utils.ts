@@ -96,7 +96,8 @@ export const CITY_NAMES_AR: Record<string, string> = {
     taza: 'تازة',
     settat: 'سطات',
     berrechid: 'برشيد',
-    khemisset: 'الخميسات'
+    khemisset: 'الخميسات',
+    'kelaat-sraghna': 'قلعة السراغنة'
 };
 
 export function getLocalizedCityName(citySlug: string, locale: string): string {

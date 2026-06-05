@@ -54,7 +54,8 @@ export const CITIES: City[] = [
     { slug: 'ifrane', name: { ar: 'إفران', fr: 'Ifrane' } },
     { slug: 'asilah', name: { ar: 'أصيلة', fr: 'Asilah' } },
     { slug: 'azrou', name: { ar: 'أزرو', fr: 'Azrou' } },
-    { slug: 'midelt', name: { ar: 'ميدلت', fr: 'Midelt' } }
+    { slug: 'midelt', name: { ar: 'ميدلت', fr: 'Midelt' } },
+    { slug: 'kelaat-sraghna', name: { ar: 'قلعة السراغنة', fr: 'Kelaat Sraghna' } }
 ];
 
 /**

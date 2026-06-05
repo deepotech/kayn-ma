@@ -55,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         });
 
         // Legal & Info pages
-        const infoPages = ['terms', 'privacy', 'contact'];
+        const infoPages = ['about', 'terms', 'privacy', 'contact'];
         infoPages.forEach(page => {
             sitemapEntries.push({
                 url: `${BASE_URL}/${locale}/${page}`,

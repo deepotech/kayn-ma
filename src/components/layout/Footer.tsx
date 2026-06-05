@@ -67,6 +67,9 @@ export default function Footer() {
                         <h3 className="font-semibold text-white mb-4">{t('about')}</h3>
                         <ul className="space-y-2 text-sm">
                             <li>
+                                <Link href="/about" className="hover:text-blue-400 transition-colors">{t('about')}</Link>
+                            </li>
+                            <li>
                                 <Link href="/terms" className="hover:text-blue-400 transition-colors">{t('terms')}</Link>
                             </li>
                             <li>
