@@ -58,6 +58,8 @@ function testFetch(url, name) {
 async function run() {
     await testFetch('http://127.0.0.1:3000/ar/rent-agencies/casablanca', 'casablanca_rent_ar');
     await testFetch('http://127.0.0.1:3000/ar/cars/city/casablanca', 'casablanca_cars_ar');
+    await testFetch('http://127.0.0.1:3000/ar/rent-agencies/kelaat-sraghna', 'kelaat_sraghna_rent_ar');
+    await testFetch('http://127.0.0.1:3000/fr/rent-agencies/kelaat-sraghna', 'kelaat_sraghna_rent_fr');
     process.exit(0);
 }
 

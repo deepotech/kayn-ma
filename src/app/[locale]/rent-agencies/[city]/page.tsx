@@ -360,6 +360,13 @@ export default async function CityAgenciesPage({ params }: Props) {
                                 { slug: 'fes', ar: 'فاس', fr: 'Fès' },
                                 { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
                             ],
+                            'kelaat-sraghna': [
+                                { slug: 'marrakech', ar: 'مراكش', fr: 'Marrakech' },
+                                { slug: 'casablanca', ar: 'الدار البيضاء', fr: 'Casablanca' },
+                                { slug: 'settat', ar: 'سطات', fr: 'Settat' },
+                                { slug: 'berrechid', ar: 'برشيد', fr: 'Berrechid' },
+                                { slug: 'agadir', ar: 'أكادير', fr: 'Agadir' },
+                            ],
                         };
                         // Default list shown on all other cities — always includes main hubs + agadir
                         const defaultList = [

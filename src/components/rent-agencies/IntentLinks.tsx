@@ -30,7 +30,8 @@ export default function IntentLinks({ city, currentIntent, locale }: Props) {
         taza: 'تازة',
         settat: 'سطات',
         berrechid: 'برشيد',
-        khemisset: 'الخميسات'
+        khemisset: 'الخميسات',
+        'kelaat-sraghna': 'قلعة السراغنة'
     };
 
     const cityName = (locale === 'ar' && cityMap[city.toLowerCase()])
