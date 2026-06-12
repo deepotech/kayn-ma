@@ -1249,6 +1249,73 @@
     "url": "https://www.google.com/maps/search/?api=1&query=mustapha%20haitoti&query_place_id=ChIJDSntNlZZpw0RLkkUK54LZYk"
   },
   {
+    "address": "126A Av. Moulay Abdelazziz, Rue Kourd Ali، القنيطرة، المغرب",
+    "bookingLinks": [],
+    "additionalInfo": null,
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqU8gl1G2ULPyWzbi2cwYIUcOWJRDANkPyS2pM7m_OAcO3xlf1MfkKJ8df7OcjmBJiKHEI3tiuHUQHeCMZB89k50xA4YyreoEXvCALwzTngQC64Eddo48XcVbYbayfbCpOzQ1zi=w534-h240-k-no",
+    "imageUrls": [
+      "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqU8gl1G2ULPyWzbi2cwYIUcOWJRDANkPyS2pM7m_OAcO3xlf1MfkKJ8df7OcjmBJiKHEI3tiuHUQHeCMZB89k50xA4YyreoEXvCALwzTngQC64Eddo48XcVbYbayfbCpOzQ1zi=w1920-h1080-k-no"
+    ],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "داخل المتجر"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2564084,
+      "lng": -6.5955084
+    },
+    "menu": null,
+    "neighborhood": "المعمورة",
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "8:30ص to 1م"
+      },
+      {
+        "day": "الأحد",
+        "hours": "مغلق"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "8:30ص to 7م"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "8:30ص to 7م"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "8:30ص to 7م"
+      },
+      {
+        "day": "الخميس",
+        "hours": "8:30ص to 7م"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "8:30ص to 7م"
+      }
+    ],
+    "phone": "+212 5 37 33 71 33",
+    "placeId": "ChIJr54LhFVZpw0RU83YsJLaEHU",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "126A Av. Moulay Abdelazziz, Rue Kourd Ali",
+    "subTitle": null,
+    "title": "Volvo Cars",
+    "url": "https://www.google.com/maps/search/?api=1&query=Volvo%20Cars&query_place_id=ChIJr54LhFVZpw0RU83YsJLaEHU"
+  },
+  {
     "address": "Residence Nakhil magasin، 4 Avenue Ahmed Chaouki، القنيطرة 14000، المغرب",
     "bookingLinks": [],
     "additionalInfo": {
@@ -2440,6 +2507,110 @@
     "url": "https://www.google.com/maps/search/?api=1&query=YGC%20%E2%80%93%20Yousam%20Golden%20Car&query_place_id=ChIJRxL8Ox9Zpw0RZsj8G_LfKRA"
   },
   {
+    "address": "شارع محمد الخامس، القنيطرة، المغرب",
+    "bookingLinks": [],
+    "additionalInfo": {
+      "إمكانية الوصول": [
+        {
+          "مدخل صالح للكراسي المتحركة": true
+        },
+        {
+          "موقف سيارات صالح للكراسي المتحركة": true
+        }
+      ],
+      "الخدمات المقدّمة": [
+        {
+          "خدمات إصلاح": true
+        },
+        {
+          "خدمة تغيير الزيت": true
+        },
+        {
+          "مغسلة سيارات": true
+        }
+      ],
+      "وسائل الراحة": [
+        {
+          "دورة مياه للجنسين": true
+        }
+      ],
+      "الدفعات": [
+        {
+          "الشيكات": true
+        },
+        {
+          "بطاقات ائتمان": true
+        },
+        {
+          "بطاقات سحب آلي": true
+        }
+      ]
+    },
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweq3Zs_Pus2D2qJjEvATOqKv98IsZE_0Ltdu3fCfHG9hO4KU0Rnu3XEXsBSlXBktncRjsrAGRJYe5YTpVTHA8gIo41ae89v5PX5HeZ0H4gR_Ti2EpuFN00HZXEptdcT3QfSKHaO9TQ=w408-h276-k-no",
+    "imageUrls": [
+      "https://lh3.googleusercontent.com/gps-cs-s/AHVAweq3Zs_Pus2D2qJjEvATOqKv98IsZE_0Ltdu3fCfHG9hO4KU0Rnu3XEXsBSlXBktncRjsrAGRJYe5YTpVTHA8gIo41ae89v5PX5HeZ0H4gR_Ti2EpuFN00HZXEptdcT3QfSKHaO9TQ=w1920-h1080-k-no"
+    ],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "داخل المتجر",
+      "مِن المالك"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2485733,
+      "lng": -6.6077485
+    },
+    "menu": null,
+    "neighborhood": null,
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "9ص to 5م"
+      },
+      {
+        "day": "الأحد",
+        "hours": "مغلق"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "8ص to 7م"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "8ص to 7م"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "8ص to 7م"
+      },
+      {
+        "day": "الخميس",
+        "hours": "8ص to 7م"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "8ص to 7م"
+      }
+    ],
+    "phone": "+212 5 37 36 82 06",
+    "placeId": "ChIJFbBQ2Y5Zpw0RzeVKRbgpdjY",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "شارع محمد الخامس",
+    "subTitle": null,
+    "title": "Kia Maroc - Concession Kénitra",
+    "url": "https://www.google.com/maps/search/?api=1&query=Kia%20Maroc%20-%20Concession%20K%C3%A9nitra&query_place_id=ChIJFbBQ2Y5Zpw0RzeVKRbgpdjY"
+  },
+  {
     "address": "14000, Kénitra, المغرب",
     "bookingLinks": [],
     "additionalInfo": null,
@@ -2813,6 +2984,82 @@
     "url": "https://www.google.com/maps/search/?api=1&query=AUTO%20AYOUB%20K%C3%89NITRA&query_place_id=ChIJ8df8IwBZpw0RdCBvqFG8MdU"
   },
   {
+    "address": "794H+C42، القنيطرة، المغرب",
+    "bookingLinks": [],
+    "additionalInfo": {
+      "وسائل الراحة": [
+        {
+          "مرحاض": true
+        },
+        {
+          "ميكانيكي": true
+        }
+      ],
+      "التخطيط": [
+        {
+          "تحديد المواعيد مُوصَى به": true
+        }
+      ]
+    },
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": null,
+    "imageUrls": [],
+    "images": null,
+    "imageCategories": [],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2560131,
+      "lng": -6.6222347
+    },
+    "menu": null,
+    "neighborhood": null,
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الأحد",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الخميس",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "نعمل على مدار 24 ساعة"
+      }
+    ],
+    "phone": "+212 6 08 25 70 80",
+    "placeId": "ChIJn8veOHZZpw0RCsaIIv9vIk0",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "794H+C42",
+    "subTitle": null,
+    "title": "كهرباء السيارات يوسف",
+    "url": "https://www.google.com/maps/search/?api=1&query=%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%8A%D9%88%D8%B3%D9%81&query_place_id=ChIJn8veOHZZpw0RCsaIIv9vIk0"
+  },
+  {
     "address": "N 114 bloc f, Kénitra 14080، المغرب",
     "bookingLinks": [],
     "additionalInfo": null,
@@ -2879,6 +3126,48 @@
     "subTitle": null,
     "title": "HEAVENAUTO",
     "url": "https://www.google.com/maps/search/?api=1&query=HEAVENAUTO&query_place_id=ChIJhSHnYAZZpw0Rvf6y4pN96a8"
+  },
+  {
+    "address": "COMMUNE MAAMOURA, CITY GARDEN F-3, Kénitra, المغرب",
+    "bookingLinks": [],
+    "additionalInfo": {
+      "إمكانية الوصول": [
+        {
+          "مدخل صالح للكراسي المتحركة": true
+        }
+      ]
+    },
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAwep3JeyfcyaYPKNGKBcHMhSDgeR32VWuNejPOxQpoSwT8nFwgNcx27v4GdmMWnwDyTjA7UaZ3V2xxbeZPZQyJ7DSZJ6-zFm5BNP5u12AGCeBpQ51WNrWwBR6yshHmCxLZ8wDYdo=w408-h725-k-no",
+    "imageUrls": [],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "الفيديوهات"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2447456,
+      "lng": -6.6077072
+    },
+    "menu": null,
+    "neighborhood": null,
+    "openingHours": [],
+    "phone": "+212 6 61 17 24 92",
+    "placeId": "ChIJoak06KFZpw0RkM891mMBtio",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "COMMUNE MAAMOURA, CITY GARDEN F-3",
+    "subTitle": null,
+    "title": "Tata Kenitra",
+    "url": "https://www.google.com/maps/search/?api=1&query=Tata%20Kenitra&query_place_id=ChIJoak06KFZpw0RkM891mMBtio"
   },
   {
     "address": "Lot n°101 Bir Rami، القنيطرة، المغرب",
@@ -3184,6 +3473,127 @@
     "subTitle": null,
     "title": "Garage Sebou",
     "url": "https://www.google.com/maps/search/?api=1&query=Garage%20Sebou&query_place_id=ChIJJ8uNCwBXpw0RF_0T57bXkEM"
+  },
+  {
+    "address": "Route de tanger, Km 4, Quartier Assam, Kénitra, المغرب",
+    "bookingLinks": [
+      {
+        "name": "hyundai.ma",
+        "url": "https://connect.hyundai.ma/"
+      }
+    ],
+    "additionalInfo": {
+      "خيارات الخدمة": [
+        {
+          "التسوّق داخل المتجر": true
+        },
+        {
+          "خدمة التوصيل": false
+        }
+      ],
+      "إمكانية الوصول": [
+        {
+          "مدخل صالح للكراسي المتحركة": true
+        },
+        {
+          "موقف سيارات صالح للكراسي المتحركة": true
+        },
+        {
+          "أماكن جلوس صالحة للكراسي المتحركة": false
+        }
+      ],
+      "الخدمات المقدّمة": [
+        {
+          "خدمات إصلاح": true
+        },
+        {
+          "خدمة تغيير الزيت": true
+        },
+        {
+          "مغسلة سيارات": true
+        }
+      ],
+      "وسائل الراحة": [
+        {
+          "دورة مياه للجنسين": true
+        }
+      ],
+      "الدفعات": [
+        {
+          "الشيكات": true
+        },
+        {
+          "بطاقات ائتمان": true
+        },
+        {
+          "بطاقات الائتمان": true
+        }
+      ]
+    },
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAwerd98TP6bUcTjeiK9aiCYqcYJ4UOI80bSxfGfx4hIWzIptuJFt1NVoO05nwUujfyszR9c1P9nOfMr2yRcpjDdhOoKJXIk7K8O5VR9Oj0l9lk2x4DnESaTRBj_HAiUUE094MlLAo=w530-h240-k-no",
+    "imageUrls": [
+      "https://lh3.googleusercontent.com/gps-cs-s/AHVAwerd98TP6bUcTjeiK9aiCYqcYJ4UOI80bSxfGfx4hIWzIptuJFt1NVoO05nwUujfyszR9c1P9nOfMr2yRcpjDdhOoKJXIk7K8O5VR9Oj0l9lk2x4DnESaTRBj_HAiUUE094MlLAo=w1920-h1080-k-no"
+    ],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "داخل المتجر",
+      "الفيديوهات",
+      "مِن المالك"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2815556,
+      "lng": -6.5391278
+    },
+    "menu": null,
+    "neighborhood": null,
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "9:30ص to 4:30م"
+      },
+      {
+        "day": "الأحد",
+        "hours": "مغلق"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "8:30ص to 6:30م"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "8:30ص to 6:30م"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "8:30ص to 6:30م"
+      },
+      {
+        "day": "الخميس",
+        "hours": "8:30ص to 6:30م"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "8:30ص to 12:30م, 3 to 6:30م"
+      }
+    ],
+    "phone": "+212 80-2058585",
+    "placeId": "ChIJwx9h2-NZpw0Rkgph9ePsmD8",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "Route de tanger, Km 4, Quartier Assam",
+    "subTitle": "Hyundai : Global Engines Kénitra",
+    "title": "Global Engines Hyundai",
+    "url": "https://www.google.com/maps/search/?api=1&query=Global%20Engines%20Hyundai&query_place_id=ChIJwx9h2-NZpw0Rkgph9ePsmD8"
   },
   {
     "address": "7C79+5QG, Rue du Port, Kénitra, المغرب",
@@ -3703,6 +4113,74 @@
     "subTitle": null,
     "title": "DONGFENG : BENTHAMI MOTORS",
     "url": "https://www.google.com/maps/search/?api=1&query=DONGFENG%20%3A%20BENTHAMI%20MOTORS&query_place_id=ChIJYTq_ov9Zpw0R-40Qp0fR9aY"
+  },
+  {
+    "address": "Rue N 303, Kénitra 14000، المغرب",
+    "bookingLinks": [],
+    "additionalInfo": null,
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweonoO76rJxOlfiTDLJ9sxqW3UJ_S8TxWW2trQLUAa0k0xN_SiJWzh0FkY2ZELJUWWyxyU0U6-mQT4D8k3aVISwJ6910FIuVVJaC5OD9uJm6BqPYCZYQjSfOXnvhJQ2tzOJ6wxQJ=w408-h299-k-no",
+    "imageUrls": [
+      "https://lh3.googleusercontent.com/gps-cs-s/AHVAweonoO76rJxOlfiTDLJ9sxqW3UJ_S8TxWW2trQLUAa0k0xN_SiJWzh0FkY2ZELJUWWyxyU0U6-mQT4D8k3aVISwJ6910FIuVVJaC5OD9uJm6BqPYCZYQjSfOXnvhJQ2tzOJ6wxQJ=w1920-h1080-k-no"
+    ],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "داخل المتجر",
+      "مِن المالك"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2677987,
+      "lng": -6.5621957
+    },
+    "menu": null,
+    "neighborhood": null,
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "8ص to 9:30م"
+      },
+      {
+        "day": "الأحد",
+        "hours": "8ص to 12ص"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "8ص to 9:30م"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "نعمل على مدار 24 ساعة"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "8ص to 9:30م"
+      },
+      {
+        "day": "الخميس",
+        "hours": "8ص to 9:30م"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "8ص to 9:30م"
+      }
+    ],
+    "phone": "+212 6 01 24 60 86",
+    "placeId": "ChIJUSZ3yqNZpw0RVAS7T3uAIiI",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "Rue N 303",
+    "subTitle": null,
+    "title": "ADIL CARS",
+    "url": "https://www.google.com/maps/search/?api=1&query=ADIL%20CARS&query_place_id=ChIJUSZ3yqNZpw0RVAS7T3uAIiI"
   },
   {
     "address": "7CFV+63V، شارع محمد الخامس، القنيطرة، المغرب",
@@ -5735,6 +6213,103 @@
     "url": "https://www.google.com/maps/search/?api=1&query=Tata%20Motors-%20Benthami%20Motors&query_place_id=ChIJLwuxCCZZpw0RzLsDGUOyRBk"
   },
   {
+    "address": "Résidence nouhaila, 172 Avenue Said Daoudi, Kenitra, المغرب",
+    "bookingLinks": [],
+    "additionalInfo": {
+      "خيارات الخدمة": [
+        {
+          "التسوّق داخل المتجر": true
+        }
+      ],
+      "إمكانية الوصول": [
+        {
+          "أماكن جلوس صالحة للكراسي المتحركة": true
+        },
+        {
+          "مدخل صالح للكراسي المتحركة": true
+        }
+      ],
+      "الدفعات": [
+        {
+          "الشيكات": true
+        },
+        {
+          "بطاقات ائتمان": true
+        },
+        {
+          "بطاقات سحب آلي": true
+        },
+        {
+          "بطاقات الائتمان": true
+        }
+      ]
+    },
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqY3fihBALn-jJHGyQnQ2Q-Sh1hxZ2E9d7lc5Nk2eIIsPrQF0jPhrRPgPAav0RZhz0BJ58EmlNjMk2JR8AkHzvuChS27mNtbMFzA-sq1yE5rbjRLsDYlPFLTYbKrhzgcMVWtliQUg=w408-h544-k-no",
+    "imageUrls": [
+      "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqY3fihBALn-jJHGyQnQ2Q-Sh1hxZ2E9d7lc5Nk2eIIsPrQF0jPhrRPgPAav0RZhz0BJ58EmlNjMk2JR8AkHzvuChS27mNtbMFzA-sq1yE5rbjRLsDYlPFLTYbKrhzgcMVWtliQUg=w1920-h1080-k-no"
+    ],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "داخل المتجر",
+      "الفيديوهات",
+      "مِن المالك"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2535225,
+      "lng": -6.5812993
+    },
+    "menu": null,
+    "neighborhood": "المعمورة",
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "9ص to 5م"
+      },
+      {
+        "day": "الأحد",
+        "hours": "مغلق"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "8ص to 6:30م"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "8ص to 6:30م"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "8ص to 6:30م"
+      },
+      {
+        "day": "الخميس",
+        "hours": "8ص to 6:30م"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "8:30ص to 6:30م"
+      }
+    ],
+    "phone": "+212 6 18 15 66 66",
+    "placeId": "ChIJUzsHoOxZpw0R3zwiyNu-EWY",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "Résidence nouhaila, 172 Avenue Said Daoudi",
+    "subTitle": null,
+    "title": "iDoscar Auto Concessoinnaire Toyota",
+    "url": "https://www.google.com/maps/search/?api=1&query=iDoscar%20Auto%20Concessoinnaire%20Toyota&query_place_id=ChIJUzsHoOxZpw0R3zwiyNu-EWY"
+  },
+  {
     "address": "MARJANE KENITRA ROAD FROM، القنيطرة 14000، المغرب",
     "bookingLinks": [],
     "additionalInfo": {
@@ -5888,6 +6463,139 @@
     "subTitle": null,
     "title": "Europa motor",
     "url": "https://www.google.com/maps/search/?api=1&query=Europa%20motor&query_place_id=ChIJ_WXPFD1Zpw0RquZpttBmmEE"
+  },
+  {
+    "address": "شارع محمد الخامس، القنيطرة 14000، المغرب",
+    "bookingLinks": [],
+    "additionalInfo": {
+      "خيارات الخدمة": [
+        {
+          "خدمة التوصيل": true
+        },
+        {
+          "التسوّق داخل المتجر": true
+        },
+        {
+          "الخدمات في الموقع": true
+        }
+      ],
+      "إمكانية الوصول": [
+        {
+          "أماكن جلوس صالحة للكراسي المتحركة": true
+        },
+        {
+          "حلقة سمع تلبّي احتياجات المستهلك": true
+        },
+        {
+          "دورة مياه تستوعب الكراسي المتحركة": true
+        }
+      ],
+      "الخدمات المقدّمة": [
+        {
+          "تأجير سيارات": true
+        },
+        {
+          "مغسلة سيارات": true
+        }
+      ],
+      "وسائل الراحة": [
+        {
+          "دورة مياه للجنسين": true
+        }
+      ],
+      "الدفعات": [
+        {
+          "الشيكات": true
+        },
+        {
+          "بطاقات سحب آلي": true
+        },
+        {
+          "بطاقات الائتمان": true
+        }
+      ],
+      "موقف سيارات": [
+        {
+          "تتوفر مواقف للسيارات في الموقع": true
+        },
+        {
+          "مرآب سيارات مدفوع": true
+        },
+        {
+          "مرآب مجاني للسيارات": true
+        },
+        {
+          "موقف سيارات مجاني": true
+        },
+        {
+          "موقف سيارات مجاني في الشارع": true
+        }
+      ]
+    },
+    "categories": [
+      "وكالة تأجير السيارات"
+    ],
+    "categoryName": "وكالة تأجير السيارات",
+    "city": "القنيطرة",
+    "description": null,
+    "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqtermAHHDZCSwPFbHBRAyQiAPcjLDy6Ct_0YECEGFXA9tGysSgZtV_raFdNZk8a6y8h3ttr8MGruDsQ4rJae6p9Fkz0Y9XlWrhvxpW8901g3b3jnbBsiZYauh-0zHpudCClAFwsbtXAOQT=w426-h240-k-no",
+    "imageUrls": [
+      "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqtermAHHDZCSwPFbHBRAyQiAPcjLDy6Ct_0YECEGFXA9tGysSgZtV_raFdNZk8a6y8h3ttr8MGruDsQ4rJae6p9Fkz0Y9XlWrhvxpW8901g3b3jnbBsiZYauh-0zHpudCClAFwsbtXAOQT=w1920-h1080-k-no"
+    ],
+    "images": null,
+    "imageCategories": [
+      "الكل",
+      "داخل المتجر",
+      "الفيديوهات",
+      "مِن المالك"
+    ],
+    "locatedIn": null,
+    "location": {
+      "lat": 34.2538483,
+      "lng": -6.602931
+    },
+    "menu": "https://www.tiktok.com/@auto.wldrhimo?_t=8k4xfakT5mP&_r=1",
+    "neighborhood": null,
+    "openingHours": [
+      {
+        "day": "السبت",
+        "hours": "9ص to 6م"
+      },
+      {
+        "day": "الأحد",
+        "hours": "9ص to 12ص"
+      },
+      {
+        "day": "الاثنين",
+        "hours": "12 to 8ص, 9ص to 6م"
+      },
+      {
+        "day": "الثلاثاء",
+        "hours": "9ص to 6م"
+      },
+      {
+        "day": "الأربعاء",
+        "hours": "9ص to 6م"
+      },
+      {
+        "day": "الخميس",
+        "hours": "9ص to 6م"
+      },
+      {
+        "day": "الجمعة",
+        "hours": "9ص to 6م"
+      }
+    ],
+    "phone": "+212 7 05 98 81 80",
+    "placeId": "ChIJFcjOzOFZpw0R3_NZo5689MY",
+    "placesTags": [],
+    "price": null,
+    "reviews": [],
+    "state": null,
+    "street": "شارع محمد الخامس",
+    "subTitle": null,
+    "title": "أوطو ولد رحيمو",
+    "url": "https://www.google.com/maps/search/?api=1&query=%D8%A3%D9%88%D8%B7%D9%88%20%D9%88%D9%84%D8%AF%20%D8%B1%D8%AD%D9%8A%D9%85%D9%88&query_place_id=ChIJFcjOzOFZpw0R3_NZo5689MY"
   },
   {
     "address": "Hay El Irchad Saknia, 309, Kénitra, المغرب",

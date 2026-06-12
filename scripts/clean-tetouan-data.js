@@ -11,6 +11,45 @@ if (!fs.existsSync(inputFile)) {
     process.exit(1);
 }
 
+function transliterateArabic(text) {
+    const mapping = {
+        'أ': 'a', 'إ': 'a', 'آ': 'a', 'ا': 'a',
+        'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j',
+        'ح': 'h', 'خ': 'kh', 'د': 'd', 'ذ': 'dh',
+        'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh',
+        'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'z',
+        'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q',
+        'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n',
+        'ه': 'h', 'و': 'w', 'ي': 'y', 'ة': 'a',
+        'ى': 'a', 'ء': '', 'ئ': 'e', 'ؤ': 'o'
+    };
+
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (mapping[char] !== undefined) {
+            result += mapping[char];
+        } else {
+            result += char;
+        }
+    }
+    return result;
+}
+
+function slugify(text) {
+    if (!text) return '';
+    const transliterated = transliterateArabic(text);
+    return transliterated
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+}
+
 const rawData = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
 
 // Categories to keep and normalize
@@ -19,6 +58,7 @@ const USED_CAR_AR = "تاجر سيارات مستعملة";
 
 const cleaned = [];
 const seenPlaceIds = new Set();
+const seenSlugs = new Set();
 let stats = {
     total: rawData.length,
     duplicates: 0,
@@ -36,11 +76,24 @@ for (const item of rawData) {
         continue;
     }
 
-    // 2. Remove entries with missing phone
+    // 2. Remove duplicates by slugified title
+    if (!item.title) {
+        stats.missingCategory++; // Or handle missing name
+        continue;
+    }
+    const itemSlug = slugify(item.title);
+    if (seenSlugs.has(itemSlug)) {
+        stats.duplicates++;
+        continue;
+    }
+
+    // 3. Remove entries with missing phone
     if (!item.phone || item.phone.trim() === '') {
         stats.missingPhone++;
         continue;
     }
+
+    seenSlugs.add(itemSlug);
 
     // 3. Remove entries with missing categories
     if (!item.categories || item.categories.length === 0) {

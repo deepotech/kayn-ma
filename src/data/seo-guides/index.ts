@@ -36,6 +36,22 @@ import { oujdaCars } from './oujda/cars';
 import { kelaatSraghnaRent } from './kelaat-sraghna/rent';
 import { kelaatSraghnaCars } from './kelaat-sraghna/cars';
 
+// Beni Mellal
+import { beniMellalRent } from './beni-mellal/rent';
+import { beniMellalCars } from './beni-mellal/cars';
+
+// Tetouan
+import { tetouanRent } from './tetouan/rent';
+import { tetouanCars } from './tetouan/cars';
+
+// Kenitra
+import { kenitaRent } from './kenitra/rent';
+import { kenitaraCars } from './kenitra/cars';
+
+// Safi
+import { safiRent } from './safi/rent';
+import { safiCars } from './safi/cars';
+
 const RENT_GUIDES: Record<string, CityGuide> = {
     casablanca: casablancaRent,
     rabat: rabatRent,
@@ -45,7 +61,11 @@ const RENT_GUIDES: Record<string, CityGuide> = {
     fes: fesRent,
     meknes: meknesRent,
     oujda: oujdaRent,
-    'kelaat-sraghna': kelaatSraghnaRent
+    'kelaat-sraghna': kelaatSraghnaRent,
+    'beni-mellal': beniMellalRent,
+    'tetouan': tetouanRent,
+    'kenitra': kenitaRent,
+    'safi': safiRent
 };
 
 const CAR_GUIDES: Record<string, CityGuide> = {
@@ -57,7 +77,11 @@ const CAR_GUIDES: Record<string, CityGuide> = {
     fes: fesCars,
     meknes: meknesCars,
     oujda: oujdaCars,
-    'kelaat-sraghna': kelaatSraghnaCars
+    'kelaat-sraghna': kelaatSraghnaCars,
+    'beni-mellal': beniMellalCars,
+    'tetouan': tetouanCars,
+    'kenitra': kenitaraCars,
+    'safi': safiCars
 };
 
 export function getCityRentGuide(citySlug: string): CityGuide | null {

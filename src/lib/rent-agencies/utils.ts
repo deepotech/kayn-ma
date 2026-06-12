@@ -92,6 +92,7 @@ export const CITY_NAMES_AR: Record<string, string> = {
     mohammedia: 'المحمدية',
     eljadida: 'الجديدة',
     beni_mellal: 'بني ملال',
+    'beni-mellal': 'بني ملال',
     nador: 'الناظور',
     taza: 'تازة',
     settat: 'سطات',

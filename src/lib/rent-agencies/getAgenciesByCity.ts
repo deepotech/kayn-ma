@@ -4,7 +4,7 @@ import { SeoIntent } from './seo-intents';
 import { getDistance } from './normalize';
 
 // Supported cities
-const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset', 'kenitra', 'oujda', 'fes', 'tanger', 'agadir', 'meknes', 'tetouan', 'kelaat-sraghna'];
+const SUPPORTED_CITIES = ['marrakech', 'rabat', 'casablanca', 'safi', 'berrechid', 'settat', 'khemisset', 'kenitra', 'oujda', 'fes', 'tanger', 'agadir', 'meknes', 'tetouan', 'kelaat-sraghna', 'beni-mellal'];
 
 // Coordinates for Airports (Hardcoded for now)
 const AIRPORTS: Record<string, { lat: number, lng: number }> = {
@@ -23,6 +23,7 @@ const AIRPORTS: Record<string, { lat: number, lng: number }> = {
     'meknes': { lat: 33.8789, lng: -5.5186 }, // Bassatine / Meknes
     'tetouan': { lat: 35.5785, lng: -5.3686 }, // Sania Ramel Airport / Tetouan Center
     'kelaat-sraghna': { lat: 32.0533, lng: -7.4063 }, // Kelaat Sraghna Center
+    'beni-mellal': { lat: 32.4019, lng: -6.3159 }, // Beni Mellal Airport
 };
 
 

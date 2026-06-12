@@ -10,6 +10,8 @@ export const CITIES = [
     { id: 'kenitra', ar: 'القنيطرة', fr: 'Kénitra' },
     { id: 'tetouan', ar: 'تطوان', fr: 'Tétouan' },
     { id: 'kelaat-sraghna', ar: 'قلعة السراغنة', fr: 'Kelaat Sraghna' },
+    { id: 'beni-mellal', ar: 'بني ملال', fr: 'Beni Mellal' },
+    { id: 'safi', ar: 'آسفي', fr: 'Safi' },
 ];
 
 export const BRANDS = [
