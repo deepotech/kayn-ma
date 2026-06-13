@@ -24,6 +24,7 @@ const CITIES = [
     { name: 'Agadir', nameAr: 'أكادير', slug: 'agadir', active: true, image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=600' },
     { name: 'Tétouan', nameAr: 'تطوان', slug: 'tetouan', active: true, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=600' },
     { name: 'Kelaat Sraghna', nameAr: 'قلعة السراغنة', slug: 'kelaat-sraghna', active: true, image: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&q=80&w=600' },
+    { name: 'Beni Mellal', nameAr: 'بني ملال', slug: 'beni-mellal', active: true, image: 'https://images.unsplash.com/photo-1549880180-250a468a4b6e?auto=format&fit=crop&q=80&w=600' },
 ];
 
 import { useTranslations } from 'next-intl';

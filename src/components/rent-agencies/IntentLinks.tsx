@@ -26,6 +26,7 @@ export default function IntentLinks({ city, currentIntent, locale }: Props) {
         mohammedia: 'المحمدية',
         eljadida: 'الجديدة',
         beni_mellal: 'بني ملال',
+        'beni-mellal': 'بني ملال',
         nador: 'الناظور',
         taza: 'تازة',
         settat: 'سطات',
