@@ -10,6 +10,9 @@ import { getIntent } from '@/lib/rent-agencies/seo-intents';
 import AgencyList from '@/components/rent-agencies/AgencyList';
 import RelatedAgencies from '@/components/rent-agencies/RelatedAgencies';
 
+// Force dynamic rendering — page uses Prisma (database queries at runtime)
+export const dynamic = 'force-dynamic';
+
 interface Props {
     params: {
         city: string;

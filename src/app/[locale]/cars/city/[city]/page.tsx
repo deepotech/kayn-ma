@@ -8,12 +8,8 @@ import { CITIES } from '@/constants/data';
 import { getTranslations } from 'next-intl/server';
 import { getCityCarGuide } from '@/data/seo-guides/index';
 
-// Generate static params for all cities to enable SSG (Static Site Generation)
-export async function generateStaticParams() {
-    return CITIES.map((city) => ({
-        city: city.id,
-    }));
-}
+// Force dynamic rendering — page uses Prisma (database queries at runtime)
+export const dynamic = 'force-dynamic';
 
 // Metadata for SEO
 export async function generateMetadata({ params: { city, locale } }: any) {

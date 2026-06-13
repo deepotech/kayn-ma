@@ -9,6 +9,9 @@ import IntentLinks from '@/components/rent-agencies/IntentLinks';
 import { getAllIntents } from '@/lib/rent-agencies/seo-intents';
 import { getCityRentGuide } from '@/data/seo-guides/index';
 
+// Force dynamic rendering — page uses Prisma (database queries at runtime)
+export const dynamic = 'force-dynamic';
+
 interface Props {
     params: {
         city: string;
