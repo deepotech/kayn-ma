@@ -26,6 +26,31 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
+function slugify(text: string): string {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+}
+
+function normalizeField(val: any): { label: string; slug: string } {
+    if (!val) return { label: '', slug: '' };
+    if (typeof val === 'string') {
+        return { label: val, slug: slugify(val) };
+    }
+    if (typeof val === 'object') {
+        const label = val.label || val.name || val.fr || val.ar || '';
+        const slug = val.slug || slugify(label);
+        return { label, slug };
+    }
+    return { label: String(val), slug: slugify(String(val)) };
+}
+
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
@@ -39,18 +64,60 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        const { userId, ...updateData } = body;
+        const { userId, ...rest } = body;
+        const updateData: any = {};
+
+        if (rest.title !== undefined) updateData.title = rest.title;
+        if (rest.price !== undefined) updateData.price = Number(rest.price);
+        if (rest.description !== undefined) updateData.description = rest.description;
+        if (rest.year !== undefined) updateData.year = Number(rest.year);
+        if (rest.mileage !== undefined) updateData.mileage = Number(rest.mileage);
+        if (rest.phone !== undefined) updateData.phone = rest.phone;
+        if (rest.fuelType !== undefined || rest.fuel !== undefined) updateData.fuelType = rest.fuelType || rest.fuel;
+        if (rest.transmission !== undefined) updateData.transmission = rest.transmission;
+        if (rest.images !== undefined) updateData.images = rest.images;
+
+        if (rest.city) {
+            const cityObj = normalizeField(rest.city);
+            const citySlug = cityObj.slug || slugify(cityObj.label || 'morocco');
+            const cityRecord = await prisma.city.upsert({
+                where: { slug: citySlug },
+                update: {},
+                create: { name: cityObj.label || citySlug, slug: citySlug }
+            });
+            updateData.cityId = cityRecord.id;
+        }
+
+        if (rest.brand) {
+            const brandObj = normalizeField(rest.brand);
+            updateData.brandLabel = brandObj.label;
+            updateData.brandSlug = brandObj.slug;
+        }
+
+        if (rest.carModel || rest.model) {
+            const modelObj = normalizeField(rest.carModel || rest.model);
+            updateData.carModelLabel = modelObj.label;
+            updateData.carModelSlug = modelObj.slug;
+        }
+
+        if (rest.bodyType) {
+            const bodyTypeObj = normalizeField(rest.bodyType);
+            updateData.bodyTypeLabel = bodyTypeObj.label;
+            updateData.bodyTypeSlug = bodyTypeObj.slug;
+        }
+
+        updateData.updatedAt = new Date();
 
         const updatedListing = await prisma.listing.update({
             where: { id },
-            data: { ...updateData, updatedAt: new Date() }
+            data: updateData
         });
 
         revalidateListingPaths(id);
         return NextResponse.json({ success: true, data: updatedListing });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating listing:', error);
-        return NextResponse.json({ error: 'Failed to update listing' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to update listing' }, { status: 500 });
     }
 }
 
