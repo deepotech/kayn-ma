@@ -67,11 +67,13 @@ export default function AgencyCard({ agency }: AgencyCardProps) {
     const tCommon = useTranslations('Common');
     const locale = useLocale();
 
-    // Thumbnail logic: prefer first photo, fallback to placeholder
-    const rawThumbnail = agency.photos && agency.photos.length > 0 ? agency.photos[0] : null;
-    const [thumbnail, setThumbnail] = useState<string | null>(rawThumbnail);
+    // Thumbnail logic: prefer first valid photo
+    const validPhoto = (agency.photos && agency.photos.length > 0 && !agency.photos[0].includes('googleusercontent.com/gps-cs-s/'))
+        ? agency.photos[0]
+        : null;
+    const [imgSrc, setImgSrc] = useState<string | null>(validPhoto);
+    const [hasError, setHasError] = useState(false);
 
-    // Build google maps direction link
     // Build google maps direction link
     const mapsLink = agency.location?.lat
         ? `https://www.google.com/maps/dir/?api=1&destination=${agency.location.lat},${agency.location.lng}`
@@ -80,26 +82,34 @@ export default function AgencyCard({ agency }: AgencyCardProps) {
     return (
         <div className="group bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 hover:shadow-md transition-all duration-300 flex flex-col md:flex-row overflow-hidden h-full md:h-52">
             {/* Image Section */}
-            <div className="relative h-48 md:h-full w-full md:w-1/3 min-w-[33%] md:max-w-[15rem] shrink-0 bg-slate-100 dark:bg-zinc-800 overflow-hidden">
-                {thumbnail ? (
+            <div className="relative h-48 md:h-full w-full md:w-1/3 min-w-[33%] md:max-w-[15rem] shrink-0 bg-slate-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center">
+                {imgSrc && !hasError ? (
                     <Image
-                        src={thumbnail}
+                        src={imgSrc}
                         alt={agency.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, 300px"
                         loading="lazy"
-                        onError={() => setThumbnail(AGENCY_PLACEHOLDER)}
+                        onError={() => setHasError(true)}
                     />
                 ) : (
-                    <div className="flex items-center justify-center h-full text-slate-400 relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950 flex flex-col items-center justify-center p-4 text-center select-none overflow-hidden">
                         <Image
                             src={AGENCY_PLACEHOLDER}
-                            alt="placeholder"
+                            alt={agency.name}
                             fill
-                            className="object-cover opacity-30"
+                            unoptimized
+                            className="object-cover opacity-15 mix-blend-overlay"
                         />
-                        <ImageIcon className="w-12 h-12 opacity-50 relative z-10" />
+                        <div className="relative z-10 flex flex-col items-center justify-center">
+                            <div className="w-12 h-12 rounded-full bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-blue-300 font-bold text-xl mb-1.5 shadow-lg backdrop-blur-sm">
+                                {agency.name ? agency.name.charAt(0).toUpperCase() : 'C'}
+                            </div>
+                            <span className="text-[11px] font-medium text-slate-300/90 max-w-[140px] truncate leading-tight">
+                                {agency.name}
+                            </span>
+                        </div>
                     </div>
                 )}
 

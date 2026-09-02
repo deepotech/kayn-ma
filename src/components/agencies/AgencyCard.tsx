@@ -1,4 +1,7 @@
 
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, MapPin, Phone } from 'lucide-react';
@@ -21,21 +24,24 @@ import { useTranslations } from 'next-intl';
 
 export default function AgencyCard({ agency }: AgencyCardProps) {
     const t = useTranslations('RentAgencies.Listing');
+    const [hasError, setHasError] = useState(false);
+    const validPhoto = agency.photos && agency.photos.length > 0 && !agency.photos[0].includes('googleusercontent.com/gps-cs-s/') ? agency.photos[0] : null;
 
     return (
         <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-            <div className="relative h-48 w-full bg-slate-100 dark:bg-zinc-800">
-                {agency.photos && agency.photos.length > 0 ? (
+            <div className="relative h-48 w-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center">
+                {validPhoto && !hasError ? (
                     <Image
-                        src={agency.photos[0]}
+                        src={validPhoto}
                         alt={agency.name}
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                        onError={() => setHasError(true)}
                     />
                 ) : (
-                    <div className="flex items-center justify-center h-full text-slate-400">
-                        <span className="text-4xl font-bold opacity-20">{agency.name.charAt(0)}</span>
+                    <div className="flex items-center justify-center h-full w-full bg-gradient-to-br from-slate-800 to-slate-950 text-slate-400">
+                        <span className="text-4xl font-bold opacity-30 text-white">{agency.name.charAt(0)}</span>
                     </div>
                 )}
             </div>

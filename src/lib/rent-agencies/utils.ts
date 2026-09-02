@@ -63,9 +63,12 @@ export function getAgencyImages(raw: any): string[] {
         photos = [...photos, ...raw.photos];
     }
 
-    // Deduplicate and filter empty/invalid
+    // Deduplicate and filter empty/invalid/expired URLs
     return Array.from(new Set(photos)).filter(url => {
-        return url && typeof url === 'string' && url.length > 5 && url.startsWith('http');
+        if (!url || typeof url !== 'string' || url.length <= 5 || !url.startsWith('http')) return false;
+        // Filter out expired Google Maps session URLs which return 403 Forbidden
+        if (url.includes('googleusercontent.com/gps-cs-s/')) return false;
+        return true;
     });
 }
 
