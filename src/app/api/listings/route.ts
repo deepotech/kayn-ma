@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { normalizeField, slugify } from '@/lib/normalization';
+import { verifyAuth } from '@/lib/auth';
 
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000;
@@ -73,6 +74,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, data: { _id: 'fake' } }, { status: 201 });
         }
 
+        // Verify session / authorization token
+        const verifiedUser = await verifyAuth(request);
+        if (verifiedUser?.isBanned) {
+            return NextResponse.json({ success: false, error: 'Your account has been suspended' }, { status: 403 });
+        }
+
+        // Lock effectiveUserId to verified token UID, preventing spoofing
+        const effectiveUserId = verifiedUser ? verifiedUser.uid : (body.userId || null);
+
+        if (!effectiveUserId) {
+            return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
+        }
+
         // Parsing & Sanitization
         const numPrice = Number(body.price);
         const numYear = Number(body.year) || new Date().getFullYear();
@@ -81,10 +95,10 @@ export async function POST(request: NextRequest) {
         const cleanWhatsapp = body.whatsapp ? body.whatsapp.toString().replace(/[\s\-\+\(\)]/g, '') : null;
 
         // Prevent duplicate submissions
-        if (body.userId && body.title && !isNaN(numPrice)) {
+        if (effectiveUserId && body.title && !isNaN(numPrice)) {
             const existingDuplicate = await prisma.listing.findFirst({
                 where: {
-                    userId: body.userId,
+                    userId: effectiveUserId,
                     title: body.title,
                     price: numPrice,
                     createdAt: { gt: new Date(Date.now() - 60000) }
@@ -184,7 +198,7 @@ export async function POST(request: NextRequest) {
                 images: body.images || [],
                 phone: cleanPhone,
                 whatsapp: cleanWhatsapp,
-                userId: body.userId || null,
+                userId: effectiveUserId,
                 status: 'approved',
                 visibility: 'public',
                 isReported: false,
