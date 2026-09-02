@@ -95,6 +95,19 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        if (!body.userId) {
+            return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
+        }
+
+        if (!Array.isArray(body.images) || body.images.length === 0) {
+            return NextResponse.json({ success: false, error: 'At least one photo is required to publish a car ad' }, { status: 400 });
+        }
+
+        const userRawDescription = (body.description || '').trim();
+        if (!userRawDescription || userRawDescription.length < 20) {
+            return NextResponse.json({ success: false, error: 'Description must be at least 20 characters long' }, { status: 400 });
+        }
+
         const requiredFields = ['title', 'city', 'price', 'phone', 'brand', 'carModel', 'year', 'fuelType', 'transmission', 'bodyType'];
         const missingFields = requiredFields.filter(field => body[field] === undefined || body[field] === null || body[field] === '');
         if (missingFields.length > 0) {

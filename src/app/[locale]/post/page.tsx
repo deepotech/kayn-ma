@@ -123,15 +123,19 @@ export default function PostAdPage() {
         }
     }, [setValue, draftRestored]);
 
-    // Auto-save draft to localStorage
+    // Auto-save draft to localStorage (safeguarded against quota limits)
     useEffect(() => {
-        const draft = {
-            formData,
-            step: currentStep,
-            imagePreviews,
-            savedAt: new Date().toISOString(),
-        };
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        try {
+            const draft = {
+                formData,
+                step: currentStep,
+                imagePreviews: imagePreviews.slice(0, 5), // Save top 5 preview URLs to prevent quota overflow
+                savedAt: new Date().toISOString(),
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) {
+            console.warn('Draft localStorage quota exceeded, skipping heavy image preview cache:', e);
+        }
     }, [formData, currentStep, imagePreviews]);
 
     // Clear draft on successful submission
