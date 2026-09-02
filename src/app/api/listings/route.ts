@@ -74,18 +74,18 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, data: { _id: 'fake' } }, { status: 201 });
         }
 
-        // Verify session / authorization token
+        // Verify session / authorization token strictly
         const verifiedUser = await verifyAuth(request);
+        if (!verifiedUser && (process.env.NODE_ENV === 'production' || !body.userId)) {
+            return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
+        }
+
         if (verifiedUser?.isBanned) {
             return NextResponse.json({ success: false, error: 'Your account has been suspended' }, { status: 403 });
         }
 
-        // Lock effectiveUserId to verified token UID, preventing spoofing
-        const effectiveUserId = verifiedUser ? verifiedUser.uid : (body.userId || null);
-
-        if (!effectiveUserId) {
-            return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
-        }
+        // Lock effectiveUserId strictly to token UID if available
+        const effectiveUserId = verifiedUser ? verifiedUser.uid : body.userId;
 
         // Parsing & Sanitization
         const numPrice = Number(body.price);
@@ -109,14 +109,19 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        if (!body.userId) {
-            return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
-        }
-
+        // Validate image array & URL protocols
         if (!Array.isArray(body.images) || body.images.length === 0) {
             return NextResponse.json({ success: false, error: 'At least one photo is required to publish a car ad' }, { status: 400 });
         }
 
+        const isValidImageObject = (img: any) =>
+            img && typeof img === 'object' && typeof img.url === 'string' && (img.url.startsWith('http://') || img.url.startsWith('https://') || img.url.startsWith('data:image/'));
+
+        if (!body.images.every(isValidImageObject)) {
+            return NextResponse.json({ success: false, error: 'Invalid image format or image URL protocol' }, { status: 400 });
+        }
+
+        // Validate Description minimum length
         const userRawDescription = (body.description || '').trim();
         if (!userRawDescription || userRawDescription.length < 20) {
             return NextResponse.json({ success: false, error: 'Description must be at least 20 characters long' }, { status: 400 });
@@ -126,6 +131,21 @@ export async function POST(request: NextRequest) {
         const missingFields = requiredFields.filter(field => body[field] === undefined || body[field] === null || body[field] === '');
         if (missingFields.length > 0) {
             return NextResponse.json({ success: false, error: `Missing required fields: ${missingFields.join(', ')}` }, { status: 400 });
+        }
+
+        // Validate Fuel Type & Transmission Enums
+        const validFuelTypes = ['Diesel', 'Petrol', 'Hybrid', 'Electric'];
+        if (body.fuelType && !validFuelTypes.includes(body.fuelType)) {
+            return NextResponse.json({ success: false, error: 'Invalid fuel type' }, { status: 400 });
+        }
+
+        const validTransmissions = ['Manual', 'Automatic'];
+        if (body.transmission && !validTransmissions.includes(body.transmission)) {
+            return NextResponse.json({ success: false, error: 'Invalid transmission type' }, { status: 400 });
+        }
+
+        if (body.purpose === 'rent' && body.pricePeriod && !['day', 'week', 'month'].includes(body.pricePeriod)) {
+            return NextResponse.json({ success: false, error: 'Invalid rental price period' }, { status: 400 });
         }
 
         const phoneRegex = /^0[567]\d{8}$/;
