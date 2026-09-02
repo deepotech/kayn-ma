@@ -53,8 +53,12 @@ export function normalizeListing(raw: any): NormalizedListing | null {
     // 2. Cover Image
     const coverImage = images[0]?.url || PLACEHOLDER_IMAGE;
 
+    const listingId = raw._id || raw.id;
+
     return {
         ...raw,
+        _id: listingId,
+        id: listingId,
         images,
         coverImage,
     };

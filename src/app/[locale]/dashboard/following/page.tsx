@@ -179,8 +179,8 @@ export default function FollowingPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {listings.map(listing => (
                                         <NavigationLink
-                                            key={listing._id}
-                                            href={`/cars/${listing._id}`} // Assuming ID based routing for now or update if slug is available
+                                            key={listing.id || listing._id}
+                                            href={`/cars/${listing.id || listing._id}`}
                                             className="group block bg-gray-50 dark:bg-zinc-800/50 rounded-xl overflow-hidden border border-gray-100 dark:border-zinc-700 hover:shadow-md transition-all"
                                         >
                                             <div className="aspect-[4/3] bg-gray-200 dark:bg-zinc-700 relative overflow-hidden">

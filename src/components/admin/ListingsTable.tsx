@@ -170,7 +170,7 @@ export default function ListingsTable({ listings, locale }: { listings: Listing[
                                                     )}
 
                                                     <Link
-                                                        href={`/${locale}/cars/${item._id}`}
+                                                        href={`/${locale}/cars/${(item as any).id || item._id}`}
                                                         target="_blank"
                                                         className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded transition-colors"
                                                         title="View"

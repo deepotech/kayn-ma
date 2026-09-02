@@ -65,12 +65,12 @@ export async function generateMetadata({ params, searchParams }: any) {
                 },
                 description: description.substring(0, 160),
                 alternates: {
-                    canonical: `https://cayn.ma/${locale}/cars/${l._id}`,
+                    canonical: `https://cayn.ma/${locale}/cars/${l.id || l._id}`,
                 },
                 openGraph: {
                     title,
                     description,
-                    url: `https://cayn.ma/${locale}/cars/${l._id}`,
+                    url: `https://cayn.ma/${locale}/cars/${l.id || l._id}`,
                     images: l.images?.[0]?.url ? [{ url: l.images[0].url, width: 1200, height: 630, alt: title }] : [],
                     type: 'website', // or product? OG uses website/article usually
                     locale: locale,
@@ -130,7 +130,7 @@ export default async function DynamicCarPage({
                 },
                 "offers": {
                     "@type": "Offer",
-                    "url": `https://cayn.ma/${locale}/cars/${l._id}`,
+                    "url": `https://cayn.ma/${locale}/cars/${l.id || l._id}`,
                     "priceCurrency": "MAD",
                     "price": l.price,
                     "itemCondition": l.condition === 'new' ? "https://schema.org/NewCondition" : "https://schema.org/UsedCondition",

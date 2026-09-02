@@ -4,11 +4,15 @@ import { carCatalog } from '@/constants/car-brands-models';
 // import { getBrandName, getModelName } from '@/constants/car-brands-models';
 
 /**
- * Checks if a string is a valid MongoDB ObjectId.
- * 24 hex characters.
+ * Checks if a string is a valid listing identifier:
+ * - MongoDB ObjectId (24 hex characters)
+ * - UUID (36 characters: 8-4-4-4-12 hex format)
  */
 export function isValidObjectId(id: string): boolean {
-    return /^[0-9a-fA-F]{24}$/.test(id);
+    if (!id || typeof id !== 'string') return false;
+    const isMongoId = /^[0-9a-fA-F]{24}$/.test(id);
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i.test(id);
+    return isMongoId || isUuid;
 }
 
 export interface SeoFilters {

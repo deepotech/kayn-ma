@@ -26,6 +26,7 @@ export default function AdminListingRow({
 }: AdminListingRowProps) {
     const locale = useLocale();
     const isRtl = locale === 'ar';
+    const listingId = (listing as any).id || listing._id;
 
     const imageUrl = listing.images?.[0]?.url || '/placeholder-car.jpg';
 
@@ -52,7 +53,7 @@ export default function AdminListingRow({
                     <div className="flex items-start justify-between gap-2 mb-2">
                         <div>
                             <Link
-                                href={`/${locale}/admin/listings/${listing._id}`}
+                                href={`/${locale}/admin/listings/${listingId}`}
                                 className="font-bold text-white hover:text-blue-400 transition-colors line-clamp-1"
                             >
                                 {listing.title}
@@ -81,7 +82,7 @@ export default function AdminListingRow({
                     {/* Actions */}
                     <div className="flex flex-wrap gap-2">
                         <Link
-                            href={`/${locale}/admin/listings/${listing._id}`}
+                            href={`/${locale}/admin/listings/${listingId}`}
                             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg transition-colors"
                         >
                             <Eye className="h-3 w-3" />
@@ -90,7 +91,7 @@ export default function AdminListingRow({
 
                         {listing.status !== 'approved' && (
                             <button
-                                onClick={() => onApprove(listing._id)}
+                                onClick={() => onApprove(listingId)}
                                 className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors"
                             >
                                 <Check className="h-3 w-3" />
@@ -100,7 +101,7 @@ export default function AdminListingRow({
 
                         {listing.status !== 'rejected' && (
                             <button
-                                onClick={() => onReject(listing._id)}
+                                onClick={() => onReject(listingId)}
                                 className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors"
                             >
                                 <X className="h-3 w-3" />
@@ -109,7 +110,7 @@ export default function AdminListingRow({
                         )}
 
                         <button
-                            onClick={() => onHide(listing._id)}
+                            onClick={() => onHide(listingId)}
                             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg transition-colors"
                         >
                             <EyeOff className="h-3 w-3" />
@@ -117,7 +118,7 @@ export default function AdminListingRow({
                         </button>
 
                         <button
-                            onClick={() => onDelete(listing._id)}
+                            onClick={() => onDelete(listingId)}
                             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors"
                         >
                             <Trash2 className="h-3 w-3" />
