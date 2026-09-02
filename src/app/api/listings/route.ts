@@ -129,6 +129,22 @@ export async function POST(request: NextRequest) {
             create: { name: cityObj.label || citySlug, slug: citySlug }
         });
 
+        // Format extra features & specs into description for full persistence
+        let finalDescription = (body.description || '').trim();
+        const extraSpecs: string[] = [];
+
+        if (body.fiscalPower) extraSpecs.push(`الخيل الجبائي (Puissance Fiscale): ${body.fiscalPower}`);
+        if (body.doors) extraSpecs.push(`عدد الأبواب: ${body.doors}`);
+        if (body.seats) extraSpecs.push(`عدد المقاعد: ${body.seats}`);
+
+        if (Array.isArray(body.features) && body.features.length > 0) {
+            extraSpecs.push(`التجهيزات والخيارات: ${body.features.join(' • ')}`);
+        }
+
+        if (extraSpecs.length > 0 && !finalDescription.includes('التجهيزات والمواصفات الإضافية')) {
+            finalDescription = `${finalDescription}\n\n---\n📋 التجهيزات والمواصفات الإضافية:\n• ${extraSpecs.join('\n• ')}`;
+        }
+
         const listing = await prisma.listing.create({
             data: {
                 purpose: body.purpose || 'sale',
@@ -137,7 +153,7 @@ export async function POST(request: NextRequest) {
                 sellerType: body.sellerType || 'individual',
                 agencyName: body.sellerType === 'agency' ? body.agencyName : null,
                 title: body.title,
-                description: body.description || null,
+                description: finalDescription || null,
                 price: numPrice,
                 pricePeriod: body.purpose === 'rent' ? (body.pricePeriod || 'day') : null,
                 currency: body.currency || 'MAD',
