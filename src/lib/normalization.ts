@@ -21,7 +21,7 @@ export function slugify(text: string | null | undefined): string {
         .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
         .trim()
         .replace(/[\s_]+/g, '-')     // Replace spaces & underscores with -
-        .replace(/[^\w\-]+/g, '')    // Remove all non-word chars (except -)
+        .replace(/[^\w\-\u0600-\u06FF]+/g, '')    // Keep alphanumeric, hyphens, and Arabic characters
         .replace(/\-\-+/g, '-')      // Replace multiple - with single -
         .replace(/^-+/, '')          // Trim - from start
         .replace(/-+$/, '');         // Trim - from end

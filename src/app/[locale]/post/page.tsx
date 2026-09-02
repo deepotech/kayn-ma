@@ -287,6 +287,9 @@ export default function PostAdPage() {
             // Create listing
             await axios.post('/api/listings', {
                 ...data,
+                price: Number(data.price),
+                year: Number(data.year),
+                mileage: Number(data.mileage || 0),
                 // Override/Add missing payload parts
                 adType: data.purpose === 'rent' ? 'rental' : 'sale',
                 pricePeriod: data.purpose === 'rent' ? (data.pricePeriod || 'day') : null,

@@ -88,20 +88,26 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Validation
+        // Validation & Parsing
+        const numPrice = Number(body.price);
+        const numYear = Number(body.year) || new Date().getFullYear();
+        const numMileage = Number(body.mileage) || 0;
+        const cleanPhone = (body.phone || '').toString().replace(/[\s\-\+\(\)]/g, '');
+        const cleanWhatsapp = body.whatsapp ? body.whatsapp.toString().replace(/[\s\-\+\(\)]/g, '') : null;
+
         const requiredFields = ['title', 'city', 'price', 'phone', 'brand', 'carModel', 'year', 'fuelType', 'transmission', 'bodyType'];
-        const missingFields = requiredFields.filter(field => !body[field]);
+        const missingFields = requiredFields.filter(field => body[field] === undefined || body[field] === null || body[field] === '');
         if (missingFields.length > 0) {
             return NextResponse.json({ success: false, error: `Missing required fields: ${missingFields.join(', ')}` }, { status: 400 });
         }
 
-        const phoneRegex = /^0[67]\d{8}$/;
-        if (!phoneRegex.test(body.phone)) {
+        const phoneRegex = /^0[567]\d{8}$/;
+        if (!phoneRegex.test(cleanPhone)) {
             return NextResponse.json({ success: false, error: 'Invalid phone number format' }, { status: 400 });
         }
 
         const minPrice = body.purpose === 'rent' ? 100 : 1000;
-        if (body.price < minPrice || body.price > 500000000) {
+        if (isNaN(numPrice) || numPrice < minPrice || numPrice > 500000000) {
             return NextResponse.json({ success: false, error: `Price must be between ${minPrice} and 500,000,000 DH` }, { status: 400 });
         }
 
@@ -116,7 +122,7 @@ export async function POST(request: NextRequest) {
         const bodyTypeObj = normalizeField(body.bodyType);
 
         // Resolve or create the city record
-        const citySlug = cityObj.slug || slugify(cityObj.label || '');
+        const citySlug = cityObj.slug || slugify(cityObj.label || '') || `city-${Date.now()}`;
         const cityRecord = await prisma.city.upsert({
             where: { slug: citySlug },
             update: {},
@@ -132,23 +138,23 @@ export async function POST(request: NextRequest) {
                 agencyName: body.sellerType === 'agency' ? body.agencyName : null,
                 title: body.title,
                 description: body.description || null,
-                price: body.price,
+                price: numPrice,
                 pricePeriod: body.purpose === 'rent' ? (body.pricePeriod || 'day') : null,
                 currency: body.currency || 'MAD',
-                brandLabel: brandObj.label || '',
-                brandSlug: brandObj.slug || slugify(brandObj.label || ''),
-                carModelLabel: modelObj.label || '',
-                carModelSlug: modelObj.slug || slugify(modelObj.label || ''),
-                bodyTypeLabel: bodyTypeObj.label || '',
-                bodyTypeSlug: bodyTypeObj.slug || slugify(bodyTypeObj.label || ''),
+                brandLabel: brandObj.label || body.brand || '',
+                brandSlug: brandObj.slug || slugify(body.brand || '') || 'other-brand',
+                carModelLabel: modelObj.label || body.carModel || '',
+                carModelSlug: modelObj.slug || slugify(body.carModel || '') || 'other-model',
+                bodyTypeLabel: bodyTypeObj.label || body.bodyType || '',
+                bodyTypeSlug: bodyTypeObj.slug || slugify(body.bodyType || '') || 'other-bodytype',
                 cityId: cityRecord.id,
-                year: body.year,
-                mileage: body.mileage || 0,
+                year: numYear,
+                mileage: numMileage,
                 fuelType: body.fuelType,
                 transmission: body.transmission,
                 images: body.images || [],
-                phone: body.phone,
-                whatsapp: body.whatsapp || null,
+                phone: cleanPhone,
+                whatsapp: cleanWhatsapp,
                 userId: body.userId || null,
                 status: 'approved',
                 visibility: 'public',
@@ -164,8 +170,8 @@ export async function POST(request: NextRequest) {
         revalidatePath('/ar/cars');
 
         return NextResponse.json({ success: true, data: listing }, { status: 201 });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error creating listing:', error);
-        return NextResponse.json({ success: false, error: 'Failed to create listing' }, { status: 500 });
+        return NextResponse.json({ success: false, error: error?.message || 'Failed to create listing' }, { status: 500 });
     }
 }
