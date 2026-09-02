@@ -73,13 +73,20 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, data: { _id: 'fake' } }, { status: 201 });
         }
 
+        // Parsing & Sanitization
+        const numPrice = Number(body.price);
+        const numYear = Number(body.year) || new Date().getFullYear();
+        const numMileage = Number(body.mileage) || 0;
+        const cleanPhone = (body.phone || '').toString().replace(/[\s\-\+\(\)]/g, '');
+        const cleanWhatsapp = body.whatsapp ? body.whatsapp.toString().replace(/[\s\-\+\(\)]/g, '') : null;
+
         // Prevent duplicate submissions
-        if (body.userId) {
+        if (body.userId && body.title && !isNaN(numPrice)) {
             const existingDuplicate = await prisma.listing.findFirst({
                 where: {
                     userId: body.userId,
                     title: body.title,
-                    price: body.price,
+                    price: numPrice,
                     createdAt: { gt: new Date(Date.now() - 60000) }
                 }
             });
@@ -87,13 +94,6 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: true, data: existingDuplicate }, { status: 200 });
             }
         }
-
-        // Validation & Parsing
-        const numPrice = Number(body.price);
-        const numYear = Number(body.year) || new Date().getFullYear();
-        const numMileage = Number(body.mileage) || 0;
-        const cleanPhone = (body.phone || '').toString().replace(/[\s\-\+\(\)]/g, '');
-        const cleanWhatsapp = body.whatsapp ? body.whatsapp.toString().replace(/[\s\-\+\(\)]/g, '') : null;
 
         const requiredFields = ['title', 'city', 'price', 'phone', 'brand', 'carModel', 'year', 'fuelType', 'transmission', 'bodyType'];
         const missingFields = requiredFields.filter(field => body[field] === undefined || body[field] === null || body[field] === '');
