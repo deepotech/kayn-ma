@@ -74,18 +74,18 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: true, data: { _id: 'fake' } }, { status: 201 });
         }
 
-        // Verify session / authorization token strictly
+        // Verify session / authorization token strictly across ALL environments
         const verifiedUser = await verifyAuth(request);
-        if (!verifiedUser && (process.env.NODE_ENV === 'production' || !body.userId)) {
+        if (!verifiedUser) {
             return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
         }
 
-        if (verifiedUser?.isBanned) {
+        if (verifiedUser.isBanned) {
             return NextResponse.json({ success: false, error: 'Your account has been suspended' }, { status: 403 });
         }
 
-        // Lock effectiveUserId strictly to token UID if available
-        const effectiveUserId = verifiedUser ? verifiedUser.uid : body.userId;
+        // Server is the single source of truth for user ID
+        const effectiveUserId = verifiedUser.uid;
 
         // Parsing & Sanitization
         const numPrice = Number(body.price);
@@ -109,16 +109,25 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Validate image array & URL protocols
+        // Validate image array & storage domain validation
         if (!Array.isArray(body.images) || body.images.length === 0) {
             return NextResponse.json({ success: false, error: 'At least one photo is required to publish a car ad' }, { status: 400 });
         }
 
-        const isValidImageObject = (img: any) =>
-            img && typeof img === 'object' && typeof img.url === 'string' && (img.url.startsWith('http://') || img.url.startsWith('https://') || img.url.startsWith('data:image/'));
+        const allowedImageDomains = ['res.cloudinary.com', 'firebasestorage.googleapis.com', 'images.unsplash.com', 'supabase.co', 'cayn.ma'];
+        const isValidImageObject = (img: any) => {
+            if (!img || typeof img !== 'object' || typeof img.url !== 'string') return false;
+            if (img.url.startsWith('data:image/')) return true;
+            try {
+                const parsedUrl = new URL(img.url);
+                return allowedImageDomains.some((domain) => parsedUrl.hostname.endsWith(domain));
+            } catch {
+                return false;
+            }
+        };
 
         if (!body.images.every(isValidImageObject)) {
-            return NextResponse.json({ success: false, error: 'Invalid image format or image URL protocol' }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Invalid image format or non-permitted storage domain' }, { status: 400 });
         }
 
         // Validate Description minimum length
@@ -133,7 +142,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: `Missing required fields: ${missingFields.join(', ')}` }, { status: 400 });
         }
 
-        // Validate Fuel Type & Transmission Enums
+        // Validate All Enums & Allowlists
+        if (body.purpose && !['sale', 'rent'].includes(body.purpose)) {
+            return NextResponse.json({ success: false, error: 'Invalid purpose value' }, { status: 400 });
+        }
+
+        if (body.sellerType && !['individual', 'agency'].includes(body.sellerType)) {
+            return NextResponse.json({ success: false, error: 'Invalid seller type' }, { status: 400 });
+        }
+
+        if (body.condition && !['new', 'used'].includes(body.condition)) {
+            return NextResponse.json({ success: false, error: 'Invalid condition value' }, { status: 400 });
+        }
+
         const validFuelTypes = ['Diesel', 'Petrol', 'Hybrid', 'Electric'];
         if (body.fuelType && !validFuelTypes.includes(body.fuelType)) {
             return NextResponse.json({ success: false, error: 'Invalid fuel type' }, { status: 400 });
