@@ -339,9 +339,15 @@ export default function PostAdPage() {
 
             setIsUploading(false);
 
+            // Generate car title automatically from brand, model, and year
+            const brandLabel = data.brand === 'other' ? (data.brandCustom || 'Other') : data.brand;
+            const modelLabel = data.model === 'other' ? (data.modelCustom || 'Other') : data.model;
+            const autoTitle = (data.title && data.title.trim()) || `${brandLabel} ${modelLabel} ${data.year}`.trim();
+
             // Construct payload WITHOUT userId (Identity is strictly extracted from verified Firebase Token on server)
             const payload = {
                 ...data,
+                title: autoTitle,
                 price: Number(data.price),
                 year: Number(data.year),
                 mileage: Number(data.mileage || 0),

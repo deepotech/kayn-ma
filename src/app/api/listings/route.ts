@@ -90,6 +90,22 @@ export async function POST(request: NextRequest) {
         const effectiveUserId = verifiedUser.uid;
         console.log(`[API /api/listings POST] Authorized publisher UID: ${effectiveUserId}`);
 
+        // Normalize carModel if only model was provided
+        if (!body.carModel && body.model) {
+            body.carModel = body.model;
+        }
+
+        // Auto-generate title if missing or empty
+        if (!body.title || typeof body.title !== 'string' || !body.title.trim()) {
+            const brandStr = body.brand === 'other' ? (body.brandCustom || 'Other') : (body.brand || '');
+            const modelStr = body.carModel === 'other' ? (body.modelCustom || 'Other') : (body.carModel || '');
+            const yearStr = body.year ? String(body.year) : '';
+            const fallbackTitle = `${brandStr} ${modelStr} ${yearStr}`.trim();
+            if (fallbackTitle) {
+                body.title = fallbackTitle;
+            }
+        }
+
         // Parsing & Sanitization
         const numPrice = Number(body.price);
         const numYear = Number(body.year) || new Date().getFullYear();
