@@ -77,15 +77,18 @@ export async function POST(request: NextRequest) {
         // Verify session / authorization token strictly across ALL environments
         const verifiedUser = await verifyAuth(request);
         if (!verifiedUser) {
+            console.log('[API /api/listings POST] 401 Unauthorized: verifyAuth returned null');
             return NextResponse.json({ success: false, error: 'Authentication required. Please sign in to publish.' }, { status: 401 });
         }
 
         if (verifiedUser.isBanned) {
+            console.log(`[API /api/listings POST] 403 Forbidden: User ${verifiedUser.uid} is suspended`);
             return NextResponse.json({ success: false, error: 'Your account has been suspended' }, { status: 403 });
         }
 
         // Server is the single source of truth for user ID
         const effectiveUserId = verifiedUser.uid;
+        console.log(`[API /api/listings POST] Authorized publisher UID: ${effectiveUserId}`);
 
         // Parsing & Sanitization
         const numPrice = Number(body.price);

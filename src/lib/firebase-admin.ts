@@ -59,14 +59,19 @@ function getFirebaseAdmin(): { app: App; auth: Auth } {
         return { app: initializedApp, auth: initializedAuth };
     }
 
+    // Option 3: Initialize with Project ID only (Allows token verification via Google public keys)
+    if (projectId) {
+        initializedApp = initializeApp({ projectId });
+        initializedAuth = getAuth(initializedApp);
+        console.log('[Firebase Admin] Initialized with Project ID (Public Key verification mode)');
+        return { app: initializedApp, auth: initializedAuth };
+    }
+
     // Error Handling - Missing credentials
     const missingVars = [];
     if (!serviceAccountKey) missingVars.push('FIREBASE_SERVICE_ACCOUNT_KEY');
     if (!projectId) missingVars.push('NEXT_PUBLIC_FIREBASE_PROJECT_ID');
-    if (!clientEmail) missingVars.push('FIREBASE_CLIENT_EMAIL');
-    if (!privateKey) missingVars.push('FIREBASE_PRIVATE_KEY');
-
-    const errorMsg = `[Firebase Admin] Missing credentials. Set FIREBASE_SERVICE_ACCOUNT_KEY or (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY). Missing: ${missingVars.join(', ')}`;
+    const errorMsg = `[Firebase Admin] Missing configuration. Missing: ${missingVars.join(', ')}`;
     console.error(errorMsg);
     throw new Error(errorMsg);
 }

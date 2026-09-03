@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { auth } from '@/lib/firebase-admin';
-import dbConnect from '@/lib/db';
-import User, { IUser } from '@/models/User';
+import prisma from '@/lib/db';
 
 export interface AuthUser {
     uid: string;
@@ -16,36 +15,83 @@ export interface AuthUser {
 export async function verifyAuth(request: NextRequest): Promise<AuthUser | null> {
     try {
         const authHeader = request.headers.get('authorization');
-        if (!authHeader?.startsWith('Bearer ')) {
+        const hasAuthHeader = Boolean(authHeader);
+        const startsWithBearer = Boolean(authHeader?.startsWith('Bearer '));
+
+        console.log(`[verifyAuth] Header check: present=${hasAuthHeader}, startsWithBearer=${startsWithBearer}`);
+
+        if (!authHeader || !startsWithBearer) {
+            console.log('[verifyAuth] Rejected: Missing or non-Bearer authorization header');
             return null;
         }
 
-        const token = authHeader.substring(7);
-        const decodedToken = await auth.verifyIdToken(token);
-
-        // Get or create user in our database
-        await dbConnect();
-        let user = await User.findOne({ firebaseUid: decodedToken.uid }).lean() as IUser | null;
-
-        if (!user) {
-            // Create new user record (lazy creation)
-            user = await User.create({
-                firebaseUid: decodedToken.uid,
-                email: decodedToken.email || '',
-                displayName: decodedToken.name || '',
-                role: 'user',
-                isBanned: false,
-            });
+        const token = authHeader.substring(7).trim();
+        if (!token) {
+            console.log('[verifyAuth] Rejected: Bearer token is empty');
+            return null;
         }
+
+        const decodedToken = await auth.verifyIdToken(token);
+        console.log(`[verifyAuth] Token verified successfully for UID: ${decodedToken.uid}`);
+
+        // Query user from PostgreSQL via Prisma
+        let dbUser = await prisma.user.findUnique({
+            where: { firebaseUid: decodedToken.uid }
+        });
+
+        if (!dbUser && decodedToken.email) {
+            dbUser = await prisma.user.findUnique({
+                where: { email: decodedToken.email.toLowerCase() }
+            });
+            if (dbUser) {
+                dbUser = await prisma.user.update({
+                    where: { id: dbUser.id },
+                    data: { firebaseUid: decodedToken.uid }
+                });
+            }
+        }
+
+        if (!dbUser) {
+            try {
+                dbUser = await prisma.user.create({
+                    data: {
+                        firebaseUid: decodedToken.uid,
+                        email: (decodedToken.email || `${decodedToken.uid}@placeholder.cayn.ma`).toLowerCase(),
+                        displayName: decodedToken.name || '',
+                        role: 'user',
+                        isBanned: false,
+                    }
+                });
+            } catch {
+                // If parallel creation or email conflict occurred, query existing
+                dbUser = await prisma.user.findFirst({
+                    where: {
+                        OR: [
+                            { firebaseUid: decodedToken.uid },
+                            ...(decodedToken.email ? [{ email: decodedToken.email.toLowerCase() }] : [])
+                        ]
+                    }
+                });
+            }
+        }
+
+        const isBanned = Boolean(dbUser?.isBanned);
+        const userEmail = decodedToken.email || dbUser?.email || '';
+        const isAdmin = Boolean(process.env.ADMIN_EMAIL && (userEmail === process.env.ADMIN_EMAIL || decodedToken.email === process.env.ADMIN_EMAIL));
+        const role: 'user' | 'moderator' | 'admin' = isAdmin
+            ? 'admin'
+            : ((dbUser?.role as any) || 'user');
+
+        console.log(`[verifyAuth] Auth resolved for UID: ${decodedToken.uid}, role: ${role}, isBanned: ${isBanned}`);
 
         return {
             uid: decodedToken.uid,
-            email: decodedToken.email || user.email,
-            role: (process.env.ADMIN_EMAIL && (decodedToken.email === process.env.ADMIN_EMAIL || user.email === process.env.ADMIN_EMAIL)) ? 'admin' : user.role,
-            isBanned: user.isBanned,
+            email: userEmail,
+            role,
+            isBanned,
         };
-    } catch (error) {
-        console.error('Auth verification failed:', error);
+    } catch (error: any) {
+        console.error('[verifyAuth] Auth verification failed:', error?.code || error?.message || error);
         return null;
     }
 }
@@ -81,7 +127,9 @@ export async function getCurrentUserId(request: NextRequest): Promise<string | n
             return null;
         }
 
-        const token = authHeader.substring(7);
+        const token = authHeader.substring(7).trim();
+        if (!token) return null;
+
         const decodedToken = await auth.verifyIdToken(token);
         return decodedToken.uid;
     } catch {

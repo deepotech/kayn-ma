@@ -1,8 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase-admin';
-import dbConnect from '@/lib/db';
-import User from '@/models/User';
+import prisma from '@/lib/db';
 
 export async function POST(request: NextRequest) {
     try {
@@ -22,57 +21,75 @@ export async function POST(request: NextRequest) {
 
         const normalizedEmail = email.toLowerCase();
 
-        // Connect to DB and upsert user
-        await dbConnect();
+        // Update or create user in PostgreSQL via Prisma
+        let user = await prisma.user.findUnique({
+            where: { firebaseUid: uid }
+        });
 
-        // Prepare user data
-        const updateData: any = {
-            email: normalizedEmail,
-            lastLoginAt: new Date(),
-        };
-
-        if (name) updateData.displayName = name;
-        if (picture) updateData.photoURL = picture;
-
-        // Update or create user in MongoDB
-        // Default role is 'user'. Admin role must be set manually or via seed script.
-        const user = await User.findOneAndUpdate(
-            { firebaseUid: uid },
-            {
-                $set: updateData,
-                $setOnInsert: {
-                    role: 'user',
-                    createdAt: new Date()
-                }
-            },
-            { upsert: true, new: true }
-        );
-
-        // Create a session cookie
-        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-        const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
-
-        // Set the cookie with strict security options
-        // FIX: Allow configuring domain explicitly for production
-        // FIX: Ensure secure is true in production or if using HTTPS
-        const cookieOptions: any = {
-            maxAge: expiresIn,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            path: '/',
-            sameSite: 'lax',
-        };
-
-        // If COOKIE_DOMAIN is set (e.g., .cayn.ma), use it to allow sharing between www and root
-        if (process.env.COOKIE_DOMAIN) {
-            cookieOptions.domain = process.env.COOKIE_DOMAIN;
+        if (!user) {
+            user = await prisma.user.findUnique({
+                where: { email: normalizedEmail }
+            });
+            if (user) {
+                user = await prisma.user.update({
+                    where: { id: user.id },
+                    data: {
+                        firebaseUid: uid,
+                        displayName: name || user.displayName
+                    }
+                });
+            }
         }
 
-        cookies().set('session', sessionCookie, cookieOptions);
+        if (!user) {
+            try {
+                user = await prisma.user.create({
+                    data: {
+                        firebaseUid: uid,
+                        email: normalizedEmail,
+                        displayName: name || '',
+                        role: 'user',
+                        isBanned: false,
+                    }
+                });
+            } catch {
+                user = await prisma.user.findFirst({
+                    where: {
+                        OR: [
+                            { firebaseUid: uid },
+                            { email: normalizedEmail }
+                        ]
+                    }
+                });
+            }
+        }
 
-        console.log(`[API/Session] Session created for ${normalizedEmail} (Role: ${user.role})`);
+        // Create a session cookie if credentials permit
+        try {
+            const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+            const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
-        return NextResponse.json({ status: 'success', role: user.role }, { status: 200 });
+            const cookieOptions: any = {
+                maxAge: expiresIn,
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                path: '/',
+                sameSite: 'lax',
+            };
+
+            if (process.env.COOKIE_DOMAIN) {
+                cookieOptions.domain = process.env.COOKIE_DOMAIN;
+            }
+
+            cookies().set('session', sessionCookie, cookieOptions);
+        } catch (cookieErr: any) {
+            console.warn('[API/Session] Session cookie creation skipped:', cookieErr?.message);
+        }
+
+        const userRole = user?.role || 'user';
+        console.log(`[API/Session] Session sync success for ${normalizedEmail} (Role: ${userRole})`);
+
+        return NextResponse.json({ status: 'success', role: userRole }, { status: 200 });
     } catch (error) {
         console.error('[API/Session] Error creating session:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

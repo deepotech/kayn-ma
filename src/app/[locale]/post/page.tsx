@@ -311,10 +311,12 @@ export default function PostAdPage() {
 
     const onSubmit = async (data: PostFormData) => {
         if (!user) {
+            console.log('[PostAd] No currentUser found. Prompting sign in.');
             setShowAuthModal(true);
             return;
         }
 
+        console.log(`[PostAd] Current user verified on client: ${user.uid}`);
         setIsSubmitting(true);
         setIsUploading(true);
         setStepError(null);
@@ -337,7 +339,7 @@ export default function PostAdPage() {
 
             setIsUploading(false);
 
-            // Construct payload
+            // Construct payload WITHOUT userId (Identity is strictly extracted from verified Firebase Token on server)
             const payload = {
                 ...data,
                 price: Number(data.price),
@@ -350,13 +352,15 @@ export default function PostAdPage() {
                 brandCustom: data.brand === 'other' ? data.brandCustom : undefined,
                 modelCustom: data.model === 'other' ? data.modelCustom : undefined,
                 images: uploadedImages,
-                userId: user.uid,
                 currency: 'MAD',
             };
 
             const token = await user.getIdToken();
+            console.log('[PostAd] Sending POST /api/listings with Authorization Bearer header');
+
             await axios.post('/api/listings', payload, {
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
