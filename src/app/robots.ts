@@ -7,10 +7,13 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: [
                 '/api/',
-                '/_next/',
                 '/dashboard/',
                 '/admin/',
-                '/*?*', // Block all query parameters (filters, pagination, search)
+                '/post',
+                '/*?*utm_*',
+                '/*?*fbclid=*',
+                '/*?*gclid=*',
+                '/*?*ref=*',
             ],
         },
         sitemap: 'https://www.cayn.ma/sitemap.xml',

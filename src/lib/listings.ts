@@ -79,6 +79,59 @@ export async function getListings(searchParams: SearchParams, slugFilters: SeoFi
     return listings;
 }
 
+export async function getListingsPaginated(searchParams: SearchParams, options?: { page?: number; limit?: number }) {
+    const page = Math.max(1, options?.page || 1);
+    const limit = Math.max(1, Math.min(50, options?.limit || 12));
+    const skip = (page - 1) * limit;
+
+    const where: any = { status: 'approved', visibility: 'public' };
+    if (searchParams.purpose) where.purpose = searchParams.purpose;
+    if (searchParams.condition) where.condition = searchParams.condition;
+    if (searchParams.sellerType) where.sellerType = searchParams.sellerType;
+    if (searchParams.brand) where.brandSlug = searchParams.brand;
+    if (searchParams.model) where.carModelSlug = searchParams.model;
+    if (searchParams.bodyType) where.bodyTypeSlug = searchParams.bodyType;
+    if (searchParams.city) where.city = { slug: searchParams.city };
+
+    if (searchParams.q) {
+        where.OR = [
+            { title: { contains: searchParams.q, mode: 'insensitive' } },
+            { description: { contains: searchParams.q, mode: 'insensitive' } },
+            { brandLabel: { contains: searchParams.q, mode: 'insensitive' } },
+            { carModelLabel: { contains: searchParams.q, mode: 'insensitive' } },
+        ];
+    }
+    if (searchParams.minPrice || searchParams.maxPrice) {
+        where.price = {};
+        if (searchParams.minPrice) where.price.gte = Number(searchParams.minPrice);
+        if (searchParams.maxPrice) where.price.lte = Number(searchParams.maxPrice);
+    }
+    if (searchParams.minYear || searchParams.maxYear) {
+        where.year = {};
+        if (searchParams.minYear) where.year.gte = Number(searchParams.minYear);
+        if (searchParams.maxYear) where.year.lte = Number(searchParams.maxYear);
+    }
+
+    const [total, listings] = await Promise.all([
+        prisma.listing.count({ where }),
+        prisma.listing.findMany({
+            where,
+            orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+            skip,
+            take: limit,
+            include: { city: true }
+        })
+    ]);
+
+    return {
+        listings: JSON.parse(JSON.stringify(listings)),
+        total,
+        page,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        limit
+    };
+}
+
 export async function getSimilarListings(
     listingId: string,
     criteria: { brandSlug?: string; bodyTypeSlug?: string; price: number; city?: string; brand?: string }

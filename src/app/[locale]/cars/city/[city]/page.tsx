@@ -24,15 +24,29 @@ export async function generateMetadata({ params: { city, locale } }: any) {
         : `Voitures d'occasion à vendre à ${cityName} - Meilleures offres ${year} | Cayn.ma`;
 
     const description = locale === 'ar'
-        ? `تصفح مئات السيارات المستعملة للبيع في ${cityName}. بيع وشري طوموبيلت بدون وسطاء. عروض حصرية وأثمنة مناسبة في ${cityName}.`
-        : `Trouvez des voitures d'occasion à vendre à ${cityName}. Achetez et vendez sans intermédiaires. Offres exclusives et bons prix à ${cityName}.`;
+        ? `تصفح السيارات المستعملة للبيع في ${cityName}. عروض حصرية وأثمنة مناسبة مع التواصل المباشر مع أصحاب الإعلانات.`
+        : `Trouvez des voitures d'occasion à vendre à ${cityName}. Offres exclusives et bons prix avec contact direct avec les vendeurs.`;
+
+    const canonicalUrl = `https://www.cayn.ma/${locale}/cars/city/${city}`;
 
     return {
         title,
         description,
         alternates: {
-            canonical: `/cars/city/${city}`,
+            canonical: canonicalUrl,
+            languages: {
+                'ar-MA': `https://www.cayn.ma/ar/cars/city/${city}`,
+                'fr-MA': `https://www.cayn.ma/fr/cars/city/${city}`,
+                'x-default': `https://www.cayn.ma/ar/cars/city/${city}`,
+            }
         },
+        openGraph: {
+            title,
+            description,
+            url: canonicalUrl,
+            type: 'website',
+            locale: locale === 'ar' ? 'ar_MA' : 'fr_MA',
+        }
     };
 }
 
@@ -78,8 +92,8 @@ export default async function CityPage({ params: { city, locale } }: any) {
         : `Voitures à vendre à ${cityName}`;
 
     const description = locale === 'ar'
-        ? `واش كتقلب على طوموبيل في ${cityName}؟ Cayn.ma كيوفر ليك ${count > 0 ? count : ''} سيارة مضمونة للبيع. من داسيا لمرسيدس، لقا الطوموبيل اللي كتناسبك في ${cityName} وبدون سمسار. شوف العروض دابا!`
-        : `Vous cherchez une voiture à ${cityName} ? Cayn.ma vous propose ${count > 0 ? count : ''} véhicules vérifiés. De Dacia à Mercedes, trouvez la voiture qu'il vous faut à ${cityName} sans intermédiaire. Découvrez les offres maintenant !`;
+        ? `ابحث عن سيارات للبيع في ${cityName}. يوفر لك موقع Cayn.ma ${count > 0 ? `${count} إعلان حقيقي` : 'أحدث العروض'} مع إمكانية التواصل مباشرة مع المعلنين.`
+        : `Vous cherchez une voiture à ${cityName} ? Cayn.ma vous propose ${count > 0 ? `${count} annonces réelles` : 'les dernières offres'} avec contact direct avec les annonceurs.`;
 
     const breadcrumbs = [
         { label: locale === 'ar' ? 'الرئيسية' : 'Accueil', href: '/' },

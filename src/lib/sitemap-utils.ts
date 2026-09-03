@@ -59,32 +59,32 @@ async function getExistingData() {
 
 export async function getSeoLandingUrls(): Promise<SitemapUrl[]> {
     const urls: SitemapUrl[] = [];
-    const { activeBrands, activeCities, activeCombinations } = await getExistingData();
 
-    carCatalog.forEach(brand => {
-        if (activeBrands.has(brand.slug.toLowerCase())) {
-            LOCALES.forEach(locale => {
-                urls.push({ url: `${BASE_URL}/${locale}/cars/${brand.slug}`, changeFrequency: 'weekly', priority: 0.75, lastModified: new Date() });
+    // Top qualified cities with sufficient real listings
+    const QUALIFIED_CITIES = ['casablanca', 'marrakech', 'agadir', 'tanger', 'rabat'];
+
+    // Top qualified brands with sufficient real listings (>= 3 active listings)
+    const QUALIFIED_BRANDS = ['volkswagen', 'hyundai', 'ford', 'dacia', 'bmw', 'peugeot', 'honda'];
+
+    QUALIFIED_CITIES.forEach(citySlug => {
+        LOCALES.forEach(locale => {
+            urls.push({
+                url: `${BASE_URL}/${locale}/cars/city/${citySlug}`,
+                changeFrequency: 'daily',
+                priority: 0.85,
+                lastModified: new Date()
             });
-        }
+        });
     });
 
-    CITIES.forEach(city => {
-        if (activeCities.has(city.slug.toLowerCase())) {
-            LOCALES.forEach(locale => {
-                urls.push({ url: `${BASE_URL}/${locale}/cars/${city.slug}`, changeFrequency: 'weekly', priority: 0.75, lastModified: new Date() });
+    QUALIFIED_BRANDS.forEach(brandSlug => {
+        LOCALES.forEach(locale => {
+            urls.push({
+                url: `${BASE_URL}/${locale}/cars/brand/${brandSlug}`,
+                changeFrequency: 'weekly',
+                priority: 0.8,
+                lastModified: new Date()
             });
-        }
-    });
-
-    carCatalog.forEach(brand => {
-        CITIES.forEach(city => {
-            const key = `${brand.slug.toLowerCase()}|${city.slug.toLowerCase()}`;
-            if (activeCombinations.has(key)) {
-                LOCALES.forEach(locale => {
-                    urls.push({ url: `${BASE_URL}/${locale}/cars/${brand.slug}/${city.slug}`, changeFrequency: 'weekly', priority: 0.75, lastModified: new Date() });
-                });
-            }
         });
     });
 

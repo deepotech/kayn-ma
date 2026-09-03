@@ -15,9 +15,22 @@ async function getListings(searchParams: any) {
     if (searchParams.minYear || searchParams.maxYear) {
         where.year = {};
         if (searchParams.minYear) where.year.gte = Number(searchParams.minYear);
-        if (searchParams.maxYear) where.year.lte = Number(searchParams.maxYear);
     }
     return prisma.listing.findMany({ where, orderBy: { createdAt: 'desc' }, include: { city: true } });
+}
+
+export async function generateMetadata({ params }: { params: { locale: string } }) {
+    const locale = params?.locale || 'ar';
+    return {
+        title: locale === 'ar' ? 'بحث عن سيارات | Cayn.ma' : 'Recherche de voitures | Cayn.ma',
+        robots: {
+            index: false,
+            follow: true,
+        },
+        alternates: {
+            canonical: `https://www.cayn.ma/${locale}/cars`,
+        }
+    };
 }
 
 export default async function SearchPage({
