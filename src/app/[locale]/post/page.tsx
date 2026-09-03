@@ -354,7 +354,12 @@ export default function PostAdPage() {
                 currency: 'MAD',
             };
 
-            await axios.post('/api/listings', payload);
+            const token = await user.getIdToken();
+            await axios.post('/api/listings', payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             clearDraft();
             setCurrentStep(8); // Success step
