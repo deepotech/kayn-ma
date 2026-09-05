@@ -21,35 +21,37 @@ const TOP_BRANDS = [
 
 import { notFound, redirect } from 'next/navigation';
 
-export async function generateMetadata({ params: { locale }, searchParams }: { params: { locale: string }; searchParams: any }) {
+export async function generateMetadata({ params: { locale }, searchParams }: { params: { locale: string }; searchParams?: any }) {
     const rawPageStr = searchParams?.page;
     let page = 1;
     if (rawPageStr !== undefined) {
         const parsed = parseInt(rawPageStr as string, 10);
         if (isNaN(parsed) || parsed < 1) {
-            return { title: 'Not Found' };
+            page = 1;
+        } else {
+            page = parsed;
         }
-        page = parsed;
     }
 
-    let title = '';
-    let description = '';
+    const title = locale === 'ar'
+        ? `سيارات مستعملة للبيع في المغرب | Cayn.ma`
+        : `Voitures d'occasion à vendre au Maroc | Cayn.ma`;
 
-    if (locale === 'ar') {
-        title = page > 1
-            ? `سيارات مستعملة للبيع في المغرب - صفحة ${page} | Cayn.ma`
-            : `سيارات مستعملة للبيع في المغرب | إعلانات وأسعار حقيقية | Cayn.ma`;
-        description = `تصفح سيارات مستعملة للبيع في المغرب بأسعار حقيقية. قارن بين أفضل العروض في الدار البيضاء، مراكش، أكادير، طنجة، والرباط، وتواصل مباشرة مع أصحاب الإعلانات.`;
-    } else {
-        title = page > 1
-            ? `Voitures d'occasion à vendre au Maroc - Page ${page} | Cayn.ma`
-            : `Voitures d'occasion à vendre au Maroc | Annonces et prix réels | Cayn.ma`;
-        description = `Trouvez des voitures d'occasion à vendre au Maroc. Parcourez des annonces vérifiées à Casablanca, Marrakech, Agadir, Tanger et Rabat avec contact direct.`;
-    }
+    const description = locale === 'ar'
+        ? `تصفح سيارات مستعملة للبيع في المغرب، حسب المدينة أو الماركة أو نوع السيارة، وتواصل مباشرة مع البائعين على Cayn.ma.`
+        : `Découvrez des voitures d'occasion à vendre au Maroc, filtrées par ville, marque et type de véhicule, et contactez directement les vendeurs.`;
 
     const canonicalUrl = page > 1
         ? `https://www.cayn.ma/${locale}/cars?page=${page}`
         : `https://www.cayn.ma/${locale}/cars`;
+
+    const alternateAr = page > 1
+        ? `https://www.cayn.ma/ar/cars?page=${page}`
+        : `https://www.cayn.ma/ar/cars`;
+
+    const alternateFr = page > 1
+        ? `https://www.cayn.ma/fr/cars?page=${page}`
+        : `https://www.cayn.ma/fr/cars`;
 
     return {
         title: {
@@ -59,9 +61,9 @@ export async function generateMetadata({ params: { locale }, searchParams }: { p
         alternates: {
             canonical: canonicalUrl,
             languages: {
-                'ar-MA': `https://www.cayn.ma/ar/cars`,
-                'fr-MA': `https://www.cayn.ma/fr/cars`,
-                'x-default': `https://www.cayn.ma/ar/cars`,
+                'ar-MA': alternateAr,
+                'fr-MA': alternateFr,
+                'x-default': alternateAr,
             }
         },
         openGraph: {

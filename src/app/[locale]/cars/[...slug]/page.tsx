@@ -26,6 +26,124 @@ function getLegacyTargetUrl(slug: string[], locale: string): string | null {
     return null;
 }
 
+import { carCatalog } from '@/constants/car-brands-models';
+import { BRANDS } from '@/constants/data';
+import { findCityBySlug, getCityName, CITIES } from '@/constants/cities';
+
+function isInvalidName(str: string | null | undefined): boolean {
+    if (!str || typeof str !== 'string') return true;
+    const lower = str.trim().toLowerCase();
+    if (['undefined', 'null', 'unknown', 'other', 'n/a', 'none', 'sans'].includes(lower)) return true;
+    if (isValidObjectId(str)) return true;
+    return false;
+}
+
+function getListingBrand(rawListing: any, locale: string): string {
+    const slug = (
+        rawListing.brandSlug ||
+        (typeof rawListing.brand === 'object' ? rawListing.brand?.slug : rawListing.brand) ||
+        ''
+    ).toLowerCase().trim();
+
+    if (slug && !isInvalidName(slug)) {
+        const fromCatalog = carCatalog.find(b => b.slug.toLowerCase() === slug);
+        if (fromCatalog) return locale === 'ar' ? fromCatalog.ar : fromCatalog.fr;
+
+        const fromData = BRANDS.find(b => b.id.toLowerCase() === slug);
+        if (fromData) return fromData.name;
+    }
+
+    const rawLabel = rawListing.brandLabel || (typeof rawListing.brand === 'string' ? rawListing.brand : '') || '';
+    if (!isInvalidName(rawLabel)) {
+        return rawLabel.trim();
+    }
+    return '';
+}
+
+function getListingModel(rawListing: any, locale: string, brandSlug?: string): string {
+    const bSlug = (brandSlug || rawListing.brandSlug || '').toLowerCase().trim();
+    const mSlug = (
+        rawListing.carModelSlug ||
+        (typeof rawListing.carModel === 'object' ? rawListing.carModel?.slug : rawListing.carModel) ||
+        ''
+    ).toLowerCase().trim();
+
+    if (bSlug && mSlug && !isInvalidName(bSlug) && !isInvalidName(mSlug)) {
+        const fromCatalog = carCatalog.find(b => b.slug.toLowerCase() === bSlug);
+        if (fromCatalog) {
+            const model = fromCatalog.models.find(m => m.slug.toLowerCase() === mSlug);
+            if (model) return locale === 'ar' ? model.ar : model.fr;
+        }
+    }
+
+    const rawLabel = rawListing.carModelLabel || (typeof rawListing.carModel === 'string' ? rawListing.carModel : '') || '';
+    if (!isInvalidName(rawLabel)) {
+        return rawLabel.trim();
+    }
+    return '';
+}
+
+function getListingCity(rawListing: any, locale: string): string {
+    const cityObj = rawListing.city;
+    const citySlug = (typeof cityObj === 'object' && cityObj?.slug)
+        ? cityObj.slug
+        : (typeof cityObj === 'string' ? cityObj : (rawListing.cityId || ''));
+
+    if (citySlug && !isInvalidName(citySlug)) {
+        const found = findCityBySlug(citySlug.toLowerCase().trim());
+        if (found) return getCityName(found, locale);
+    }
+
+    if (typeof cityObj === 'object' && cityObj?.name && !isInvalidName(cityObj.name)) {
+        const trimmedName = cityObj.name.trim();
+        const foundByName = CITIES.find(
+            c => c.name.ar === trimmedName || c.name.fr.toLowerCase() === trimmedName.toLowerCase() || c.slug === trimmedName.toLowerCase()
+        );
+        if (foundByName) return getCityName(foundByName, locale);
+        return trimmedName;
+    }
+
+    return '';
+}
+
+function buildListingTitle(brand: string, model: string, city: string, locale: string): string {
+    const isAr = locale === 'ar';
+
+    if (brand && model && city) {
+        return isAr
+            ? `${brand} ${model} مستعملة للبيع في ${city} | Cayn.ma`
+            : `${brand} ${model} d'occasion à vendre à ${city} | Cayn.ma`;
+    }
+
+    if (brand && model && !city) {
+        return isAr
+            ? `${brand} ${model} مستعملة للبيع في المغرب | Cayn.ma`
+            : `${brand} ${model} d'occasion à vendre au Maroc | Cayn.ma`;
+    }
+
+    if (brand && !model && city) {
+        return isAr
+            ? `سيارات ${brand} مستعملة للبيع في ${city} | Cayn.ma`
+            : `Voitures ${brand} d'occasion à vendre à ${city} | Cayn.ma`;
+    }
+
+    if (brand && !model && !city) {
+        return isAr
+            ? `سيارات ${brand} مستعملة للبيع في المغرب | Cayn.ma`
+            : `Voitures ${brand} d'occasion à vendre au Maroc | Cayn.ma`;
+    }
+
+    if (!brand && city) {
+        return isAr
+            ? `سيارات مستعملة للبيع في ${city} | Cayn.ma`
+            : `Voitures d'occasion à vendre à ${city} | Cayn.ma`;
+    }
+
+    return isAr
+        ? `سيارات مستعملة للبيع في المغرب | Cayn.ma`
+        : `Voitures d'occasion à vendre au Maroc | Cayn.ma`;
+}
+
 export async function generateMetadata({ params: { slug, locale } }: { params: { slug: string[]; locale: string } }) {
     const idOrFirstSlug = slug[0];
 
@@ -39,19 +157,19 @@ export async function generateMetadata({ params: { slug, locale } }: { params: {
             if (!rawListing) return { title: 'Not Found' };
             const l = normalizeListing(rawListing) as any;
 
-            const purposeLabel = locale === 'ar'
-                ? (l.purpose === 'rent' ? 'للكراء' : 'للبيع')
-                : (l.purpose === 'rent' ? 'à louer' : 'à vendre');
+            const brand = getListingBrand(rawListing, locale);
+            const model = getListingModel(rawListing, locale, rawListing.brandSlug);
+            const city = getListingCity(rawListing, locale);
 
-            const brandLabel = typeof l.brand === 'object' ? l.brand?.label : l.brand;
-            const modelLabel = typeof l.carModel === 'object' ? l.carModel?.label : l.carModel;
-            const cityLabel = typeof l.city === 'object' ? (l.city?.label || l.city?.name || l.city?.slug || '') : (l.city || '');
+            const title = buildListingTitle(brand, model, city, locale);
 
-            const title = `${brandLabel} ${modelLabel} ${l.year} - ${cityLabel} | Cayn.ma`;
-            const conditionLabel = locale === 'ar' ? (l.condition === 'new' ? 'جديدة' : 'مستعملة') : (l.condition === 'new' ? 'Neuve' : 'Occasion');
-            const description = `${brandLabel} ${modelLabel} ${l.year} ${purposeLabel} ${locale === 'ar' ? 'ب' : 'à'} ${cityLabel}. ${conditionLabel}, ${l.fuelType}, ${l.transmission}. ${l.mileage}km. ${l.price?.toLocaleString()} DH.`;
+            const carDescriptor = [brand, model, rawListing.year].filter(Boolean).join(' ');
+            const locationStr = city ? (locale === 'ar' ? `في ${city}` : `à ${city}`) : (locale === 'ar' ? 'في المغرب' : 'au Maroc');
+            const description = locale === 'ar'
+                ? `${carDescriptor} مستعملة للبيع ${locationStr} على Cayn.ma. تفاصيل ومواصفات وتواصل مباشر مع البائع.`
+                : `${carDescriptor} d'occasion à vendre ${locationStr} sur Cayn.ma. Détails, équipements et contact direct avec le vendeur.`;
 
-            const canonicalUrl = `https://www.cayn.ma/${locale}/cars/${l.id || l._id}`;
+            const canonicalUrl = `https://www.cayn.ma/${locale}/cars/${idOrFirstSlug}`;
 
             return {
                 title: {
@@ -60,6 +178,11 @@ export async function generateMetadata({ params: { slug, locale } }: { params: {
                 description: description.substring(0, 160),
                 alternates: {
                     canonical: canonicalUrl,
+                    languages: {
+                        'ar-MA': `https://www.cayn.ma/ar/cars/${idOrFirstSlug}`,
+                        'fr-MA': `https://www.cayn.ma/fr/cars/${idOrFirstSlug}`,
+                        'x-default': `https://www.cayn.ma/ar/cars/${idOrFirstSlug}`,
+                    }
                 },
                 openGraph: {
                     title,

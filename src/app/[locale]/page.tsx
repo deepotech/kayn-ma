@@ -48,12 +48,12 @@ import JsonLd from '@/components/seo/JsonLd';
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
   const title = locale === 'ar'
-    ? 'Cayn.ma | أفضل سوق لبيع وشراء السيارات في المغرب'
-    : 'Cayn.ma | Le meilleur site de vente et location de voitures au Maroc';
+    ? 'Cayn.ma | بيع وشراء السيارات في المغرب'
+    : 'Cayn.ma | Acheter et vendre des voitures au Maroc';
 
   const description = locale === 'ar'
-    ? 'بيع وكراء السيارات في المغرب بسهولة. آلاف الإعلانات لسيارات مستعملة وجديدة. تواصل مباشر مع البائعين بدون وسيط. انشر إعلانك مجاناً اليوم.'
-    : 'Achetez et louez des voitures au Maroc facilement. Milliers d\'annonces de voitures neuves et d\'occasion. Contact direct sans intermédiaire. Publiez votre annonce gratuitement.';
+    ? 'Cayn.ma منصة مغربية لبيع وشراء السيارات. اكتشف سيارات مستعملة وجديدة للبيع في مختلف مدن المغرب وتواصل مباشرة مع البائعين.'
+    : 'Cayn.ma est une plateforme marocaine pour acheter et vendre des voitures neuves et d\'occasion dans les différentes villes du Maroc.';
 
   return {
     title: {
@@ -61,20 +61,21 @@ export async function generateMetadata({ params: { locale } }: { params: { local
     },
     description: description.substring(0, 160),
     alternates: {
-      canonical: `https://cayn.ma/${locale}`,
+      canonical: `https://www.cayn.ma/${locale}`,
       languages: {
-        'ar': 'https://cayn.ma/ar',
-        'fr': 'https://cayn.ma/fr',
+        'ar': 'https://www.cayn.ma/ar',
+        'fr': 'https://www.cayn.ma/fr',
+        'x-default': 'https://www.cayn.ma/ar',
       },
     },
     openGraph: {
       title,
       description,
-      url: `https://cayn.ma/${locale}`,
+      url: `https://www.cayn.ma/${locale}`,
       siteName: 'Cayn.ma',
       images: [
         {
-          url: 'https://cayn.ma/og-image.jpg', // Ensure this exists or use a dynamic one
+          url: 'https://www.cayn.ma/og-image.jpg',
           width: 1200,
           height: 630,
           alt: title,
@@ -87,7 +88,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://cayn.ma/twitter-image.jpg'], // Ensure this exists
+      images: ['https://www.cayn.ma/twitter-image.jpg'],
     },
   };
 }

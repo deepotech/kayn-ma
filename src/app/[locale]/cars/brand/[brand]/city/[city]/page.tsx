@@ -49,7 +49,9 @@ export async function generateMetadata({ params: { brand, city, locale } }: { pa
     const canonicalUrl = `https://www.cayn.ma/${locale}/cars/brand/${brandData.slug}/city/${cityData.slug}`;
 
     return {
-        title,
+        title: {
+            absolute: title,
+        },
         description,
         alternates: {
             canonical: canonicalUrl,
@@ -140,7 +142,7 @@ export default async function BrandCityCarsPage({ params: { brand, city, locale 
                 '@type': 'ListItem',
                 position: index + 1,
                 name: crumb.label,
-                item: `https://cayn.ma/${locale}${crumb.href}`
+                item: `https://www.cayn.ma/${locale}${crumb.href}`
             }))
         }
     };

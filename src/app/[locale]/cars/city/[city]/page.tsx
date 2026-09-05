@@ -4,40 +4,55 @@ import prisma from '@/lib/db';
 import ListingCard from '@/components/listings/ListingCard';
 import SeoHeader from '@/components/seo/SeoHeader';
 import InternalLinks from '@/components/seo/InternalLinks';
-import { CITIES } from '@/constants/data';
+import { CITIES as ALL_CITIES, findCityBySlug } from '@/constants/cities';
+import { CITIES as DATA_CITIES } from '@/constants/data';
 import { getTranslations } from 'next-intl/server';
 import { getCityCarGuide } from '@/data/seo-guides/index';
 
 // Force dynamic rendering — page uses Prisma (database queries at runtime)
 export const dynamic = 'force-dynamic';
 
+function getCityData(citySlug: string) {
+    const lower = (citySlug || '').toLowerCase();
+    const city = findCityBySlug(lower) || ALL_CITIES.find(c => c.slug === lower);
+    if (city) {
+        return { slug: city.slug, ar: city.name.ar, fr: city.name.fr };
+    }
+    const dataCity = DATA_CITIES.find(c => c.id.toLowerCase() === lower);
+    if (dataCity) {
+        return { slug: dataCity.id, ar: dataCity.ar, fr: dataCity.fr };
+    }
+    return null;
+}
+
 // Metadata for SEO
 export async function generateMetadata({ params: { city, locale } }: any) {
-    const cityData = CITIES.find(c => c.id === city);
+    const cityData = getCityData(city);
     if (!cityData) return {};
 
     const cityName = locale === 'ar' ? cityData.ar : cityData.fr;
-    const year = new Date().getFullYear();
 
     const title = locale === 'ar'
-        ? `سيارات مستعملة للبيع في ${cityName} - أفضل العروض ${year} | Cayn.ma`
-        : `Voitures d'occasion à vendre à ${cityName} - Meilleures offres ${year} | Cayn.ma`;
+        ? `سيارات مستعملة للبيع في ${cityName} | Cayn.ma`
+        : `Voitures d'occasion à vendre à ${cityName} | Cayn.ma`;
 
     const description = locale === 'ar'
         ? `تصفح السيارات المستعملة للبيع في ${cityName}. عروض حصرية وأثمنة مناسبة مع التواصل المباشر مع أصحاب الإعلانات.`
         : `Trouvez des voitures d'occasion à vendre à ${cityName}. Offres exclusives et bons prix avec contact direct avec les vendeurs.`;
 
-    const canonicalUrl = `https://www.cayn.ma/${locale}/cars/city/${city}`;
+    const canonicalUrl = `https://www.cayn.ma/${locale}/cars/city/${cityData.slug}`;
 
     return {
-        title,
+        title: {
+            absolute: title,
+        },
         description,
         alternates: {
             canonical: canonicalUrl,
             languages: {
-                'ar-MA': `https://www.cayn.ma/ar/cars/city/${city}`,
-                'fr-MA': `https://www.cayn.ma/fr/cars/city/${city}`,
-                'x-default': `https://www.cayn.ma/ar/cars/city/${city}`,
+                'ar-MA': `https://www.cayn.ma/ar/cars/city/${cityData.slug}`,
+                'fr-MA': `https://www.cayn.ma/fr/cars/city/${cityData.slug}`,
+                'x-default': `https://www.cayn.ma/ar/cars/city/${cityData.slug}`,
             }
         },
         openGraph: {
@@ -74,7 +89,7 @@ async function getCityListings(cityId: string) {
 }
 
 export default async function CityPage({ params: { city, locale } }: any) {
-    const cityData = CITIES.find(c => c.id === city);
+    const cityData = getCityData(city);
 
     if (!cityData) {
         notFound();
@@ -84,12 +99,11 @@ export default async function CityPage({ params: { city, locale } }: any) {
     const cityName = locale === 'ar' ? cityData.ar : cityData.fr;
     const listings = await getCityListings(city);
     const count = listings.length;
-    const year = new Date().getFullYear();
 
     // Programmatic Content Generation
     const title = locale === 'ar'
-        ? `سيارات للبيع في ${cityName}`
-        : `Voitures à vendre à ${cityName}`;
+        ? `سيارات مستعملة للبيع في ${cityName}`
+        : `Voitures d'occasion à vendre à ${cityName}`;
 
     const description = locale === 'ar'
         ? `ابحث عن سيارات للبيع في ${cityName}. يوفر لك موقع Cayn.ma ${count > 0 ? `${count} إعلان حقيقي` : 'أحدث العروض'} مع إمكانية التواصل مباشرة مع المعلنين.`
@@ -98,7 +112,7 @@ export default async function CityPage({ params: { city, locale } }: any) {
     const breadcrumbs = [
         { label: locale === 'ar' ? 'الرئيسية' : 'Accueil', href: '/' },
         { label: locale === 'ar' ? 'السيارات' : 'Voitures', href: '/search' },
-        { label: cityName, href: `/cars/city/${city}` },
+        { label: cityName, href: `/cars/city/${cityData.slug}` },
     ];
 
     // Schema Markup (CollectionPage)
@@ -107,7 +121,7 @@ export default async function CityPage({ params: { city, locale } }: any) {
         '@type': 'CollectionPage',
         name: title,
         description: description,
-        url: `https://cayn.ma/${locale}/cars/city/${city}`,
+        url: `https://www.cayn.ma/${locale}/cars/city/${cityData.slug}`,
         numberOfItems: listings.length,
         breadcrumb: {
             '@type': 'BreadcrumbList',
@@ -115,7 +129,7 @@ export default async function CityPage({ params: { city, locale } }: any) {
                 '@type': 'ListItem',
                 position: index + 1,
                 name: crumb.label,
-                item: `https://cayn.ma${crumb.href}` // Naive URL construction, ideally use absolute domain env var
+                item: `https://www.cayn.ma${crumb.href}`
             }))
         }
     };
@@ -127,7 +141,7 @@ export default async function CityPage({ params: { city, locale } }: any) {
             '@type': 'ListItem',
             position: index + 1,
             name: crumb.label,
-            item: `https://cayn.ma${crumb.href}`
+            item: `https://www.cayn.ma${crumb.href}`
         }))
     };
 
