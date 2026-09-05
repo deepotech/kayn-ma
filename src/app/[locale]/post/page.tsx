@@ -2,9 +2,10 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import { useRouter } from '@/navigation';
+import { useSearchParams } from 'next/navigation';
 import { dataURLtoFile } from '@/lib/utils';
 import { ChevronRight, ChevronLeft, Check, Rocket, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -52,11 +53,12 @@ export type PostFormData = {
 const DRAFT_KEY = 'cayn_post_draft_v2';
 const TOTAL_STEPS = 7;
 
-export default function PostAdPage() {
+function PostAdForm() {
     const t = useTranslations('PostAd');
     const locale = useLocale();
     const isRtl = locale === 'ar';
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user } = useAuth();
 
     const [currentStep, setCurrentStep] = useState(1);
@@ -122,6 +124,45 @@ export default function PostAdPage() {
             }
         }
     }, [setValue, draftRestored]);
+
+    // Handle incoming prefill parameters from searchParams (e.g. from /sell-car)
+    useEffect(() => {
+        if (!searchParams) return;
+        const purposeParam = searchParams.get('purpose');
+        const adTypeParam = searchParams.get('adType');
+        if (purposeParam === 'sale' || purposeParam === 'rent') {
+            setValue('purpose', purposeParam);
+        } else if (adTypeParam === 'rental') {
+            setValue('purpose', 'rent');
+        } else if (adTypeParam === 'sale') {
+            setValue('purpose', 'sale');
+        }
+
+        const brandParam = searchParams.get('brand');
+        if (brandParam && brandParam !== 'undefined' && brandParam !== 'null') {
+            setValue('brand', brandParam);
+        }
+        const modelParam = searchParams.get('model');
+        if (modelParam && modelParam !== 'undefined' && modelParam !== 'null') {
+            setValue('model', modelParam);
+        }
+        const cityParam = searchParams.get('city');
+        if (cityParam && cityParam !== 'undefined' && cityParam !== 'null') {
+            setValue('city', cityParam);
+        }
+        const yearParam = searchParams.get('year');
+        if (yearParam && !isNaN(Number(yearParam))) {
+            setValue('year', Number(yearParam));
+        }
+        const priceParam = searchParams.get('price');
+        if (priceParam && !isNaN(Number(priceParam))) {
+            setValue('price', Number(priceParam));
+        }
+        const pricePeriodParam = searchParams.get('pricePeriod');
+        if (pricePeriodParam && ['day', 'week', 'month'].includes(pricePeriodParam)) {
+            setValue('pricePeriod', pricePeriodParam as 'day' | 'week' | 'month');
+        }
+    }, [searchParams, setValue]);
 
     // Auto-save draft to localStorage (safeguarded against quota limits)
     useEffect(() => {
@@ -576,5 +617,17 @@ export default function PostAdPage() {
             {/* Auth Modal */}
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
         </div>
+    );
+}
+
+export default function PostAdPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        }>
+            <PostAdForm />
+        </Suspense>
     );
 }
