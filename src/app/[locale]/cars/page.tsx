@@ -3,7 +3,7 @@ import ListingCard from '@/components/listings/ListingCard';
 import SearchFilters from '@/components/search/SearchFilters';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { Plus, ChevronRight, ChevronLeft, ShieldCheck, FileText, CheckCircle2 } from 'lucide-react';
+import { Plus, ChevronRight, ChevronLeft, ShieldCheck, FileText, CheckCircle2, Sparkles } from 'lucide-react';
 import { getListingsPaginated, SearchParams } from '@/lib/listings';
 import prisma from '@/lib/db';
 import { CITIES } from '@/constants/cities';
@@ -286,6 +286,31 @@ export default async function CarsPage({
                     </p>
                 </div>
 
+                {/* Sell or Rent Promo Banner */}
+                <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/50 to-blue-50 dark:from-zinc-900 dark:via-blue-950/30 dark:to-zinc-900 border border-blue-200/70 dark:border-blue-900/50 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div className="flex items-center gap-3 sm:gap-4 text-center sm:text-start">
+                        <div className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                            <Sparkles className="w-5 h-5 text-amber-300" />
+                        </div>
+                        <div>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                                {isAr ? 'لديك سيارة تريد بيعها أو كراءها؟' : 'Vous avez un véhicule à vendre ou à louer ?'}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+                                {isAr
+                                    ? 'اعرضها أمام آلاف المشترين والمهتمين بالكراء في المغرب مجاناً وبدون عمولة.'
+                                    : 'Présentez-la gratuitement à des milliers d’acheteurs et locataires au Maroc.'}
+                            </p>
+                        </div>
+                    </div>
+                    <Link
+                        href={`/${locale}/sell-car`}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all shrink-0"
+                    >
+                        <span>{isAr ? 'بع أو اكْرِ سيارتك' : 'Vendez ou louez votre voiture'}</span>
+                    </Link>
+                </div>
+
                 {/* Main Content Layout: Sidebar + Listings Grid */}
                 <div className="flex flex-col md:flex-row gap-8">
                     <SearchFilters totalResults={total} />
@@ -351,12 +376,20 @@ export default async function CarsPage({
                                 <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
                                     {isAr ? 'جرّب تغيير خيارات التصفية أو كن أول من ينشر إعلانه هنا' : 'Essayez de modifier vos filtres ou publiez votre annonce'}
                                 </p>
-                                <Link href="/post">
-                                    <Button className="gap-2">
-                                        <Plus className="h-5 w-5" />
-                                        {isAr ? 'أضف إعلانك مجاناً' : 'Publier une annonce'}
-                                    </Button>
-                                </Link>
+                                <div className="flex flex-wrap items-center justify-center gap-3">
+                                    <Link href={`/${locale}/sell-car`}>
+                                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700">
+                                            <Sparkles className="h-4 w-4 text-amber-300" />
+                                            {isAr ? 'بع أو اكْرِ سيارتك' : 'Vendez ou louez votre voiture'}
+                                        </Button>
+                                    </Link>
+                                    <Link href="/post">
+                                        <Button variant="outline" className="gap-2">
+                                            <Plus className="h-4 w-4" />
+                                            {isAr ? 'أضف إعلانك مجاناً' : 'Publier une annonce'}
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         )}
                     </div>

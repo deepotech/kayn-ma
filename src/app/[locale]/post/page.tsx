@@ -4,10 +4,10 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { useState, useCallback, useEffect, Suspense } from 'react';
 import axios from 'axios';
-import { useRouter } from '@/navigation';
+import { useRouter, Link } from '@/navigation';
 import { useSearchParams } from 'next/navigation';
 import { dataURLtoFile } from '@/lib/utils';
-import { ChevronRight, ChevronLeft, Check, Rocket, Loader2, AlertCircle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Rocket, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/components/auth/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
@@ -444,6 +444,27 @@ function PostAdForm() {
                     <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-3 text-red-700 dark:text-red-400 text-sm font-medium animate-in fade-in">
                         <AlertCircle className="w-5 h-5 shrink-0" />
                         <span>{stepError}</span>
+                    </div>
+                )}
+
+                {/* Optional recommendation to interactive sell-car page */}
+                {currentStep === 1 && (
+                    <div className="mb-6 p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+                        <div className="flex items-center gap-2.5 text-blue-900 dark:text-blue-200 text-center sm:text-start">
+                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                            <span>
+                                {locale === 'ar'
+                                    ? 'هل تبحث عن تجربة أسرع لتقييم ونشر سيارتك بالخطوات الموجهة؟'
+                                    : 'Vous cherchez une expérience guidée avec estimation pour publier votre voiture ?'}
+                            </span>
+                        </div>
+                        <Link
+                            href="/sell-car"
+                            className="font-bold text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100 underline decoration-blue-400 shrink-0 inline-flex items-center gap-1"
+                        >
+                            <span>{locale === 'ar' ? 'بع أو اكْرِ سيارتك' : 'Vendez ou louez votre voiture'}</span>
+                            <ChevronRight className={`w-3.5 h-3.5 ${isRtl ? 'rotate-180' : ''}`} />
+                        </Link>
                     </div>
                 )}
 

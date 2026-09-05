@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/navigation';
 import { Button } from '@/components/ui/Button';
-import { Car, Menu, Plus, Search, User, X, LogOut, ChevronDown } from 'lucide-react';
+import { Car, Menu, Plus, Search, User, X, LogOut, ChevronDown, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 
@@ -43,8 +43,15 @@ export default function Header() {
                 </Link>
 
                 {/* Desktop Nav Links */}
-                <nav className="hidden md:flex items-center gap-6 mx-6">
-                    <Link href="/rent-agencies" className="text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-200 transition-colors">
+                <nav className="hidden md:flex items-center gap-5 mx-6">
+                    <Link
+                        href="/sell-car"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-3 py-1.5 rounded-full border border-blue-200/60 dark:border-blue-800/60 transition-colors whitespace-nowrap"
+                    >
+                        <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                        <span>{t('Header.sellCar')}</span>
+                    </Link>
+                    <Link href="/rent-agencies" className="text-sm font-medium text-slate-700 hover:text-blue-600 dark:text-slate-200 transition-colors whitespace-nowrap">
                         {t('Header.rentAgencies')}
                     </Link>
                 </nav>
@@ -160,6 +167,19 @@ export default function Header() {
                                 </Link>
                                 <Link href="/rent-agencies" onClick={toggleMenu} className="py-2 hover:text-blue-600 font-medium">
                                     {t('Header.rentAgencies')}
+                                </Link>
+                                <Link
+                                    href="/sell-car"
+                                    onClick={toggleMenu}
+                                    className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200/60 dark:border-blue-800/60 transition-colors"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <Sparkles className="w-4 h-4 text-amber-500" />
+                                        {t('Header.sellCar')}
+                                    </span>
+                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                                        →
+                                    </span>
                                 </Link>
                             </nav>
                             <hr />

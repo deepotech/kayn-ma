@@ -45,6 +45,11 @@ export default function Footer() {
                             <li>
                                 <Link href="/cars?purpose=rent" className="hover:text-blue-400 transition-colors">{tCategories('rental')}</Link>
                             </li>
+                            <li>
+                                <Link href="/sell-car" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors flex items-center gap-1.5">
+                                    <span>{t('sellCar')}</span>
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 

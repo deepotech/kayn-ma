@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/Button';
-import { Search, BadgeCheck, MessageCircle, Banknote, ChevronDown, Car, RefreshCw, Building2, Key, Shield, Phone, AlertTriangle, Plus } from 'lucide-react';
+import { Search, BadgeCheck, MessageCircle, Banknote, ChevronDown, Car, RefreshCw, Building2, Key, Shield, Phone, AlertTriangle, Plus, Sparkles } from 'lucide-react';
 import { Link } from '@/navigation';
 
 import ListingCard from '@/components/listings/ListingCard';
@@ -199,6 +199,21 @@ export default async function HomePage({ params: { locale } }: { params: { local
               <span className="text-sm font-medium">{t('noCommission')}</span>
             </div>
           </div>
+
+          {/* Quick CTA to sell-car */}
+          <div className="mt-8 pt-6 border-t border-white/15 max-w-xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="text-sm text-white/90 text-center sm:text-start">
+              <span className="font-bold">{t('sellCarPrompt')}</span>{' '}
+              <span className="opacity-80 block sm:inline text-xs sm:text-sm">{t('sellCarSub')}</span>
+            </div>
+            <Link
+              href="/sell-car"
+              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-sm shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 shrink-0"
+            >
+              <Sparkles className="h-4 w-4 text-slate-900" />
+              <span>{tCommon('sellCar')}</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -240,9 +255,9 @@ export default async function HomePage({ params: { locale } }: { params: { local
         </div>
 
         <LatestListingsTabs
-          saleListings={saleListings}
-          rentListings={rentListings}
-          allListings={allListings}
+          saleListings={saleListings as any}
+          rentListings={rentListings as any}
+          allListings={allListings as any}
         />
       </section>
 

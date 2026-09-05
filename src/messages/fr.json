@@ -20,6 +20,7 @@
         "search": "Rechercher",
         "signIn": "Se connecter",
         "postAd": "Vendre ma voiture",
+        "sellCar": "Vendez ou louez votre voiture",
         "home": "Accueil",
         "cars": "Voitures",
         "menu": "Menu",
@@ -57,7 +58,8 @@
         "loggedInAs": "Connecté en tant que",
         "myListings": "Mes annonces",
         "logout": "Déconnexion",
-        "rentAgencies": "Agences de location"
+        "rentAgencies": "Agences de location",
+        "sellCar": "Vendez ou louez votre voiture"
     },
     "Hero": {
         "title": "Vente et location de voitures au Maroc en toute simplicité",
@@ -67,7 +69,9 @@
         "allCities": "Toutes les villes",
         "freeAds": "Annonces gratuites",
         "directContact": "Contact direct",
-        "noCommission": "Sans commission"
+        "noCommission": "Sans commission",
+        "sellCarPrompt": "Vous avez une voiture à vendre ou à louer ?",
+        "sellCarSub": "Publiez-la en quelques minutes gratuitement"
     },
     "Categories": {
         "title": "Catégories",
@@ -103,7 +107,8 @@
         "terms": "Conditions d'utilisation",
         "privacy": "Politique de confidentialité",
         "contact": "Contact",
-        "copyright": "Tous droits réservés"
+        "copyright": "Tous droits réservés",
+        "sellCar": "Vendez ou louez votre voiture"
     },
     "Badges": {
         "new": "Neuve",
