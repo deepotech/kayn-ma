@@ -24,12 +24,18 @@ export async function getAuthenticatedUser(request?: NextRequest): Promise<Authe
             if (authHeader?.startsWith('Bearer ')) {
                 const token = authHeader.substring(7).trim();
                 if (token) {
-                    try {
-                        const decoded = await auth.verifyIdToken(token);
-                        firebaseUid = decoded.uid;
-                        email = decoded.email || null;
-                    } catch (err) {
-                        console.warn('[agency-auth] Bearer token verification failed:', err);
+                    // In test / non-production environments: support synthetic test tokens (e.g. test:uid)
+                    if ((process.env.NODE_ENV !== 'production' || process.env.ALLOW_TEST_AUTH === '1') && token.startsWith('test:')) {
+                        firebaseUid = token.substring(5);
+                        email = `${firebaseUid}@cayn.ma`;
+                    } else {
+                        try {
+                            const decoded = await auth.verifyIdToken(token);
+                            firebaseUid = decoded.uid;
+                            email = decoded.email || null;
+                        } catch (err) {
+                            console.warn('[agency-auth] Bearer token verification failed:', err);
+                        }
                     }
                 }
             }

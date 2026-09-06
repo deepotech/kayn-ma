@@ -44,6 +44,14 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+    return handleUpdateVehicle(request, params);
+}
+
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+    return handleUpdateVehicle(request, params);
+}
+
+async function handleUpdateVehicle(request: NextRequest, params: { id: string }) {
     try {
         const user = await getAuthenticatedUser(request);
         if (!user) {
