@@ -387,6 +387,73 @@
             "noText": "Aucun commentaire",
             "directions": "Itinéraire",
             "getDirections": "Obtenir l'itinéraire"
+        },
+        "title": "Agences de location de voitures au Maroc",
+        "Claim": {
+            "isOwner": "Êtes-vous le propriétaire de cette agence ?",
+            "claimNow": "Revendiquer cette agence",
+            "manageFleet": "Gérer la flotte de voitures et les tarifs",
+            "badgePending": "Demande de vérification en cours",
+            "badgeVerified": "Agence vérifiée et certifiée",
+            "modalTitle": "Revendiquer l'agence {name}",
+            "phone": "Numéro de téléphone pour vérification",
+            "notes": "Informations complémentaires ou justificatif (RC ou licence)",
+            "submit": "Envoyer la demande de vérification",
+            "success": "Votre demande a été envoyée avec succès ! Notre équipe vous contactera rapidement.",
+            "loginRequired": "Veuillez vous connecter pour revendiquer cette agence"
+        },
+        "claim": {
+            "isOwner": "Êtes-vous le propriétaire de cette agence ?",
+            "claimNow": "Revendiquer cette agence",
+            "manageFleet": "Gérer la flotte de voitures et les tarifs",
+            "badgePending": "Demande de vérification en cours",
+            "badgeVerified": "Agence vérifiée et certifiée",
+            "modalTitle": "Revendiquer l'agence {name}",
+            "phone": "Numéro de téléphone pour vérification",
+            "notes": "Informations complémentaires ou justificatif (RC ou licence)",
+            "submit": "Envoyer la demande de vérification",
+            "success": "Votre demande a été envoyée avec succès ! Notre équipe vous contactera rapidement.",
+            "loginRequired": "Veuillez vous connecter pour revendiquer cette agence"
+        },
+        "Fleet": {
+            "title": "Voitures de location disponibles",
+            "subtitle": "Choisissez votre véhicule préféré et réservez-le directement auprès de l'agence au meilleur tarif",
+            "emptyTitle": "Aucun véhicule ajouté pour l'instant",
+            "emptySubtitle": "Contactez directement l'agence pour connaître la disponibilité et les prix actuels.",
+            "emptyOwnerTitle": "Votre flotte est actuellement vide",
+            "emptyOwnerSubtitle": "Ajoutez vos voitures de location avec vos tarifs journaliers et mensuels pour attirer des milliers de clients.",
+            "addFirstCar": "Ajouter votre premier véhicule",
+            "bookWhatsapp": "Réserver via WhatsApp",
+            "callAgency": "Appeler l'agence",
+            "perDay": "DH / jour",
+            "perWeek": "DH / semaine",
+            "perMonth": "DH / mois",
+            "deposit": "Caution",
+            "minDays": "Durée min de location",
+            "days": "jours",
+            "day": "jour",
+            "unlimited": "Illimité",
+            "status": {
+                "available": "Disponible",
+                "rented": "En location",
+                "maintenance": "En maintenance",
+                "hidden": "Masqué"
+            },
+            "lastUpdated": "Dernière mise à jour",
+            "viewDetails": "Détails et tarifs de location"
+        },
+        "Dashboard": {
+            "title": "Gestion de l'agence de location",
+            "vehiclesCount": "Véhicules de la flotte",
+            "availableCount": "Véhicules disponibles",
+            "viewsCount": "Vues du profil",
+            "clicksCount": "Clics WhatsApp & Téléphone",
+            "addNewCar": "Ajouter un véhicule",
+            "manageFleet": "Gérer la flotte",
+            "editProfile": "Modifier les coordonnées",
+            "verifiedAgency": "Agence certifiée & officielle",
+            "pendingAgency": "Demande de vérification en cours d'examen",
+            "unverifiedAgency": "Agence non vérifiée"
         }
     },
     "MyListings": {
@@ -485,62 +552,6 @@
         "whyUs": {
             "title": "Pourquoi Cayn.ma ?",
             "content": "Parce que nous prônons une transparence totale, vérifions manuellement la qualité des informations et fournissons des guides de référence locaux pour vous aider à prendre les meilleures décisions."
-        }
-    },
-    "RentAgencies": {
-        "title": "Agences de location de voitures au Maroc",
-        "claim": {
-            "isOwner": "Êtes-vous le propriétaire de cette agence ?",
-            "claimNow": "Revendiquer cette agence",
-            "manageFleet": "Gérer la flotte de voitures et les tarifs",
-            "badgePending": "Demande de vérification en cours",
-            "badgeVerified": "Agence vérifiée et certifiée",
-            "modalTitle": "Revendiquer l'agence {name}",
-            "phone": "Numéro de téléphone pour vérification",
-            "notes": "Informations complémentaires ou justificatif (RC ou licence)",
-            "submit": "Envoyer la demande de vérification",
-            "success": "Votre demande a été envoyée avec succès ! Notre équipe vous contactera rapidement.",
-            "loginRequired": "Veuillez vous connecter pour revendiquer cette agence"
-        },
-        "Fleet": {
-            "title": "Voitures de location disponibles",
-            "subtitle": "Choisissez votre véhicule préféré et réservez-le directement auprès de l'agence au meilleur tarif",
-            "emptyTitle": "Aucun véhicule ajouté pour l'instant",
-            "emptySubtitle": "Contactez directement l'agence pour connaître la disponibilité et les prix actuels.",
-            "emptyOwnerTitle": "Votre flotte est actuellement vide",
-            "emptyOwnerSubtitle": "Ajoutez vos voitures de location avec vos tarifs journaliers et mensuels pour attirer des milliers de clients.",
-            "addFirstCar": "Ajouter votre premier véhicule",
-            "bookWhatsapp": "Réserver via WhatsApp",
-            "callAgency": "Appeler l'agence",
-            "perDay": "DH / jour",
-            "perWeek": "DH / semaine",
-            "perMonth": "DH / mois",
-            "deposit": "Caution",
-            "minDays": "Durée min de location",
-            "days": "jours",
-            "day": "jour",
-            "unlimited": "Illimité",
-            "status": {
-                "available": "Disponible",
-                "rented": "En location",
-                "maintenance": "En maintenance",
-                "hidden": "Masqué"
-            },
-            "lastUpdated": "Dernière mise à jour",
-            "viewDetails": "Détails et tarifs de location"
-        },
-        "Dashboard": {
-            "title": "Gestion de l'agence de location",
-            "vehiclesCount": "Véhicules de la flotte",
-            "availableCount": "Véhicules disponibles",
-            "viewsCount": "Vues du profil",
-            "clicksCount": "Clics WhatsApp & Téléphone",
-            "addNewCar": "Ajouter un véhicule",
-            "manageFleet": "Gérer la flotte",
-            "editProfile": "Modifier les coordonnées",
-            "verifiedAgency": "Agence certifiée & officielle",
-            "pendingAgency": "Demande de vérification en cours d'examen",
-            "unverifiedAgency": "Agence non vérifiée"
         }
     }
 }
