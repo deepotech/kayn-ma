@@ -7,44 +7,52 @@ export interface AuthUser {
     email: string;
     role: 'user' | 'moderator' | 'admin';
     isBanned: boolean;
+    dbUserId: string;
 }
 
 /**
- * Verify Firebase token from request headers and get user data
+ * Verify Firebase token from request headers (or session cookie) and get user data from PostgreSQL
  */
 export async function verifyAuth(request: NextRequest): Promise<AuthUser | null> {
     try {
         const authHeader = request.headers.get('authorization');
-        const hasAuthHeader = Boolean(authHeader);
-        const startsWithBearer = Boolean(authHeader?.startsWith('Bearer '));
-
-        console.log(`[verifyAuth] Header check: present=${hasAuthHeader}, startsWithBearer=${startsWithBearer}`);
-
-        if (!authHeader || !startsWithBearer) {
-            console.log('[verifyAuth] Rejected: Missing or non-Bearer authorization header');
-            return null;
-        }
-
-        const token = authHeader.substring(7).trim();
-        if (!token) {
-            console.log('[verifyAuth] Rejected: Bearer token is empty');
-            return null;
-        }
-
-        let uid: string;
+        let uid: string | null = null;
         let email: string | null = null;
         let name: string | null = null;
 
-        if ((process.env.NODE_ENV !== 'production' || process.env.ALLOW_TEST_AUTH === '1') && token.startsWith('test:')) {
-            uid = token.substring(5);
-            email = `${uid}@cayn.ma`;
-            name = uid;
-        } else {
-            const decodedToken = await auth.verifyIdToken(token);
-            uid = decodedToken.uid;
-            email = decodedToken.email || null;
-            name = decodedToken.name || null;
-            console.log(`[verifyAuth] Token verified successfully for UID: ${uid}`);
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7).trim();
+            if (token) {
+                if (process.env.NODE_ENV !== 'production' && process.env.ALLOW_TEST_AUTH === '1' && token.startsWith('test:')) {
+                    uid = token.substring(5);
+                    email = `${uid}@cayn.ma`;
+                    name = uid;
+                } else {
+                    const decodedToken = await auth.verifyIdToken(token);
+                    uid = decodedToken.uid;
+                    email = decodedToken.email || null;
+                    name = decodedToken.name || null;
+                }
+            }
+        }
+
+        // Fallback to session cookie if no Bearer token
+        if (!uid) {
+            const sessionCookie = request.cookies.get('session')?.value;
+            if (sessionCookie) {
+                try {
+                    const decodedSession = await auth.verifySessionCookie(sessionCookie, true);
+                    uid = decodedSession.uid;
+                    email = decodedSession.email || null;
+                    name = decodedSession.name || null;
+                } catch {
+                    // Session cookie invalid or expired
+                }
+            }
+        }
+
+        if (!uid) {
+            return null;
         }
 
         // Query user from PostgreSQL via Prisma
@@ -76,7 +84,6 @@ export async function verifyAuth(request: NextRequest): Promise<AuthUser | null>
                     }
                 });
             } catch {
-                // If parallel creation or email conflict occurred, query existing
                 dbUser = await prisma.user.findFirst({
                     where: {
                         OR: [
@@ -88,23 +95,25 @@ export async function verifyAuth(request: NextRequest): Promise<AuthUser | null>
             }
         }
 
-        const isBanned = Boolean(dbUser?.isBanned);
-        const userEmail = decodedToken.email || dbUser?.email || '';
-        const isAdmin = Boolean(process.env.ADMIN_EMAIL && (userEmail === process.env.ADMIN_EMAIL || decodedToken.email === process.env.ADMIN_EMAIL));
-        const role: 'user' | 'moderator' | 'admin' = isAdmin
-            ? 'admin'
-            : ((dbUser?.role as any) || 'user');
+        if (!dbUser) {
+            return null;
+        }
 
-        console.log(`[verifyAuth] Auth resolved for UID: ${decodedToken.uid}, role: ${role}, isBanned: ${isBanned}`);
+        const isBanned = Boolean(dbUser.isBanned);
+        const userEmail = email || dbUser.email || '';
+        const role: 'user' | 'moderator' | 'admin' = dbUser.role === 'admin'
+            ? 'admin'
+            : (dbUser.role === 'moderator' ? 'moderator' : 'user');
 
         return {
-            uid: decodedToken.uid,
+            uid,
             email: userEmail,
             role,
             isBanned,
+            dbUserId: dbUser.id,
         };
-    } catch (error: any) {
-        console.error('[verifyAuth] Auth verification failed:', error?.code || error?.message || error);
+    } catch (error: unknown) {
+        console.error('[verifyAuth] Auth verification failed:', error);
         return null;
     }
 }
@@ -125,6 +134,27 @@ export async function requireAdmin(request: NextRequest): Promise<{ user: AuthUs
 
     if (!['admin', 'moderator'].includes(user.role)) {
         return { error: 'Forbidden - Admin access required', status: 403 };
+    }
+
+    return { user };
+}
+
+/**
+ * Strictly require admin role (not moderator) for sensitive management actions
+ */
+export async function requireStrictAdmin(request: NextRequest): Promise<{ user: AuthUser } | { error: string; status: number }> {
+    const user = await verifyAuth(request);
+
+    if (!user) {
+        return { error: 'Unauthorized. Admin authentication required.', status: 401 };
+    }
+
+    if (user.isBanned) {
+        return { error: 'Forbidden. Account is banned.', status: 403 };
+    }
+
+    if (user.role !== 'admin') {
+        return { error: 'Forbidden. Strictly admin access required.', status: 403 };
     }
 
     return { user };

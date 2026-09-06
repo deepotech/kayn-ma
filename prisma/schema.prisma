@@ -85,6 +85,7 @@ model Business {
   reviews            Review[]
   categories         BusinessCategory[]
   vehicles           AgencyVehicle[]
+  claims             AgencyClaim[]     @relation("AgencyClaims")
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -219,7 +220,9 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  businesses   Business[]
+  businesses      Business[]
+  applicantClaims AgencyClaim[] @relation("ApplicantClaims")
+  reviewedClaims  AgencyClaim[] @relation("ReviewedClaims")
 
   @@index([firebaseUid])
   @@index([email])
@@ -337,4 +340,36 @@ model AgencyVehicle {
   @@index([agencyId, status])
   @@index([brandSlug, modelSlug])
   @@index([status])
+}
+
+enum AgencyClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model AgencyClaim {
+  id              String            @id @default(uuid())
+  agencyId        String
+  userId          String
+  fullName        String
+  phone           String
+  email           String
+  notes           String?           @db.Text
+  status          AgencyClaimStatus @default(PENDING)
+  rejectionReason String?           @db.Text
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  agency          Business          @relation("AgencyClaims", fields: [agencyId], references: [id], onDelete: Restrict)
+  applicant       User              @relation("ApplicantClaims", fields: [userId], references: [id], onDelete: Restrict)
+  reviewer        User?             @relation("ReviewedClaims", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([agencyId])
+  @@index([userId])
+  @@index([reviewedById])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
 }

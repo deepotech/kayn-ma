@@ -418,8 +418,11 @@
         "Fleet": {
             "title": "Voitures de location disponibles",
             "subtitle": "Choisissez votre véhicule préféré et réservez-le directement auprès de l'agence au meilleur tarif",
-            "emptyTitle": "Aucun véhicule ajouté pour l'instant",
-            "emptySubtitle": "Contactez directement l'agence pour connaître la disponibilité et les prix actuels.",
+            "emptyTitle": "Cette agence n’a pas encore ajouté ses véhicules",
+            "emptySubtitle": "Vous êtes le propriétaire ? Ajoutez votre flotte et vos tarifs pour attirer des clients.",
+            "addVehiclesNow": "Ajoutez vos véhicules maintenant",
+            "claimToManage": "Revendiquer l'agence pour ajouter la flotte",
+            "contactAgencyDirectly": "Contactez directement l'agence pour connaître la disponibilité et les prix actuels.",
             "emptyOwnerTitle": "Votre flotte est actuellement vide",
             "emptyOwnerSubtitle": "Ajoutez vos voitures de location avec vos tarifs journaliers et mensuels pour attirer des milliers de clients.",
             "addFirstCar": "Ajouter votre premier véhicule",
@@ -440,7 +443,10 @@
                 "hidden": "Masqué"
             },
             "lastUpdated": "Dernière mise à jour",
-            "viewDetails": "Détails et tarifs de location"
+            "viewDetails": "Détails et tarifs de location",
+            "relatedAgenciesTitle": "Agences de location similaires",
+            "relatedAgenciesSubtitle": "D'autres agences de confiance dans la même ville",
+            "viewAgency": "Voir l'agence"
         },
         "Dashboard": {
             "title": "Gestion de l'agence de location",

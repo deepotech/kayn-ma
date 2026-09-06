@@ -12,6 +12,8 @@ interface AgencyClaimModalProps {
     agencyPhone?: string | null;
     verificationStatus?: string;
     isOwner?: boolean;
+    triggerText?: string;
+    className?: string;
 }
 
 export default function AgencyClaimModal({
@@ -20,6 +22,8 @@ export default function AgencyClaimModal({
     agencyPhone,
     verificationStatus = 'UNVERIFIED',
     isOwner = false,
+    triggerText,
+    className,
 }: AgencyClaimModalProps) {
     const t = useTranslations('RentAgencies.Claim');
     const locale = useLocale();
@@ -28,8 +32,9 @@ export default function AgencyClaimModal({
 
     const [isOpen, setIsOpen] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [fullName, setFullName] = useState(user?.displayName || '');
     const [phone, setPhone] = useState(agencyPhone || '');
-    const [whatsapp, setWhatsapp] = useState(agencyPhone || '');
+    const [email, setEmail] = useState(user?.email || '');
     const [notes, setNotes] = useState('');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<string>(verificationStatus);
@@ -41,6 +46,8 @@ export default function AgencyClaimModal({
             setShowAuthModal(true);
             return;
         }
+        if (!fullName && user.displayName) setFullName(user.displayName);
+        if (!email && user.email) setEmail(user.email);
         setIsOpen(true);
     };
 
@@ -59,10 +66,10 @@ export default function AgencyClaimModal({
                 },
                 body: JSON.stringify({
                     agencyId,
+                    fullName,
                     phone,
-                    whatsapp,
-                    notes,
-                    verificationMethod: 'phone'
+                    email,
+                    notes
                 })
             });
 
@@ -77,12 +84,26 @@ export default function AgencyClaimModal({
                     ? 'تم إرسال طلب تأكيد الملكية بنجاح! سيقوم فريقنا بمراجعته والتواصل معك لتأكيد الوكالة.'
                     : 'Votre demande de revendication a été envoyée ! Notre équipe va la vérifier et vous contacter.'
             );
-        } catch (err: any) {
-            setError(err.message || 'Error submitting claim');
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Error submitting claim';
+            setError(message);
         } finally {
             setLoading(false);
         }
     };
+
+    // If the logged in user is the verified owner
+    if (isOwner && status === 'VERIFIED') {
+        return (
+            <a
+                href={`/${locale}/dashboard/agency`}
+                className={className || "inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-lg text-xs md:text-sm font-semibold border border-blue-200 dark:border-blue-800 transition-colors shadow-sm"}
+            >
+                <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>{isRtl ? 'إدارة وكالتي' : 'Gérer mon agence'}</span>
+            </a>
+        );
+    }
 
     // If verified
     if (status === 'VERIFIED') {
@@ -104,16 +125,18 @@ export default function AgencyClaimModal({
         );
     }
 
+    const defaultBtnText = isRtl ? 'هل أنت صاحب هذه الوكالة؟' : 'Êtes-vous le propriétaire ?';
+
     return (
         <>
             {/* Banner button */}
             <button
                 type="button"
                 onClick={handleOpen}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-lg text-xs md:text-sm font-semibold border border-blue-200 dark:border-blue-800 transition-colors shadow-sm"
+                className={className || "inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-lg text-xs md:text-sm font-semibold border border-blue-200 dark:border-blue-800 transition-colors shadow-sm"}
             >
                 <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>{isRtl ? 'هل أنت صاحب هذه الوكالة؟' : 'Êtes-vous le propriétaire ?'}</span>
+                <span>{triggerText || defaultBtnText}</span>
             </button>
 
             {/* Claim Modal */}
@@ -173,7 +196,21 @@ export default function AgencyClaimModal({
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        {isRtl ? 'رقم الهاتف للمعاينة *' : 'Numéro de téléphone *'}
+                                        {isRtl ? 'الاسم الكامل لمقدم الطلب *' : 'Nom complet du demandeur *'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        placeholder={isRtl ? 'محمد العلمي' : 'Mohammed Alami'}
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                        {isRtl ? 'رقم الهاتف للتواصل *' : 'Numéro de téléphone *'}
                                     </label>
                                     <input
                                         type="tel"
@@ -187,26 +224,27 @@ export default function AgencyClaimModal({
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        {isRtl ? 'رقم الواتساب (للتواصل السريع)' : 'Numéro WhatsApp'}
+                                        {isRtl ? 'البريد الإلكتروني للتواصل *' : 'Adresse e-mail *'}
                                     </label>
                                     <input
-                                        type="tel"
-                                        value={whatsapp}
-                                        onChange={(e) => setWhatsapp(e.target.value)}
-                                        placeholder="0612345678"
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="contact@agence.ma"
                                         className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        {isRtl ? 'ملاحظات إضافية (اختياري)' : 'Remarques complémentaires'}
+                                        {isRtl ? 'ملاحظات إضافية أو إثبات الملكية (اختياري)' : 'Remarques complémentaires (Optionnel)'}
                                     </label>
                                     <textarea
                                         rows={2}
                                         value={notes}
                                         onChange={(e) => setNotes(e.target.value)}
-                                        placeholder={isRtl ? 'مثال: أنا مدير الفرع في شارع...' : 'Exemple: Je suis le gérant du bureau...'}
+                                        placeholder={isRtl ? 'مثال: أنا الممثل القانوني أو مدير الوكالة...' : 'Exemple: Je suis le gérant légal de l\'agence...'}
                                         className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                                     />
                                 </div>

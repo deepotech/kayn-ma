@@ -9,7 +9,7 @@ import { getCurrentUser } from '@/lib/server-auth';
 // Helper for auth check
 async function checkAdminAuth() {
     const user = await getCurrentUser();
-    if (!user || !user.email) {
+    if (!user || !user.uid || !user.email) {
         throw new Error('Unauthorized');
     }
     const { isAdmin } = await verifyAdminRole(user.email);

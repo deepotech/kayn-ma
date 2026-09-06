@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { MapPin, Phone, Globe, Star, AlertCircle, PhoneCall, Clock, Navigation, CheckCircle2, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Globe, Star, AlertCircle, PhoneCall, Clock, Navigation, CheckCircle2, MessageCircle, ShieldCheck } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { getAgencyBySlug, getAgenciesByIntent } from '@/lib/agencies';
 import { buildAgencyHref, getLocalizedCityName, generateBreadcrumbSchema } from '@/lib/rent-agencies/utils';
@@ -11,6 +11,7 @@ import AgencyList from '@/components/rent-agencies/AgencyList';
 import RelatedAgencies from '@/components/rent-agencies/RelatedAgencies';
 import AgencyFleetSection from '@/components/agency/AgencyFleetSection';
 import AgencyClaimModal from '@/components/agency/AgencyClaimModal';
+import AgencyCoverImage from '@/components/agency/AgencyCoverImage';
 import { getCurrentUser } from '@/lib/server-auth';
 import prisma from '@/lib/db';
 
@@ -311,7 +312,7 @@ export default async function Page({ params }: Props) {
         : null;
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 pb-24 md:pb-8 max-w-7xl">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -341,43 +342,60 @@ export default async function Page({ params }: Props) {
                 <div className="lg:col-span-2">
                     <div className="bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden mb-8 shadow-sm">
                         {/* Cover/Header */}
-                        <div className="h-56 md:h-80 bg-slate-100 dark:bg-zinc-800 relative">
-                            {agency.photos && agency.photos.length > 0 ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={agency.photos[0]}
-                                    alt={agency.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-slate-300 dark:text-zinc-700 bg-slate-50 dark:bg-zinc-800">
-                                    <span className="text-6xl font-bold opacity-20">{agency.name.charAt(0)}</span>
-                                </div>
-                            )}
-
-                            <div className="absolute top-4 right-4 flex gap-2">
-                                {agency.isMixedService && (
-                                    <div className="bg-amber-100 dark:bg-amber-900/90 text-amber-800 dark:text-amber-200 backdrop-blur px-3 py-1 rounded-full text-xs font-bold border border-amber-200 dark:border-amber-700 uppercase tracking-wide">
-                                        {t('Card.mixedServices')}
-                                    </div>
-                                )}
-                            </div>
+                        <div className="h-48 sm:h-60 md:h-72 relative overflow-hidden bg-slate-900">
+                            <AgencyCoverImage
+                                src={agency.coverPhoto || (agency.photos && agency.photos.length > 0 ? agency.photos[0] : null)}
+                                alt={agency.name}
+                                agencyName={agency.name}
+                                cityName={agency.citySlug || agency.city}
+                                isMixedService={agency.isMixedService}
+                                verificationStatus={agency.verificationStatus}
+                                className="w-full h-full object-cover"
+                            />
                         </div>
 
-                        <div className="p-6 md:p-8">
+                        <div className="p-6 md:p-8 pt-0">
+                            {/* Brand Avatar / Overlapping Badge */}
+                            <div className="-mt-10 sm:-mt-12 mb-6 flex items-end justify-between relative z-20">
+                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-zinc-900 border-4 border-white dark:border-zinc-900 shadow-xl overflow-hidden flex items-center justify-center text-blue-500 font-black text-2xl sm:text-3xl shrink-0">
+                                    {agency.photos && agency.photos.length > 0 && !agency.photos[0].includes('googleusercontent.com/gps-cs-s/') ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={agency.photos[0]}
+                                            alt={agency.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center text-white font-bold text-2xl">
+                                            {agency.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
                                 <div>
                                     <div className="flex items-center flex-wrap gap-3 mb-3">
                                         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{agency.name}</h1>
                                         {agency.verificationStatus === 'VERIFIED' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold border border-emerald-200 dark:border-emerald-800">
-                                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                                <span>{locale === 'ar' ? 'وكالة موثقة' : 'Agence vérifiée'}</span>
-                                            </span>
+                                            <div className="flex items-center flex-wrap gap-2">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold border border-emerald-200 dark:border-emerald-800">
+                                                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                                    <span>{locale === 'ar' ? 'وكالة موثقة' : 'Agence vérifiée'}</span>
+                                                </span>
+                                                {isOwner && (
+                                                    <Link
+                                                        href={`/${locale}/dashboard/agency`}
+                                                        className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs font-bold shadow-sm transition-colors"
+                                                    >
+                                                        <ShieldCheck className="w-3.5 h-3.5" />
+                                                        <span>{locale === 'ar' ? 'إدارة وكالتي' : 'Gérer mon agence'}</span>
+                                                    </Link>
+                                                )}
+                                            </div>
                                         ) : agency.verificationStatus === 'PENDING' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-full text-xs font-bold border border-amber-200 dark:border-amber-800">
-                                                <Clock className="w-4 h-4 text-amber-600" />
-                                                <span>{locale === 'ar' ? 'قيد مراجعة الإدارة' : 'En attente de validation'}</span>
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 rounded-full text-xs font-bold border border-amber-200 dark:border-amber-800">
+                                                <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                                <span>{locale === 'ar' ? 'طلب التوثيق قيد المراجعة' : 'Vérification en cours'}</span>
                                             </span>
                                         ) : (
                                             <AgencyClaimModal
@@ -392,18 +410,18 @@ export default async function Page({ params }: Props) {
 
                                     <div className="flex items-center flex-wrap gap-4 text-sm font-medium">
                                         {agency.rating ? (
-                                            <div className="flex items-center text-slate-900 dark:text-white">
+                                            <div className="flex items-center text-slate-900 dark:text-zinc-100 font-bold">
                                                 <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 me-1.5" />
                                                 <span className="text-base">{agency.rating.toFixed(1)}</span>
-                                                <span className="text-slate-400 mx-1.5">•</span>
-                                                <span className="text-slate-500 underline decoration-slate-300 dark:decoration-zinc-700 underline-offset-4">{agency.reviewsCount} {t('Detail.reviews')}</span>
+                                                <span className="text-slate-400 mx-1.5 font-normal">•</span>
+                                                <span className="text-slate-600 dark:text-zinc-300 font-medium underline decoration-slate-300 dark:decoration-zinc-700 underline-offset-4">{agency.reviewsCount} {t('Detail.reviews')}</span>
                                             </div>
                                         ) : (
-                                            <span className="text-slate-500">{t('Detail.noReviews')}</span>
+                                            <span className="text-slate-500 dark:text-zinc-400">{t('Detail.noReviews')}</span>
                                         )}
                                         <span className="hidden md:inline text-slate-300 dark:text-zinc-700">|</span>
-                                        <div className="flex items-center text-slate-600 dark:text-slate-400">
-                                            <MapPin className="w-4 h-4 me-1.5" />
+                                        <div className="flex items-center text-slate-700 dark:text-zinc-300">
+                                            <MapPin className="w-4 h-4 me-1.5 text-blue-600" />
                                             <span className="capitalize">{agency.citySlug}</span>
                                         </div>
                                     </div>
@@ -449,7 +467,7 @@ export default async function Page({ params }: Props) {
                                     <h3 className="font-semibold text-slate-900 dark:text-white mb-4 flex items-center text-lg">
                                         <MapPin className="w-5 h-5 me-2 text-slate-400" /> {t('Detail.address')}
                                     </h3>
-                                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-lg text-base">
+                                    <p className="text-slate-700 dark:text-zinc-200 leading-relaxed bg-slate-50 dark:bg-zinc-800/70 p-4 rounded-xl text-base border border-slate-100 dark:border-zinc-800">
                                         {agency.address}
                                     </p>
 
@@ -459,7 +477,7 @@ export default async function Page({ params }: Props) {
                                                 href={agency.website}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg transition-colors"
+                                                className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold bg-blue-50 dark:bg-blue-950/40 px-4 py-2.5 rounded-xl border border-blue-100 dark:border-blue-900/40 transition-colors text-sm"
                                             >
                                                 <Globe className="w-4 h-4 me-2" /> {t('Detail.visitWebsite')}
                                             </a>
@@ -472,13 +490,13 @@ export default async function Page({ params }: Props) {
                                         <Clock className="w-5 h-5 me-2 text-slate-400" /> {t('Detail.openingHours')}
                                     </h3>
                                     {agency.openingHours && agency.openingHours.length > 0 ? (
-                                        <div className="bg-slate-50 dark:bg-zinc-800/50 rounded-lg p-4 text-sm space-y-3">
+                                        <div className="bg-slate-50 dark:bg-zinc-800/70 rounded-xl p-4 text-sm space-y-3 border border-slate-100 dark:border-zinc-800">
                                             {agency.openingHours.map((oh: any, i: number) => {
                                                 const { text, dir } = formatOpeningHours(oh.hours, locale);
                                                 return (
                                                     <div key={i} className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-zinc-700 last:border-0 last:pb-0 last:border-0 border-dashed">
-                                                        <span className="text-slate-500 font-medium">{oh.day}</span>
-                                                        <span className="font-semibold text-slate-900 dark:text-slate-300" dir={dir}>
+                                                        <span className="text-slate-700 dark:text-zinc-300 font-medium">{oh.day}</span>
+                                                        <span className="font-bold text-slate-900 dark:text-zinc-100" dir={dir}>
                                                             {text}
                                                         </span>
                                                     </div>
@@ -486,7 +504,7 @@ export default async function Page({ params }: Props) {
                                             })}
                                         </div>
                                     ) : (
-                                        <p className="text-slate-400 text-sm italic border border-dashed border-slate-200 dark:border-zinc-700 p-4 rounded-lg">
+                                        <p className="text-slate-500 dark:text-zinc-400 text-sm italic border border-dashed border-slate-200 dark:border-zinc-700 p-4 rounded-xl">
                                             {t('Detail.hoursUnknown') || 'Working hours not available'}
                                         </p>
                                     )}
@@ -567,9 +585,6 @@ export default async function Page({ params }: Props) {
                             </p>
                         </div>
                     </div>
-
-                    {/* Related Agencies Section */}
-                    <RelatedAgencies key={agency._id} currentAgency={agency} locale={locale} />
                 </div>
 
                 {/* Sidebar */}
@@ -580,7 +595,7 @@ export default async function Page({ params }: Props) {
                             <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center">
                                 <MapPin className="w-4 h-4 me-2 text-slate-400" /> {t('Detail.location')}
                             </h3>
-                            <div className="aspect-square bg-slate-100 dark:bg-zinc-800 rounded-lg overflow-hidden relative border border-slate-200 dark:border-zinc-700">
+                            <div className="aspect-[16/10] max-h-56 bg-slate-100 dark:bg-zinc-800 rounded-lg overflow-hidden relative border border-slate-200 dark:border-zinc-700">
                                 <a
                                     href={mapsLinkSearch}
                                     target="_blank"
@@ -635,6 +650,44 @@ export default async function Page({ params }: Props) {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* Related Agencies Section - FULL WIDTH across max-w-7xl */}
+            <div className="mt-14">
+                <RelatedAgencies key={agency._id} currentAgency={agency} locale={locale} />
+            </div>
+
+            {/* Mobile Fixed Action Bar (Doesn't obscure content thanks to pb-24 on container) */}
+            <div className="fixed bottom-0 inset-x-0 z-40 bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 p-3 flex items-center gap-2.5 md:hidden shadow-2xl">
+                {whatsappUrl && (
+                    <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-600 active:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md"
+                    >
+                        <MessageCircle className="w-4 h-4" />
+                        <span>WhatsApp</span>
+                    </a>
+                )}
+                {agency.phone && (
+                    <a
+                        href={`tel:${agency.phone}`}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 active:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md"
+                    >
+                        <PhoneCall className="w-4 h-4" />
+                        <span>{t('Detail.callNow')}</span>
+                    </a>
+                )}
+                <a
+                    href={mapsLinkDirections}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 bg-zinc-800 border border-zinc-700 text-white rounded-xl active:bg-zinc-700"
+                    title="Map"
+                >
+                    <Navigation className="w-4 h-4" />
+                </a>
             </div>
 
             {/* Internal Linking */}
