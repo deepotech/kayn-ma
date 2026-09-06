@@ -1,4 +1,4 @@
-import { DashboardListing, DashboardStats, FavoriteItem } from './dashboard-types';
+import { DashboardListing, DashboardStats, FavoriteItem, User } from './dashboard-types';
 
 const API_BASE = '/api/my-listings';
 
@@ -204,3 +204,16 @@ export async function removeFavorite(id: string, userId: string): Promise<boolea
     });
     return true;
 }
+
+/**
+ * Get current user profile for dashboard
+ */
+export async function getMe(): Promise<User | null> {
+    try {
+        const res = await fetchApi<{ user: User }>('/api/auth/me');
+        return res.user || null;
+    } catch {
+        return null;
+    }
+}
+

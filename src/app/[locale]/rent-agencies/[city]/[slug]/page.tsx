@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { MapPin, Phone, Globe, Star, AlertCircle, PhoneCall, Clock, Navigation } from 'lucide-react';
+import { MapPin, Phone, Globe, Star, AlertCircle, PhoneCall, Clock, Navigation, CheckCircle2, MessageCircle } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { getAgencyBySlug, getAgenciesByIntent } from '@/lib/agencies';
 import { buildAgencyHref, getLocalizedCityName, generateBreadcrumbSchema } from '@/lib/rent-agencies/utils';
@@ -9,6 +9,10 @@ import IntentLinks from '@/components/rent-agencies/IntentLinks';
 import { getIntent } from '@/lib/rent-agencies/seo-intents';
 import AgencyList from '@/components/rent-agencies/AgencyList';
 import RelatedAgencies from '@/components/rent-agencies/RelatedAgencies';
+import AgencyFleetSection from '@/components/agency/AgencyFleetSection';
+import AgencyClaimModal from '@/components/agency/AgencyClaimModal';
+import { getCurrentUser } from '@/lib/server-auth';
+import prisma from '@/lib/db';
 
 // Force dynamic rendering — page uses Prisma (database queries at runtime)
 export const dynamic = 'force-dynamic';
@@ -247,6 +251,19 @@ export default async function Page({ params }: Props) {
         notFound();
     }
 
+    // Check if logged in user owns this agency
+    const serverUser = await getCurrentUser();
+    let isOwner = false;
+    if (serverUser?.uid && agency.ownerId) {
+        const dbUser = await prisma.user.findUnique({
+            where: { firebaseUid: serverUser.uid },
+            select: { id: true }
+        });
+        if (dbUser && dbUser.id === agency.ownerId) {
+            isOwner = true;
+        }
+    }
+
     const t = await getTranslations({ locale, namespace: 'RentAgencies' });
 
     // Structured Data (LocalBusiness / AutoRental)
@@ -284,6 +301,14 @@ export default async function Page({ params }: Props) {
 
     const mapsLinkDirections = `https://www.google.com/maps/dir/?api=1&destination=${agency.location.lat},${agency.location.lng}`;
     const mapsLinkSearch = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(agency.name + ' ' + agency.city)}`;
+
+    const whatsappPhone = agency.whatsapp || agency.phone;
+    const whatsappMsg = locale === 'ar'
+        ? `مرحباً، أود الاستفسار عن كراء سيارة من وكالة ${agency.name} على Cayn.ma.`
+        : `Bonjour, je souhaite me renseigner sur la location d'une voiture chez ${agency.name} sur Cayn.ma.`;
+    const whatsappUrl = whatsappPhone
+        ? `https://wa.me/212${whatsappPhone.replace(/^(\+212|0)/, '')}?text=${encodeURIComponent(whatsappMsg)}`
+        : null;
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -342,7 +367,29 @@ export default async function Page({ params }: Props) {
                         <div className="p-6 md:p-8">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
                                 <div>
-                                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">{agency.name}</h1>
+                                    <div className="flex items-center flex-wrap gap-3 mb-3">
+                                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{agency.name}</h1>
+                                        {agency.verificationStatus === 'VERIFIED' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold border border-emerald-200 dark:border-emerald-800">
+                                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                                <span>{locale === 'ar' ? 'وكالة موثقة' : 'Agence vérifiée'}</span>
+                                            </span>
+                                        ) : agency.verificationStatus === 'PENDING' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-full text-xs font-bold border border-amber-200 dark:border-amber-800">
+                                                <Clock className="w-4 h-4 text-amber-600" />
+                                                <span>{locale === 'ar' ? 'قيد مراجعة الإدارة' : 'En attente de validation'}</span>
+                                            </span>
+                                        ) : (
+                                            <AgencyClaimModal
+                                                agencyId={agency._id}
+                                                agencyName={agency.name}
+                                                agencyPhone={agency.phone}
+                                                verificationStatus={agency.verificationStatus}
+                                                isOwner={isOwner}
+                                            />
+                                        )}
+                                    </div>
+
                                     <div className="flex items-center flex-wrap gap-4 text-sm font-medium">
                                         {agency.rating ? (
                                             <div className="flex items-center text-slate-900 dark:text-white">
@@ -361,11 +408,22 @@ export default async function Page({ params }: Props) {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex gap-3 shrink-0">
+                                <div className="flex flex-wrap gap-3 shrink-0">
+                                    {whatsappUrl && (
+                                        <a
+                                            href={whatsappUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                                        >
+                                            <MessageCircle className="w-4 h-4" />
+                                            <span>WhatsApp</span>
+                                        </a>
+                                    )}
                                     {agency.phone && (
                                         <a
                                             href={`tel:${agency.phone}`}
-                                            className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                                            className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
                                         >
                                             <PhoneCall className="w-4 h-4" />
                                             <span className="hidden md:inline">{t('Detail.callNow')}</span>
@@ -436,6 +494,13 @@ export default async function Page({ params }: Props) {
                             </div>
                         </div>
                     </div>
+
+                    {/* FLEET SECTION: Placed prominently before reviews and related agencies */}
+                    <AgencyFleetSection
+                        agency={agency}
+                        vehicles={agency.vehicles}
+                        isOwner={isOwner}
+                    />
 
                     {/* Reviews Section */}
                     {agency.reviews && agency.reviews.length > 0 && (

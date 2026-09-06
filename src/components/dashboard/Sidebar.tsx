@@ -2,7 +2,7 @@
 
 import { Link, usePathname } from '@/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { LayoutDashboard, Car, Heart, Settings, LogOut, PlusCircle, X, UserPlus } from 'lucide-react';
+import { LayoutDashboard, Car, Heart, Settings, LogOut, PlusCircle, X, UserPlus, Building2 } from 'lucide-react';
 import { User } from '@/lib/dashboard-types';
 
 interface SidebarProps {
@@ -20,6 +20,7 @@ export default function Sidebar({ user, isOpen, onClose }: SidebarProps) {
 
     const menuItems = [
         { icon: LayoutDashboard, labelAr: 'لوحة التحكم', labelFr: 'Tableau de bord', href: '/dashboard' },
+        { icon: Building2, labelAr: 'وكالة كراء السيارات', labelFr: 'Agence de Location', href: '/dashboard/agency' },
         { icon: Car, labelAr: 'إعلاناتي', labelFr: 'Mes Annonces', href: '/dashboard/listings' },
         { icon: Heart, labelAr: 'المفضلة', labelFr: 'Favoris', href: '/dashboard/favorites' },
         { icon: UserPlus, labelAr: 'المتابعون', labelFr: 'Abonnements', href: '/dashboard/following' },

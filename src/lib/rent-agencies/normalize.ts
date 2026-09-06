@@ -13,6 +13,52 @@ export interface ReviewNormalized {
     originalLanguage?: string | null;
 }
 
+export interface AgencyVehicleImage {
+    url: string;
+    publicId?: string;
+}
+
+export interface AgencyVehicleNormalized {
+    id: string;
+    agencyId: string;
+    brand: string;
+    brandSlug: string;
+    model: string;
+    modelSlug: string;
+    year: number;
+    category: string;
+    bodyType: string;
+    transmission: 'Manual' | 'Automatic' | string;
+    fuel: 'Diesel' | 'Petrol' | 'Hybrid' | 'Electric' | string;
+    seats: number;
+    doors: number;
+    luggage: number;
+    color?: string | null;
+    description?: string | null;
+    images: AgencyVehicleImage[];
+    featuredImage?: string | null;
+    dailyPrice: number;
+    weeklyPrice?: number | null;
+    monthlyPrice?: number | null;
+    securityDeposit?: number | null;
+    minRentalDays: number;
+    mileagePerDay?: number | null;
+    extraMileagePrice?: number | null;
+    deliveryFee?: number | null;
+    airportDeliveryFee?: number | null;
+    priceNotes?: string | null;
+    seasonPricing?: Record<string, number> | null;
+    status: 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'HIDDEN' | string;
+    lastConfirmedAt: string;
+    slug: string;
+    views: number;
+    whatsappClicks: number;
+    callClicks: number;
+    order: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface Agency {
     _id: string; // generated from slug or index
     name: string;
@@ -21,6 +67,11 @@ export interface Agency {
     citySlug: string; // "marrakech" (URL safe)
     address: string;
     phone: string | null;
+    whatsapp?: string | null;
+    email?: string | null;
+    description?: string | null;
+    logo?: string | null;
+    coverPhoto?: string | null;
     rating: number | null;
     reviewsCount: number;
     photos: string[];
@@ -31,6 +82,17 @@ export interface Agency {
     };
     website: string | null;
     score?: number; // Internal scoring for ranking
+
+    // Ownership and verification
+    ownerId?: string | null;
+    verificationStatus?: 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED' | string;
+    claimed?: boolean;
+    claimedAt?: string | null;
+    verifiedAt?: string | null;
+    verificationMethod?: string | null;
+
+    // Vehicle fleet
+    vehicles?: AgencyVehicleNormalized[];
 
     // New fields
     openingHours: { day: string; hours: string }[];

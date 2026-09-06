@@ -67,6 +67,11 @@ function mapPrismaToAgency(dbBusiness: any): NormalizedAgency {
         citySlug: dbBusiness.city?.slug || 'unknown',
         address: dbBusiness.address,
         phone: dbBusiness.phone,
+        whatsapp: dbBusiness.whatsapp || dbBusiness.phone,
+        email: dbBusiness.email || null,
+        description: dbBusiness.description || null,
+        logo: dbBusiness.logo || null,
+        coverPhoto: dbBusiness.coverPhoto || null,
         rating: dbBusiness.rating,
         reviewsCount: dbBusiness.reviewsCount,
         photos: dbBusiness.photos || [],
@@ -87,6 +92,52 @@ function mapPrismaToAgency(dbBusiness: any): NormalizedAgency {
             textTranslated: r.textTranslated,
             publishedAtText: r.publishedAtText,
             originalLanguage: r.originalLanguage
+        })) || [],
+        ownerId: dbBusiness.ownerId || null,
+        verificationStatus: dbBusiness.verificationStatus || 'UNVERIFIED',
+        claimed: dbBusiness.claimed || dbBusiness.verificationStatus === 'VERIFIED',
+        claimedAt: dbBusiness.claimedAt ? new Date(dbBusiness.claimedAt).toISOString() : null,
+        verifiedAt: dbBusiness.verifiedAt ? new Date(dbBusiness.verifiedAt).toISOString() : null,
+        verificationMethod: dbBusiness.verificationMethod || null,
+        vehicles: dbBusiness.vehicles?.map((v: any) => ({
+            id: v.id,
+            agencyId: v.agencyId,
+            brand: v.brand,
+            brandSlug: v.brandSlug,
+            model: v.model,
+            modelSlug: v.modelSlug,
+            year: v.year,
+            category: v.category,
+            bodyType: v.bodyType,
+            transmission: v.transmission,
+            fuel: v.fuel,
+            seats: v.seats,
+            doors: v.doors,
+            luggage: v.luggage,
+            color: v.color,
+            description: v.description,
+            images: Array.isArray(v.images) ? v.images : [],
+            featuredImage: v.featuredImage || (Array.isArray(v.images) && v.images[0]?.url ? v.images[0].url : null),
+            dailyPrice: v.dailyPrice,
+            weeklyPrice: v.weeklyPrice,
+            monthlyPrice: v.monthlyPrice,
+            securityDeposit: v.securityDeposit,
+            minRentalDays: v.minRentalDays,
+            mileagePerDay: v.mileagePerDay,
+            extraMileagePrice: v.extraMileagePrice,
+            deliveryFee: v.deliveryFee,
+            airportDeliveryFee: v.airportDeliveryFee,
+            priceNotes: v.priceNotes,
+            seasonPricing: v.seasonPricing,
+            status: v.status,
+            lastConfirmedAt: v.lastConfirmedAt ? new Date(v.lastConfirmedAt).toISOString() : new Date().toISOString(),
+            slug: v.slug,
+            views: v.views || 0,
+            whatsappClicks: v.whatsappClicks || 0,
+            callClicks: v.callClicks || 0,
+            order: v.order || 0,
+            createdAt: v.createdAt ? new Date(v.createdAt).toISOString() : new Date().toISOString(),
+            updatedAt: v.updatedAt ? new Date(v.updatedAt).toISOString() : new Date().toISOString(),
         })) || [],
         mixedServices: dbBusiness.mixedServices,
         isMixedService: dbBusiness.mixedServices,
@@ -127,7 +178,16 @@ export async function getAgencyBySlug(citySlug: string, slug: string): Promise<N
         include: {
             city: true,
             categories: { include: { category: true } },
-            reviews: { take: 20, orderBy: { createdAt: 'desc' } }
+            reviews: { take: 20, orderBy: { createdAt: 'desc' } },
+            vehicles: {
+                where: {
+                    status: { not: 'HIDDEN' }
+                },
+                orderBy: [
+                    { order: 'asc' },
+                    { createdAt: 'desc' }
+                ]
+            }
         }
     });
 

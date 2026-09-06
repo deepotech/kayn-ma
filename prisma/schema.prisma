@@ -49,25 +49,50 @@ model Business {
   reviewsCount  Int      @default(0)
   photos        String[] // Array of image URLs
   
-  source        String   @default("apify")
-  status        String   @default("active")
-  claimed       Boolean  @default(false)
+  source             String   @default("apify")
+  status             String   @default("active")
+  claimed            Boolean  @default(false)
   
-  mixedServices Boolean  @default(false)
-  noDeposit     Boolean  @default(false)
-  priceLevel    String?
+  // Ownership & Verification
+  ownerId            String?
+  verificationStatus String   @default("UNVERIFIED") // UNVERIFIED, PENDING, VERIFIED, REJECTED
+  claimedAt          DateTime?
+  verifiedAt         DateTime?
+  verificationMethod String?  // phone, whatsapp, admin_manual
+  claimPhone         String?
+  claimNotes         String?
   
-  openingHours  Json?    // Storing structured hours
-  
-  city          City     @relation(fields: [cityId], references: [id])
-  reviews       Review[]
-  categories    BusinessCategory[]
+  // Additional agency profile details
+  whatsapp           String?
+  email              String?
+  description        String?  @db.Text
+  logo               String?
+  coverPhoto         String?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  // Analytics
+  views              Int      @default(0)
+  whatsappClicks     Int      @default(0)
+  callClicks         Int      @default(0)
+  
+  mixedServices      Boolean  @default(false)
+  noDeposit          Boolean  @default(false)
+  priceLevel         String?
+  
+  openingHours       Json?    // Storing structured hours
+  
+  city               City     @relation(fields: [cityId], references: [id])
+  owner              User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  reviews            Review[]
+  categories         BusinessCategory[]
+  vehicles           AgencyVehicle[]
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@index([cityId])
   @@index([slug])
+  @@index([ownerId])
+  @@index([verificationStatus])
   @@index([rating, reviewsCount]) // Optimized for filtering
 }
 
@@ -194,6 +219,8 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  businesses   Business[]
+
   @@index([firebaseUid])
   @@index([email])
 }
@@ -256,4 +283,58 @@ model Report {
   @@unique([listingId, reporterId])
   @@index([reporterId, createdAt(sort: Desc)])
   @@index([reporterIp, createdAt(sort: Desc)])
+}
+
+model AgencyVehicle {
+  id                  String    @id @default(uuid())
+  agencyId            String
+  brand               String
+  brandSlug           String
+  model               String
+  modelSlug           String
+  year                Int
+  category            String    @default("economy") // economy, compact, midsize, suv, luxury, commercial
+  bodyType            String    @default("sedan")
+  transmission        String    @default("Manual") // Manual, Automatic
+  fuel                String    @default("Diesel") // Diesel, Petrol, Hybrid, Electric
+  seats               Int       @default(5)
+  doors               Int       @default(4)
+  luggage             Int       @default(2)
+  color               String?
+  description         String?   @db.Text
+  images              Json      // Array of { url: string, publicId?: string }
+  featuredImage       String?
+  
+  // Pricing tiers
+  dailyPrice          Float
+  weeklyPrice         Float?
+  monthlyPrice        Float?
+  securityDeposit     Float?
+  minRentalDays       Int       @default(1)
+  mileagePerDay       Int?      // e.g. 250 (km included per day)
+  extraMileagePrice   Float?    // e.g. 2 (MAD/km)
+  deliveryFee         Float?
+  airportDeliveryFee  Float?
+  priceNotes          String?
+  seasonPricing       Json?     // Extensible seasonal foundation
+
+  // Availability status
+  status              String    @default("AVAILABLE") // AVAILABLE, RENTED, MAINTENANCE, HIDDEN
+  lastConfirmedAt     DateTime  @default(now())
+
+  // SEO & Analytics
+  slug                String    @unique
+  views               Int       @default(0)
+  whatsappClicks      Int       @default(0)
+  callClicks          Int       @default(0)
+  order               Int       @default(0)
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  agency              Business  @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, status])
+  @@index([brandSlug, modelSlug])
+  @@index([status])
 }

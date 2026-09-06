@@ -35,7 +35,7 @@ async function getExistingData() {
     });
 
     // Fetch city slugs for the cityIds
-    const cityIds = [...new Set(grouped.map(g => g.cityId))];
+    const cityIds = Array.from(new Set(grouped.map(g => g.cityId)));
     const cities = await prisma.city.findMany({
         where: { id: { in: cityIds } },
         select: { id: true, slug: true }

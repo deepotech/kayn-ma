@@ -106,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         });
     });
 
-    // Agency Detail Pages
+    // Agency Detail Pages & Fleet Vehicles
     allAgencies.forEach(agency => {
         LOCALES.forEach(locale => {
             sitemapEntries.push({
@@ -115,6 +115,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 changeFrequency: 'weekly',
                 priority: 0.7,
             });
+
+            // Active vehicles for this agency
+            if (agency.vehicles && agency.vehicles.length > 0) {
+                agency.vehicles.forEach((vehicle: any) => {
+                    if (vehicle.status !== 'HIDDEN' && vehicle.slug) {
+                        sitemapEntries.push({
+                            url: `${BASE_URL}/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}/${vehicle.slug}`,
+                            lastModified: vehicle.updatedAt ? new Date(vehicle.updatedAt) : new Date(),
+                            changeFrequency: 'daily',
+                            priority: 0.75,
+                        });
+                    }
+                });
+            }
         });
     });
     } catch (e) {

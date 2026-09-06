@@ -12,7 +12,8 @@ import {
     Settings,
     LogOut,
     X,
-    Shield
+    Shield,
+    BadgeCheck
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthContext';
 
@@ -57,6 +58,12 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             labelAr: 'الوكالات',
             labelFr: 'Agences',
             href: `/${locale}/admin/agencies`
+        },
+        {
+            icon: BadgeCheck,
+            labelAr: 'طلبات تأكيد الوكالات',
+            labelFr: 'Revendications Agences',
+            href: `/${locale}/admin/agency-claims`
         },
         {
             icon: Settings,
