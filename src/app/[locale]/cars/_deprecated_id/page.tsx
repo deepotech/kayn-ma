@@ -218,7 +218,7 @@ export default async function ListingPage({ params: { id, locale } }: any) {
                                     <Shield className="h-5 w-5 text-blue-500" />
                                     {t('trustSafety')}
                                 </h2>
-                                <ReportButton listingId={id} />
+                                <ReportButton listingId={id} locale={locale} />
                             </div>
                         </div>
 

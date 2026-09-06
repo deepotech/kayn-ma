@@ -10,7 +10,7 @@ async function getDirectListings() {
     await dbConnect();
     const listings = await Listing.find({
         sellerType: { $ne: 'agency' }, // Not agency
-        status: 'active'
+        status: 'approved'
     })
         .sort({ createdAt: -1 })
         .limit(30)

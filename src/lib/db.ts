@@ -14,5 +14,16 @@ export async function dbConnect(): Promise<PrismaClient> {
     return prisma;
 }
 
-export default prisma;
+const handler: ProxyHandler<typeof dbConnect> = {
+    apply() {
+        return prisma;
+    },
+    get(_target, prop, receiver) {
+        return Reflect.get(prisma, prop, receiver);
+    }
+};
+
+const defaultExport = new Proxy(dbConnect, handler);
+
+export default defaultExport as unknown as PrismaClient & typeof dbConnect;
 

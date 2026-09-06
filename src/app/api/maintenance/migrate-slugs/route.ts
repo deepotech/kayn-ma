@@ -1,12 +1,28 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
+import { Types } from 'mongoose';
 import Listing from '@/models/Listing';
 
+interface LegacyListingRecord {
+    _id: Types.ObjectId;
+    brandSlug?: string;
+    brandCustom?: string;
+    brand?: { label?: string; slug?: string } | string;
+    modelSlug?: string;
+    modelCustom?: string;
+    carModel?: { label?: string; slug?: string } | string;
+    bodyTypeSlug?: string;
+    bodyType?: { label?: string; slug?: string } | string;
+}
+
 // Helper to normalize slugs
-const slugify = (text: string) => {
+const slugify = (text: unknown) => {
     if (!text) return 'unknown';
-    return text.toString().toLowerCase()
+    if (typeof text === 'object' && text !== null && 'slug' in text) {
+        return String((text as { slug?: string }).slug || 'unknown');
+    }
+    return String(text).toLowerCase()
         .trim()
         .replace(/\s+/g, '-')     // Replace spaces with -
         .replace(/[^\w\-]+/g, '') // Remove all non-word chars
@@ -31,9 +47,9 @@ export async function GET() {
         let updatedCount = 0;
         const updates = [];
 
-        for (const listing of listings) {
+        for (const listing of (listings as unknown as LegacyListingRecord[])) {
             let needsUpdate = false;
-            const updateData: any = {};
+            const updateData: Record<string, unknown> = {};
 
             // Helper to check and set slug
             if (!listing.brandSlug) {
@@ -67,8 +83,9 @@ export async function GET() {
             updatedCount
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Migration failed';
         console.error('Migration failed:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        return NextResponse.json({ success: false, error: message }, { status: 500 });
     }
 }

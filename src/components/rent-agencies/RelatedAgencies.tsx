@@ -1,6 +1,6 @@
 import { getRelatedAgencies } from '@/lib/agencies';
 import { NormalizedAgency } from '@/lib/rent-agencies/normalize';
-import AgencyCard from './AgencyCard';
+import RelatedAgenciesCarousel from './RelatedAgenciesCarousel';
 import { getTranslations } from 'next-intl/server';
 
 interface Props {
@@ -9,22 +9,19 @@ interface Props {
 }
 
 export default async function RelatedAgencies({ currentAgency, locale }: Props) {
-    const t = await getTranslations({ locale, namespace: 'RentAgencies.Listing' });
+    const t = await getTranslations({ locale, namespace: 'RentAgencies' });
     const related = await getRelatedAgencies(currentAgency, 8);
 
     if (related.length === 0) return null;
 
-    return (
-        <div className="mt-16 pt-10 border-t border-slate-200 dark:border-zinc-800">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
-                {t('relatedAgencies') || (locale === 'ar' ? 'وكالات مشابهة' : 'Agences similaires')}
-            </h2>
+    const title = t('Fleet.relatedAgenciesTitle') || (locale === 'ar' ? 'وكالات كراء سيارات مشابهة' : 'Agences de location similaires');
+    const subtitle = t('Fleet.relatedAgenciesSubtitle') || (locale === 'ar' ? 'وكالات أخرى موثوقة في نفس المدينة' : "D'autres agences de confiance dans la même ville");
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {related.map((agency) => (
-                    <AgencyCard key={agency._id} agency={agency} />
-                ))}
-            </div>
-        </div>
+    return (
+        <RelatedAgenciesCarousel
+            agencies={related}
+            title={title}
+            subtitle={subtitle}
+        />
     );
 }

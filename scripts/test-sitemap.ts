@@ -1,5 +1,5 @@
 
-import { generateSitemaps, default as sitemapFunc } from '../src/app/sitemap';
+import sitemapFunc from '../src/app/sitemap';
 import dbConnect from '../src/lib/db';
 
 async function test() {
@@ -8,18 +8,9 @@ async function test() {
         await dbConnect();
         console.log('DB Connected');
 
-        console.log('Generating Sitemaps List...');
-        const sitemaps = await generateSitemaps();
-        console.log('Sitemaps:', sitemaps);
-
-        console.log('Generating Static Sitemap...');
-        const staticSitemap = await sitemapFunc({ id: 'static' });
-        console.log('Static entries:', staticSitemap.length);
-
-        console.log('Generating Agencies Sitemap...');
-        const agenciesSitemap = await sitemapFunc({ id: 'agencies' });
-        console.log('Agencies entries:', agenciesSitemap.length);
-
+        console.log('Generating Sitemap...');
+        const sitemap = await sitemapFunc();
+        console.log('Total entries:', sitemap.length);
     } catch (error) {
         console.error('Test Failed:', error);
     }

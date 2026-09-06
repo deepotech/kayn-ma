@@ -290,7 +290,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
             {CITIES.map(city => (
               <Link
                 key={city.slug}
-                href={`/cars/cities/${city.slug}`}
+                href={`/cars/city/${city.slug}`}
                 className="px-4 py-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 text-center hover:border-blue-400 hover:text-blue-600 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 {tHome('carsInCity')} {getCityName(city, locale)}

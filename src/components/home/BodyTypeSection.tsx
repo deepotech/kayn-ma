@@ -17,7 +17,7 @@ export default function BodyTypeSection() {
                     {BODY_TYPES.map((type) => (
                         <Link
                             key={type.id}
-                            href={`/cars/${type.id}`}
+                            href={`/cars?bodyType=${type.id}`}
                             className="flex flex-col items-center justify-center p-4 rounded-xl border border-gray-100 hover:border-blue-500 hover:shadow-md transition-all group bg-gray-50 dark:bg-zinc-900 dark:border-zinc-800"
                         >
                             <div className="h-10 w-16 mb-3 relative flex items-center justify-center">

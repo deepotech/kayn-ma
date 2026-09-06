@@ -14,14 +14,23 @@ function getLegacyTargetUrl(slug: string[], locale: string): string | null {
     const filters = parseSeoSlugs(slug);
     if (!filters.isValid) return null;
 
+    const queryParams = new URLSearchParams();
+    if (filters.bodyType) {
+        queryParams.set('bodyType', filters.bodyType);
+    }
+    const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+
     if (filters.brand && filters.city) {
-        return `/${locale}/cars/brand/${filters.brand}/city/${filters.city}`;
+        return `/${locale}/cars/brand/${filters.brand}/city/${filters.city}${queryString}`;
     }
     if (filters.city && !filters.brand) {
-        return `/${locale}/cars/city/${filters.city}`;
+        return `/${locale}/cars/city/${filters.city}${queryString}`;
     }
     if (filters.brand && !filters.city) {
-        return `/${locale}/cars/brand/${filters.brand}`;
+        return `/${locale}/cars/brand/${filters.brand}${queryString}`;
+    }
+    if (filters.bodyType) {
+        return `/${locale}/cars?bodyType=${filters.bodyType}`;
     }
     return null;
 }

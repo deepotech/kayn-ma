@@ -126,6 +126,8 @@ export default function AgencyVehicleForm({ initialData, isEditing = false }: Ag
         // Limit to 8
         const remaining = 8 - images.length;
         if (remaining <= 0) return;
+
+        const toUpload = files.slice(0, remaining);
         // Validate file types and size (max 10MB each)
         const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
         for (const file of toUpload) {

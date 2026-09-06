@@ -964,7 +964,7 @@ export default function SellOrRentLanding({
                             {topCities.map((city) => (
                                 <Link
                                     key={city.slug}
-                                    href={`/cars/cities/${city.slug}`}
+                                    href={`/cars/city/${city.slug}`}
                                     className="p-3 bg-white dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700 text-center text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-blue-500 hover:text-blue-600 transition-colors"
                                 >
                                     {isRtl ? `سيارات في ${city.name.ar}` : `Voitures à ${city.name.fr}`}

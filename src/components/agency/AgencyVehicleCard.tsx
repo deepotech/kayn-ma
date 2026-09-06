@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useLocale } from 'next-intl';
 import { Phone, MessageCircle, Fuel, Gauge, Users, CheckCircle2, Clock, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { AgencyVehicleNormalized } from '@/lib/rent-agencies/normalize';
@@ -13,6 +13,17 @@ interface AgencyVehicleCardProps {
     agencyWhatsapp?: string | null;
     citySlug: string;
     agencySlug: string;
+}
+
+const DEFAULT_CAR_IMG = '/images/placeholder-car.jpg';
+
+function cleanUrl(url?: string | null): string {
+    if (!url || typeof url !== 'string') return DEFAULT_CAR_IMG;
+    const trimmed = url.trim();
+    if (!trimmed || trimmed.includes('googleusercontent.com/gps-cs-s/')) {
+        return DEFAULT_CAR_IMG;
+    }
+    return trimmed;
 }
 
 function timeAgo(dateString: string, locale: string) {
@@ -46,6 +57,11 @@ export default function AgencyVehicleCard({
     const contactPhone = agencyPhone || '';
     const contactWhatsapp = agencyWhatsapp || agencyPhone || '';
 
+    const initialPhoto = cleanUrl(
+        vehicle.featuredImage || (vehicle.images && vehicle.images[0]?.url) || null
+    );
+    const [imgSrc, setImgSrc] = useState<string>(initialPhoto);
+
     const handleTrackClick = (type: 'whatsapp' | 'call') => {
         fetch('/api/agency/stats/click', {
             method: 'POST',
@@ -58,9 +74,10 @@ export default function AgencyVehicleCard({
         }).catch(() => null);
     };
 
+    const fullVehicleUrl = `https://www.cayn.ma${detailUrl}`;
     const whatsappMessage = isRtl
-        ? `مرحباً، أود الاستفسار عن كراء سيارة ${vehicle.brand} ${vehicle.model} ${vehicle.year} من وكالة ${agencyName} على Cayn.ma`
-        : `Bonjour, je souhaite me renseigner sur la location de la ${vehicle.brand} ${vehicle.model} ${vehicle.year} chez ${agencyName} sur Cayn.ma`;
+        ? `مرحباً، أود الاستفسار عن كراء سيارة ${vehicle.brand} ${vehicle.model} ${vehicle.year} من وكالة ${agencyName} على Cayn.ma:\n${fullVehicleUrl}`
+        : `Bonjour, je souhaite me renseigner sur la location de la ${vehicle.brand} ${vehicle.model} ${vehicle.year} chez ${agencyName} sur Cayn.ma:\n${fullVehicleUrl}`;
 
     const whatsappUrl = contactWhatsapp
         ? `https://wa.me/212${contactWhatsapp.replace(/^(\+212|0)/, '')}?text=${encodeURIComponent(whatsappMessage)}`
@@ -71,19 +88,19 @@ export default function AgencyVehicleCard({
         AVAILABLE: {
             labelAr: 'متاحة للكراء',
             labelFr: 'Disponible',
-            bg: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+            bg: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
             icon: CheckCircle2
         },
         RENTED: {
             labelAr: 'محجوزة حالياً',
-            labelFr: 'Réservée',
-            bg: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+            labelFr: 'En location',
+            bg: 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800',
             icon: Clock
         },
         MAINTENANCE: {
-            labelAr: 'غير متاحة مؤقتاً',
-            labelFr: 'Non disponible',
-            bg: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700',
+            labelAr: 'في الصيانة',
+            labelFr: 'En maintenance',
+            bg: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700',
             icon: AlertTriangle
         },
         HIDDEN: {
@@ -97,8 +114,6 @@ export default function AgencyVehicleCard({
     const statusInfo = statusConfig[vehicle.status as keyof typeof statusConfig] || statusConfig.AVAILABLE;
     const StatusIcon = statusInfo.icon;
 
-    const coverPhoto = vehicle.featuredImage || (vehicle.images && vehicle.images[0]?.url) || '/images/placeholder-car.jpg';
-
     return (
         <div className="group flex flex-col h-full bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
             {/* Image Container */}
@@ -106,10 +121,15 @@ export default function AgencyVehicleCard({
                 <Link href={detailUrl} className="block w-full h-full">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                        src={coverPhoto}
+                        src={imgSrc}
                         alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
+                        onError={() => {
+                            if (imgSrc !== DEFAULT_CAR_IMG) {
+                                setImgSrc(DEFAULT_CAR_IMG);
+                            }
+                        }}
                     />
                 </Link>
 
@@ -122,7 +142,7 @@ export default function AgencyVehicleCard({
                 </div>
 
                 {/* Year Badge */}
-                <div className="absolute top-3 end-3 bg-black/60 backdrop-blur-md text-white px-2.5 py-0.5 rounded-lg text-xs font-bold">
+                <div className="absolute top-3 end-3 bg-black/70 backdrop-blur-md text-white px-2.5 py-0.5 rounded-lg text-xs font-bold border border-white/10">
                     {vehicle.year}
                 </div>
             </div>
@@ -136,45 +156,64 @@ export default function AgencyVehicleCard({
                         </h3>
                     </Link>
 
-                    {/* Specs chips */}
-                    <div className="grid grid-cols-3 gap-2 mt-3 text-xs text-slate-500 dark:text-slate-400">
-                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800/60 px-2 py-1 rounded-lg">
-                            <Gauge className="w-3.5 h-3.5 text-slate-400" />
+                    {/* Specs chips with enhanced contrast */}
+                    <div className="grid grid-cols-3 gap-2 mt-3 text-xs text-slate-700 dark:text-zinc-300 font-medium">
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800/80 px-2 py-1 rounded-lg border border-slate-100 dark:border-zinc-800">
+                            <Gauge className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-400 shrink-0" />
                             <span className="truncate">{vehicle.transmission === 'Manual' ? (isRtl ? 'يدوي' : 'Manuel') : (isRtl ? 'أوتوماتيك' : 'Auto')}</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800/60 px-2 py-1 rounded-lg">
-                            <Fuel className="w-3.5 h-3.5 text-slate-400" />
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800/80 px-2 py-1 rounded-lg border border-slate-100 dark:border-zinc-800">
+                            <Fuel className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-400 shrink-0" />
                             <span className="truncate">{vehicle.fuel}</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800/60 px-2 py-1 rounded-lg">
-                            <Users className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{vehicle.seats} {isRtl ? 'مقاعد' : 'places'}</span>
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-zinc-800/80 px-2 py-1 rounded-lg border border-slate-100 dark:border-zinc-800">
+                            <Users className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-400 shrink-0" />
+                            <span>{vehicle.seats} {isRtl ? 'مقاعد' : 'pl.'}</span>
                         </div>
                     </div>
 
-                    {/* Pricing */}
+                    {/* Pricing Tiers */}
                     <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800">
                         <div className="flex items-baseline justify-between">
                             <div>
-                                <span className="text-xs text-slate-400">
-                                    {isRtl ? 'ابتداءً من' : 'À partir de'}
+                                <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-0.5">
+                                    {isRtl ? 'السعر اليومي' : 'Tarif journalier'}
                                 </span>
-                                <div className="text-xl font-black text-blue-600 dark:text-blue-400">
-                                    {vehicle.dailyPrice} <span className="text-xs font-bold text-slate-500">{isRtl ? 'درهم / اليوم' : 'DH / jour'}</span>
+                                <div className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                                    {vehicle.dailyPrice} <span className="text-xs font-bold text-slate-500 dark:text-zinc-400">{isRtl ? 'درهم / يوم' : 'DH / jour'}</span>
                                 </div>
                             </div>
                             {vehicle.securityDeposit !== null && vehicle.securityDeposit !== undefined && (
                                 <div className="text-end">
-                                    <span className="text-[10px] text-slate-400 block">{isRtl ? 'الضمان' : 'Caution'}</span>
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{vehicle.securityDeposit} DH</span>
+                                    <span className="text-xs text-slate-500 dark:text-zinc-400 block mb-0.5">{isRtl ? 'الضمانة' : 'Caution'}</span>
+                                    <span className="text-sm font-bold text-slate-800 dark:text-zinc-200">{vehicle.securityDeposit} DH</span>
                                 </div>
                             )}
                         </div>
 
+                        {/* Extended pricing tiers (Weekly / Monthly) if present */}
+                        {(vehicle.weeklyPrice || vehicle.monthlyPrice) && (
+                            <div className="flex items-center gap-3 mt-2.5 pt-2 border-t border-dashed border-slate-100 dark:border-zinc-800/80 text-xs text-slate-600 dark:text-zinc-400">
+                                {vehicle.weeklyPrice && (
+                                    <span>
+                                        <strong className="text-slate-800 dark:text-zinc-200 font-bold">{vehicle.weeklyPrice} DH</strong>
+                                        <span className="text-[11px] text-slate-500 dark:text-zinc-400 ms-1">{isRtl ? '/ أسبوع' : '/ sem.'}</span>
+                                    </span>
+                                )}
+                                {vehicle.weeklyPrice && vehicle.monthlyPrice && <span className="text-slate-300 dark:text-zinc-700">•</span>}
+                                {vehicle.monthlyPrice && (
+                                    <span>
+                                        <strong className="text-slate-800 dark:text-zinc-200 font-bold">{vehicle.monthlyPrice} DH</strong>
+                                        <span className="text-[11px] text-slate-500 dark:text-zinc-400 ms-1">{isRtl ? '/ شهر' : '/ mois'}</span>
+                                    </span>
+                                )}
+                            </div>
+                        )}
+
                         {/* Confirmation time */}
-                        <div className="mt-2 text-[11px] text-slate-400">
-                            {isRtl ? 'آخر تأكيد للتوفر: ' : 'Disponibilité confirmée: '}
-                            <span className="text-slate-500 font-medium">{timeAgo(vehicle.lastConfirmedAt, locale)}</span>
+                        <div className="mt-2.5 text-xs text-slate-500 dark:text-zinc-400">
+                            {isRtl ? 'آخر تأكيد للتوفر: ' : 'Disponibilité: '}
+                            <span className="text-slate-700 dark:text-zinc-300 font-medium">{timeAgo(vehicle.lastConfirmedAt, locale)}</span>
                         </div>
                     </div>
                 </div>
@@ -187,9 +226,9 @@ export default function AgencyVehicleCard({
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => handleTrackClick('whatsapp')}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm"
                         >
-                            <MessageCircle className="w-3.5 h-3.5" />
+                            <MessageCircle className="w-4 h-4" />
                             <span>{isRtl ? 'واتساب' : 'WhatsApp'}</span>
                         </a>
                     )}
@@ -197,7 +236,7 @@ export default function AgencyVehicleCard({
                         <a
                             href={`tel:${contactPhone}`}
                             onClick={() => handleTrackClick('call')}
-                            className="p-2 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl transition-colors"
+                            className="p-2.5 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl transition-colors"
                             title={isRtl ? 'اتصال' : 'Appeler'}
                         >
                             <Phone className="w-4 h-4" />
@@ -205,7 +244,7 @@ export default function AgencyVehicleCard({
                     )}
                     <Link
                         href={detailUrl}
-                        className="px-3 py-2 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-xl text-xs font-bold transition-colors text-center"
+                        className="px-3.5 py-2.5 bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-xl text-xs font-bold transition-colors text-center"
                     >
                         {isRtl ? 'التفاصيل' : 'Détails'}
                     </Link>

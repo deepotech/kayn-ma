@@ -16,7 +16,7 @@ function getBrandData(brandSlug: string) {
     const fromCatalog = carCatalog.find(b => b.slug.toLowerCase() === lower);
     if (!fromData && !fromCatalog) return null;
 
-    const name = fromCatalog ? fromCatalog.name : (fromData ? fromData.name : brandSlug);
+    const name = fromCatalog ? fromCatalog.fr : (fromData ? fromData.name : brandSlug);
     const ar = fromCatalog?.ar || name;
     const fr = fromCatalog?.fr || name;
 

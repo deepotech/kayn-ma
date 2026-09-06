@@ -192,7 +192,7 @@ export default async function ListingDetailView({ id, locale }: { id: string, lo
                                     <Shield className="h-5 w-5 text-blue-500" />
                                     {t('trustSafety')}
                                 </h2>
-                                <ReportButton listingId={id} />
+                                <ReportButton listingId={id} locale={locale} />
                             </div>
                         </div>
 

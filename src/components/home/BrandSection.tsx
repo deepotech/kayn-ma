@@ -25,7 +25,7 @@ export default function BrandSection() {
                     {displayedBrands.map((brand) => (
                         <Link
                             key={brand.id}
-                            href={`/cars/brands/${brand.id}`}
+                            href={`/cars/brand/${brand.id}`}
                             className="flex flex-col items-center group p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
                         >
                             <div className="relative w-16 h-16 mb-3 grayscale group-hover:grayscale-0 transition-all duration-300">
