@@ -4,17 +4,20 @@ import { useEffect, useState, useCallback } from 'react';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
-import { RefreshCw, Loader2, Eye, XCircle, EyeOff, Trash2, Flag } from 'lucide-react';
+import { RefreshCw, Loader2, Eye, XCircle, EyeOff, Trash2, Flag, AlertTriangle } from 'lucide-react';
 import StatusBadge from '@/components/admin/StatusBadge';
 import ConfirmModal from '@/components/admin/ConfirmModal';
 import { Report, AdminReportsResponse } from '@/lib/admin-types';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export default function AdminReportsPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
+    const { user: authUser } = useAuth();
 
     const [reports, setReports] = useState<Report[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -33,24 +36,42 @@ export default function AdminReportsPage() {
 
     const fetchReports = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: '20',
             });
 
-            const res = await fetch(`/api/admin/reports?${params}`);
+            const headers: Record<string, string> = {};
+            if (authUser) {
+                try {
+                    const token = await authUser.getIdToken();
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                } catch {
+                    // Fallback to cookie
+                }
+            }
+
+            const res = await fetch(`/api/admin/reports?${params}`, { headers });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
+
             const data: AdminReportsResponse = await res.json();
 
-            setReports(data.reports);
-            setTotal(data.total);
-            setTotalPages(data.totalPages);
-        } catch (error) {
-            console.error('Failed to fetch reports:', error);
+            setReports(Array.isArray(data.reports) ? data.reports : []);
+            setTotal(typeof data.total === 'number' ? data.total : 0);
+            setTotalPages(typeof data.totalPages === 'number' ? data.totalPages : 1);
+        } catch (err: unknown) {
+            console.error('Failed to fetch reports:', err);
+            setError(isRtl ? 'تعذر تحميل قائمة البلاغات. يرجى التحقق من الصلاحيات والمحاولة مجدداً.' : 'Échec du chargement des signalements. Veuillez réessayer.');
+            setReports([]);
         } finally {
             setLoading(false);
         }
-    }, [page]);
+    }, [page, authUser, isRtl]);
 
     useEffect(() => {
         fetchReports();
@@ -59,11 +80,24 @@ export default function AdminReportsPage() {
     const handleAction = async (reportId: string, action: 'dismiss' | 'hide' | 'delete') => {
         setActionLoading(reportId);
         try {
-            await fetch(`/api/admin/reports/${reportId}`, {
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (authUser) {
+                try {
+                    const token = await authUser.getIdToken();
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                } catch {
+                    // Fallback to cookie
+                }
+            }
+            const res = await fetch(`/api/admin/reports/${reportId}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({ action }),
             });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
             fetchReports();
         } catch (error) {
             console.error('Failed to process action:', error);
@@ -130,13 +164,31 @@ export default function AdminReportsPage() {
                 </button>
             </div>
 
+            {/* Error Banner */}
+            {error && (
+                <div className="bg-red-900/30 border border-red-800/50 rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0" />
+                        <span className="text-red-300 text-sm font-medium">{error}</span>
+                    </div>
+                    <button
+                        onClick={() => fetchReports()}
+                        disabled={loading}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0"
+                    >
+                        <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                        <span>{isRtl ? 'إعادة المحاولة' : 'Réessayer'}</span>
+                    </button>
+                </div>
+            )}
+
             {/* Reports List */}
             <div className="space-y-3">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-red-500" />
                     </div>
-                ) : reports.length === 0 ? (
+                ) : (!reports || reports.length === 0) ? (
                     <div className="text-center py-12">
                         <Flag className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
                         <p className="text-zinc-400">

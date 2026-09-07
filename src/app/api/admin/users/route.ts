@@ -1,75 +1,123 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import User from '@/models/User';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { requireAdmin } from '@/lib/auth';
 
 // GET /api/admin/users
 export async function GET(request: NextRequest) {
-    try {
-        await dbConnect();
+    const authResult = await requireAdmin(request);
+    if ('error' in authResult) {
+        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
 
+    try {
         const { searchParams } = new URL(request.url);
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '20');
+        const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20') || 20));
         const role = searchParams.get('role');
         const banned = searchParams.get('banned');
-        const search = searchParams.get('search');
+        const search = searchParams.get('search')?.trim();
 
         const skip = (page - 1) * limit;
 
-        // Build query
-        const query: any = {};
+        // Build Prisma where query
+        const where: Prisma.UserWhereInput = {};
 
         if (role && role !== 'all') {
-            query.role = role;
+            where.role = role;
         }
 
         if (banned === 'true') {
-            query.isBanned = true;
+            where.isBanned = true;
         } else if (banned === 'false') {
-            query.isBanned = false;
+            where.isBanned = false;
         }
 
         if (search) {
-            query.$or = [
-                { email: { $regex: search, $options: 'i' } },
-                { displayName: { $regex: search, $options: 'i' } },
+            where.OR = [
+                { email: { contains: search, mode: 'insensitive' } },
+                { displayName: { contains: search, mode: 'insensitive' } },
             ];
         }
 
-        const [users, total] = await Promise.all([
-            User.find(query)
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            User.countDocuments(query),
-        ]);
+        const fetchUsersAndCounts = async () => {
+            const [users, total] = await Promise.all([
+                prisma.user.findMany({
+                    where,
+                    orderBy: { createdAt: 'desc' },
+                    skip,
+                    take: limit,
+                }),
+                prisma.user.count({ where }),
+            ]);
 
-        // Get listing counts for each user
-        const usersWithCounts = await Promise.all(
-            users.map(async (user: any) => {
-                const listingsCount = await Listing.countDocuments({ userId: user.firebaseUid });
-                return {
-                    ...user,
-                    _id: user._id.toString(),
-                    listingsCount,
-                };
-            })
-        );
+            // Get listings count for these users
+            const userFirebaseUids = users.map(u => u.firebaseUid).filter(Boolean);
+            const listingCounts = userFirebaseUids.length > 0
+                ? await prisma.listing.groupBy({
+                    by: ['userId'],
+                    where: {
+                        userId: { in: userFirebaseUids }
+                    },
+                    _count: {
+                        id: true
+                    }
+                })
+                : [];
+
+            return { users, total, listingCounts };
+        };
+
+        let timerId: NodeJS.Timeout | undefined;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+            timerId = setTimeout(() => {
+                reject(new Error('ADMIN_USERS_TIMEOUT'));
+            }, 8000);
+            if (typeof timerId.unref === 'function') timerId.unref();
+        });
+
+        const { users, total, listingCounts } = await Promise.race([
+            fetchUsersAndCounts(),
+            timeoutPromise,
+        ]).finally(() => {
+            if (timerId) clearTimeout(timerId);
+        });
+
+        const countMap = new Map<string, number>();
+        listingCounts.forEach(lc => {
+            if (lc.userId) {
+                countMap.set(lc.userId, lc._count.id);
+            }
+        });
+
+        const formattedUsers = users.map(u => ({
+            _id: u.id,
+            id: u.id,
+            firebaseUid: u.firebaseUid,
+            email: u.email,
+            displayName: u.displayName || undefined,
+            role: u.role as any,
+            isBanned: u.isBanned,
+            banReason: u.banReason || undefined,
+            bannedUntil: u.bannedUntil ? u.bannedUntil.toISOString() : undefined,
+            listingsCount: countMap.get(u.firebaseUid) || 0,
+            createdAt: u.createdAt.toISOString(),
+            updatedAt: u.updatedAt.toISOString(),
+        }));
 
         const totalPages = Math.ceil(total / limit);
 
         return NextResponse.json({
-            users: usersWithCounts,
+            users: formattedUsers,
             total,
             page,
             limit,
             totalPages,
         });
-    } catch (error) {
-        console.error('[Admin Users Error]', error);
+    } catch (error: unknown) {
+        const errMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[Admin Users Error]', errMessage);
         return NextResponse.json(
             { error: 'Failed to fetch users' },
             { status: 500 }

@@ -1,45 +1,68 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
 
 // PATCH /api/admin/reports/[id] - Take action on a reported listing
 export async function PATCH(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        await dbConnect();
+    const authResult = await requireAdmin(request);
+    if ('error' in authResult) {
+        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
 
+    try {
         const { id } = params;
         const body = await request.json();
         const { action } = body; // 'dismiss' | 'hide' | 'delete'
 
         if (action === 'dismiss') {
-            // Clear reports
-            await Listing.findByIdAndUpdate(id, {
-                $set: {
-                    isReported: false,
-                    reportsCount: 0,
-                },
-            });
+            await prisma.$transaction([
+                prisma.listing.update({
+                    where: { id },
+                    data: {
+                        isReported: false,
+                        reportsCount: 0,
+                    },
+                }),
+                prisma.report.updateMany({
+                    where: { listingId: id },
+                    data: { status: 'dismissed' },
+                }),
+            ]);
 
             return NextResponse.json({ success: true, action: 'dismissed' });
         }
 
         if (action === 'hide') {
-            // Hide the listing
-            await Listing.findByIdAndUpdate(id, {
-                $set: {
-                    visibility: 'hidden',
-                    isReported: false,
-                },
-            });
+            await prisma.$transaction([
+                prisma.listing.update({
+                    where: { id },
+                    data: {
+                        visibility: 'hidden',
+                        isReported: false,
+                    },
+                }),
+                prisma.report.updateMany({
+                    where: { listingId: id },
+                    data: { status: 'resolved' },
+                }),
+            ]);
 
             return NextResponse.json({ success: true, action: 'hidden' });
         }
 
         if (action === 'delete') {
-            await Listing.findByIdAndDelete(id);
+            await prisma.$transaction([
+                prisma.report.deleteMany({
+                    where: { listingId: id },
+                }),
+                prisma.listing.delete({
+                    where: { id },
+                }),
+            ]);
             return NextResponse.json({ success: true, action: 'deleted' });
         }
 
@@ -47,8 +70,9 @@ export async function PATCH(
             { error: 'Invalid action' },
             { status: 400 }
         );
-    } catch (error) {
-        console.error('[Admin Report Action Error]', error);
+    } catch (error: unknown) {
+        const errMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[Admin Report Action Error]', errMessage);
         return NextResponse.json(
             { error: 'Failed to process report action' },
             { status: 500 }

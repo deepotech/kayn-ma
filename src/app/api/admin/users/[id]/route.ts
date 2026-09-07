@@ -1,20 +1,25 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import User from '@/models/User';
+import prisma from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { requireAdmin } from '@/lib/auth';
 
 // PATCH /api/admin/users/[id]
 export async function PATCH(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        await dbConnect();
+    const authResult = await requireAdmin(request);
+    if ('error' in authResult) {
+        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
 
+    try {
         const { id } = params;
         const body = await request.json();
         const { isBanned, banReason, bannedUntil, role } = body;
 
-        const updateData: any = {};
+        const updateData: Prisma.UserUpdateInput = {};
 
         if (typeof isBanned === 'boolean') {
             updateData.isBanned = isBanned;
@@ -36,30 +41,21 @@ export async function PATCH(
             updateData.role = role;
         }
 
-        const user = await User.findByIdAndUpdate(
-            id,
-            { $set: updateData },
-            { new: true }
-        ).lean();
-
-        if (!user) {
-            return NextResponse.json(
-                { error: 'User not found' },
-                { status: 404 }
-            );
-        }
-
-        console.log(`[Admin] User ${id} updated:`, updateData);
+        const user = await prisma.user.update({
+            where: { id },
+            data: updateData,
+        });
 
         return NextResponse.json({
             success: true,
             user: {
                 ...user,
-                _id: (user as any)._id.toString(),
+                _id: user.id,
             },
         });
-    } catch (error) {
-        console.error('[Admin User Update Error]', error);
+    } catch (error: unknown) {
+        const errMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[Admin User Update Error]', errMessage);
         return NextResponse.json(
             { error: 'Failed to update user' },
             { status: 500 }

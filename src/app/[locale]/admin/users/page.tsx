@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useLocale } from 'next-intl';
-import { Search, RefreshCw, Loader2 } from 'lucide-react';
+import { Search, RefreshCw, Loader2, AlertTriangle } from 'lucide-react';
 import AdminUserRow from '@/components/admin/AdminUserRow';
 import ConfirmModal from '@/components/admin/ConfirmModal';
 import { AdminUser, AdminUsersResponse } from '@/lib/admin-types';
+import { useAuth } from '@/components/auth/AuthContext';
 
 const ROLE_OPTIONS = [
     { value: 'all', labelFr: 'Tous', labelAr: 'الكل' },
@@ -17,9 +18,11 @@ const ROLE_OPTIONS = [
 export default function AdminUsersPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
+    const { user: authUser } = useAuth();
 
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
@@ -43,6 +46,7 @@ export default function AdminUsersPage() {
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
             const params = new URLSearchParams({
                 page: page.toString(),
@@ -52,18 +56,35 @@ export default function AdminUsersPage() {
             if (search) params.set('search', search);
             if (showBanned) params.set('banned', 'true');
 
-            const res = await fetch(`/api/admin/users?${params}`);
+            const headers: Record<string, string> = {};
+            if (authUser) {
+                try {
+                    const token = await authUser.getIdToken();
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                } catch {
+                    // Fallback to cookie
+                }
+            }
+
+            const res = await fetch(`/api/admin/users?${params}`, { headers });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
+
             const data: AdminUsersResponse = await res.json();
 
-            setUsers(data.users);
-            setTotal(data.total);
-            setTotalPages(data.totalPages);
-        } catch (error) {
-            console.error('Failed to fetch users:', error);
+            setUsers(Array.isArray(data.users) ? data.users : []);
+            setTotal(typeof data.total === 'number' ? data.total : 0);
+            setTotalPages(typeof data.totalPages === 'number' ? data.totalPages : 1);
+        } catch (err: unknown) {
+            console.error('Failed to fetch users:', err);
+            setError(isRtl ? 'تعذر تحميل قائمة المستخدمين. يرجى التحقق من الصلاحيات والمحاولة مجدداً.' : 'Échec du chargement des utilisateurs. Veuillez réessayer.');
+            setUsers([]);
         } finally {
             setLoading(false);
         }
-    }, [page, role, search, showBanned]);
+    }, [page, role, search, showBanned, authUser, isRtl]);
 
     useEffect(() => {
         fetchUsers();
@@ -72,11 +93,24 @@ export default function AdminUsersPage() {
     const updateUser = async (id: string, data: any) => {
         setActionLoading(id);
         try {
-            await fetch(`/api/admin/users/${id}`, {
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (authUser) {
+                try {
+                    const token = await authUser.getIdToken();
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                } catch {
+                    // Fallback to cookie
+                }
+            }
+            const res = await fetch(`/api/admin/users/${id}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify(data),
             });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
             fetchUsers();
         } catch (error) {
             console.error('Failed to update user:', error);
@@ -135,7 +169,10 @@ export default function AdminUsersPage() {
                             type="text"
                             placeholder={isRtl ? 'بحث بالإيميل أو الاسم...' : 'Rechercher par email ou nom...'}
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(1);
+                            }}
                             onKeyDown={(e) => e.key === 'Enter' && fetchUsers()}
                             className="w-full pl-10 pr-4 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
@@ -144,7 +181,10 @@ export default function AdminUsersPage() {
                     {/* Role Filter */}
                     <select
                         value={role}
-                        onChange={(e) => setRole(e.target.value)}
+                        onChange={(e) => {
+                            setRole(e.target.value);
+                            setPage(1);
+                        }}
                         className="px-4 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                         {ROLE_OPTIONS.map((opt) => (
@@ -159,7 +199,10 @@ export default function AdminUsersPage() {
                         <input
                             type="checkbox"
                             checked={showBanned}
-                            onChange={(e) => setShowBanned(e.target.checked)}
+                            onChange={(e) => {
+                                setShowBanned(e.target.checked);
+                                setPage(1);
+                            }}
                             className="rounded bg-zinc-600 border-zinc-500 text-red-500 focus:ring-red-500"
                         />
                         <span className="text-white text-sm">
@@ -169,13 +212,31 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
+            {/* Error Banner */}
+            {error && (
+                <div className="bg-red-900/30 border border-red-800/50 rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0" />
+                        <span className="text-red-300 text-sm font-medium">{error}</span>
+                    </div>
+                    <button
+                        onClick={() => fetchUsers()}
+                        disabled={loading}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0"
+                    >
+                        <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                        <span>{isRtl ? 'إعادة المحاولة' : 'Réessayer'}</span>
+                    </button>
+                </div>
+            )}
+
             {/* Users List */}
             <div className="space-y-3">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-red-500" />
                     </div>
-                ) : users.length === 0 ? (
+                ) : (!users || users.length === 0) ? (
                     <div className="text-center py-12 text-zinc-400">
                         {isRtl ? 'لا يوجد مستخدمين' : 'Aucun utilisateur trouvé'}
                     </div>
