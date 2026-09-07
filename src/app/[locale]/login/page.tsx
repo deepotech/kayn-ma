@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useRouter } from '@/navigation';
 import { Button } from '@/components/ui/Button';
@@ -19,6 +19,9 @@ export default function LoginPage() {
     const searchParams = useSearchParams();
     const redirectPath = searchParams.get('redirect') || '/';
 
+    const locale = useLocale();
+    const isRtl = locale === 'ar';
+
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -34,6 +37,12 @@ export default function LoginPage() {
     //     }
     // }, [user, loading, router, redirectPath]);
 
+    const getSessionSyncErrorMessage = () => {
+        return isRtl
+            ? 'فشل إنشاء جلسة آمنة مع الخادم. يرجى التحقق من الاتصال وإعادة المحاولة.'
+            : 'Échec de création de session sécurisée avec le serveur. Veuillez réessayer.';
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -41,8 +50,8 @@ export default function LoginPage() {
 
         try {
             if (isLogin) {
+                // signInWithEmail awaits session sync; throws if session creation failed
                 await signInWithEmail(email, password);
-                // Check if admin
                 const { isAdmin } = await verifyAdminRole(email);
                 if (isAdmin) {
                     router.push('/admin');
@@ -53,21 +62,23 @@ export default function LoginPage() {
                 await signUpWithEmail(email, password);
                 router.push('/');
             }
-        } catch (err: any) {
-            console.error(err);
-            // Firebase error messages handling
-            if (err.code === 'auth/user-not-found') {
+        } catch (err: unknown) {
+            const error = err as { code?: string; message?: string };
+            console.error('[LoginPage] Submit error:', error?.code || error?.message || 'Unknown submit error');
+            if (error?.message === 'SESSION_SYNC_FAILED') {
+                setError(getSessionSyncErrorMessage());
+            } else if (error?.code === 'auth/user-not-found') {
                 setError(t('errorUserNotFound'));
-            } else if (err.code === 'auth/wrong-password') {
+            } else if (error?.code === 'auth/wrong-password') {
                 setError(t('errorWrongPassword'));
-            } else if (err.code === 'auth/email-already-in-use') {
+            } else if (error?.code === 'auth/email-already-in-use') {
                 setError(t('errorEmailInUse'));
-            } else if (err.code === 'auth/weak-password') {
+            } else if (error?.code === 'auth/weak-password') {
                 setError(t('errorWeakPassword'));
-            } else if (err.code === 'auth/invalid-email') {
+            } else if (error?.code === 'auth/invalid-email') {
                 setError(t('errorInvalidEmail'));
             } else {
-                setError(err.message || t('errorGeneric'));
+                setError(error?.message || t('errorGeneric'));
             }
         } finally {
             setIsSubmitting(false);
@@ -89,9 +100,14 @@ export default function LoginPage() {
             } else {
                 router.push('/');
             }
-        } catch (err: any) {
-            console.error(err);
-            setError(err.message || t('errorGeneric'));
+        } catch (err: unknown) {
+            const error = err as { code?: string; message?: string };
+            console.error('[LoginPage] Google sign-in error:', error?.code || error?.message || 'Unknown sign-in error');
+            if (error?.message === 'SESSION_SYNC_FAILED') {
+                setError(getSessionSyncErrorMessage());
+            } else {
+                setError(error?.message || t('errorGeneric'));
+            }
         } finally {
             setIsSubmitting(false);
         }

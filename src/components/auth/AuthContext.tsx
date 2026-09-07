@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
 import {
     User,
     onAuthStateChanged,
@@ -26,29 +26,63 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const lastSyncedUidRef = useRef<string | null>(null);
+    const syncStateRef = useRef<{
+        uid: string;
+        promise: Promise<boolean>;
+    } | null>(null);
+
+    const syncSession = async (firebaseUser: User): Promise<boolean> => {
+        // Reuse in-flight sync only if it belongs to the exact same UID
+        if (syncStateRef.current && syncStateRef.current.uid === firebaseUser.uid) {
+            return await syncStateRef.current.promise;
+        }
+
+        const runSync = async (): Promise<boolean> => {
+            try {
+                const idToken = await firebaseUser.getIdToken();
+                const res = await fetch('/api/auth/session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken }),
+                });
+                if (res.ok) {
+                    lastSyncedUidRef.current = firebaseUser.uid;
+                    return true;
+                }
+                console.error('[AuthContext] Session sync responded with status:', res.status);
+                return false;
+            } catch (error) {
+                console.error('[AuthContext] Failed to sync session:', error);
+                return false;
+            } finally {
+                if (syncStateRef.current?.uid === firebaseUser.uid) {
+                    syncStateRef.current = null;
+                }
+            }
+        };
+
+        const syncPromise = runSync();
+        syncStateRef.current = { uid: firebaseUser.uid, promise: syncPromise };
+        return await syncPromise;
+    };
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                // Determine if we need to refresh the session cookie
-                try {
-                    const idToken = await firebaseUser.getIdToken();
-                    await fetch('/api/auth/session', { // Updated endpoint
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ idToken }),
-                    });
-                    // Only set user after session sync is attempted
+                const synced = lastSyncedUidRef.current === firebaseUser.uid || (await syncSession(firebaseUser));
+                if (synced) {
                     setUser(firebaseUser);
-                } catch (error) {
-                    console.error('Failed to sync session:', error);
-                    // Still set user to allow client-side to function, even if server sync failed (though strict pages will block)
-                    setUser(firebaseUser);
+                } else {
+                    console.warn('[AuthContext] Server session sync failed; clearing client auth state to prevent inconsistency');
+                    setUser(null);
+                    await firebaseSignOut(auth).catch(() => {});
                 }
             } else {
+                lastSyncedUidRef.current = null;
+                syncStateRef.current = null;
                 setUser(null);
-                // Ensure session is cleared
-                await fetch('/api/auth/logout', { method: 'POST' });
+                await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
             }
 
             setLoading(false);
@@ -58,24 +92,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const signInWithEmail = async (email: string, password: string) => {
-        return await signInWithEmailAndPassword(auth, email, password);
-        // The observer will handle the cookie sync
+        const credential = await signInWithEmailAndPassword(auth, email, password);
+        const synced = await syncSession(credential.user);
+        if (!synced) {
+            setUser(null);
+            await firebaseSignOut(auth).catch(() => {});
+            throw new Error('SESSION_SYNC_FAILED');
+        }
+        setUser(credential.user);
+        return credential;
     };
 
     const signUpWithEmail = async (email: string, password: string) => {
-        return await createUserWithEmailAndPassword(auth, email, password);
-        // The observer will handle the cookie sync
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        const synced = await syncSession(credential.user);
+        if (!synced) {
+            setUser(null);
+            await firebaseSignOut(auth).catch(() => {});
+            throw new Error('SESSION_SYNC_FAILED');
+        }
+        setUser(credential.user);
+        return credential;
     };
 
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
-        return await signInWithPopup(auth, provider);
-        // The observer will handle the cookie sync
+        const credential = await signInWithPopup(auth, provider);
+        const synced = await syncSession(credential.user);
+        if (!synced) {
+            setUser(null);
+            await firebaseSignOut(auth).catch(() => {});
+            throw new Error('SESSION_SYNC_FAILED');
+        }
+        setUser(credential.user);
+        return credential;
     };
 
     const signOut = async () => {
-        await firebaseSignOut(auth);
-        await fetch('/api/auth/logout', { method: 'POST' });
+        lastSyncedUidRef.current = null;
+        syncStateRef.current = null;
+        setUser(null);
+        await firebaseSignOut(auth).catch(() => {});
+        await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     };
 
     return (

@@ -1,33 +1,63 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { Car, Users, Flag, Clock, TrendingUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Car, Users, Flag, Clock, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import StatCard from '@/components/admin/StatCard';
 import { AdminStats } from '@/lib/admin-types';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export default function AdminDashboard() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
+    const { user, loading: authLoading } = useAuth();
     const [stats, setStats] = useState<AdminStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchStats();
-    }, []);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const res = await fetch('/api/admin/stats');
+            const headers: Record<string, string> = {};
+            if (user) {
+                try {
+                    const token = await user.getIdToken();
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+                } catch {
+                    // Fallback to cookie
+                }
+            }
+
+            const res = await fetch('/api/admin/stats', { headers });
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `HTTP ${res.status}`);
+            }
+
             const data = await res.json();
             setStats(data);
-        } catch (error) {
-            console.error('Failed to fetch stats:', error);
+        } catch (err) {
+            console.error('Failed to fetch stats:', err);
+            setError(isRtl ? 'تعذر تحميل الإحصائيات. يرجى التحقق من الصلاحيات والمحاولة مجدداً.' : 'Échec du chargement des statistiques. Veuillez vérifier vos accès et réessayer.');
+            setStats(null);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, isRtl]);
+
+    useEffect(() => {
+        if (!authLoading) {
+            if (user) {
+                fetchStats();
+            } else {
+                setLoading(false);
+            }
+        }
+    }, [authLoading, user, fetchStats]);
 
     return (
         <div className="space-y-6">
@@ -41,32 +71,50 @@ export default function AdminDashboard() {
                 </p>
             </div>
 
+            {/* Error Banner */}
+            {error && (
+                <div className="bg-red-900/30 border border-red-800/50 rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0" />
+                        <span className="text-red-300 text-sm font-medium">{error}</span>
+                    </div>
+                    <button
+                        onClick={fetchStats}
+                        disabled={loading}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0"
+                    >
+                        <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                        <span>{isRtl ? 'إعادة المحاولة' : 'Réessayer'}</span>
+                    </button>
+                </div>
+            )}
+
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     title={isRtl ? 'إجمالي الإعلانات' : 'Total Annonces'}
-                    value={stats?.totalListings || 0}
+                    value={stats ? stats.totalListings : '—'}
                     icon={Car}
                     color="blue"
                     isLoading={loading}
                 />
                 <StatCard
                     title={isRtl ? 'في انتظار المراجعة' : 'En attente'}
-                    value={stats?.pendingListings || 0}
+                    value={stats ? stats.pendingListings : '—'}
                     icon={Clock}
                     color="yellow"
                     isLoading={loading}
                 />
                 <StatCard
                     title={isRtl ? 'المستخدمين' : 'Utilisateurs'}
-                    value={stats?.totalUsers || 0}
+                    value={stats ? stats.totalUsers : '—'}
                     icon={Users}
                     color="purple"
                     isLoading={loading}
                 />
                 <StatCard
                     title={isRtl ? 'البلاغات' : 'Signalements'}
-                    value={stats?.reportsCount || 0}
+                    value={stats ? stats.reportsCount : '—'}
                     icon={Flag}
                     color="red"
                     isLoading={loading}
@@ -77,21 +125,21 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <StatCard
                     title={isRtl ? 'الإعلانات المعتمدة' : 'Annonces approuvées'}
-                    value={stats?.approvedListings || 0}
+                    value={stats ? stats.approvedListings : '—'}
                     icon={CheckCircle}
                     color="green"
                     isLoading={loading}
                 />
                 <StatCard
                     title={isRtl ? 'الإعلانات المرفوضة' : 'Annonces rejetées'}
-                    value={stats?.rejectedListings || 0}
+                    value={stats ? stats.rejectedListings : '—'}
                     icon={XCircle}
                     color="red"
                     isLoading={loading}
                 />
                 <StatCard
                     title={isRtl ? 'المستخدمين المحظورين' : 'Utilisateurs bannis'}
-                    value={stats?.bannedUsers || 0}
+                    value={stats ? stats.bannedUsers : '—'}
                     icon={AlertTriangle}
                     color="red"
                     isLoading={loading}
