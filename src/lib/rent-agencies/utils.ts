@@ -101,7 +101,8 @@ export const CITY_NAMES_AR: Record<string, string> = {
     settat: 'سطات',
     berrechid: 'برشيد',
     khemisset: 'الخميسات',
-    'kelaat-sraghna': 'قلعة السراغنة'
+    'kelaat-sraghna': 'قلعة السراغنة',
+    'el-attaouia': 'العطاوية'
 };
 
 export function getLocalizedCityName(citySlug: string, locale: string): string {

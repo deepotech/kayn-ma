@@ -52,6 +52,10 @@ import { kenitaraCars } from './kenitra/cars';
 import { safiRent } from './safi/rent';
 import { safiCars } from './safi/cars';
 
+// El Attaouia
+import { elAttaouiaRent } from './el-attaouia/rent';
+import { elAttaouiaCars } from './el-attaouia/cars';
+
 const RENT_GUIDES: Record<string, CityGuide> = {
     casablanca: casablancaRent,
     rabat: rabatRent,
@@ -65,7 +69,8 @@ const RENT_GUIDES: Record<string, CityGuide> = {
     'beni-mellal': beniMellalRent,
     'tetouan': tetouanRent,
     'kenitra': kenitaRent,
-    'safi': safiRent
+    'safi': safiRent,
+    'el-attaouia': elAttaouiaRent
 };
 
 const CAR_GUIDES: Record<string, CityGuide> = {
@@ -81,7 +86,8 @@ const CAR_GUIDES: Record<string, CityGuide> = {
     'beni-mellal': beniMellalCars,
     'tetouan': tetouanCars,
     'kenitra': kenitaraCars,
-    'safi': safiCars
+    'safi': safiCars,
+    'el-attaouia': elAttaouiaCars
 };
 
 export function getCityRentGuide(citySlug: string): CityGuide | null {

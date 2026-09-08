@@ -79,5 +79,13 @@ export const CITY_METADATA: Record<string, CityMeta> = {
         airportEn: 'Marrakech Menara Airport (Nearest, 75km)',
         airportAr: 'مطار مراكش المنارة الدولي (الأقرب، 75 كلم)',
         highlights: ['Boulevard Mohammed V', 'El Nakhla', 'El Jibs', 'Weekly Souk Sebt']
+    },
+    'el-attaouia': {
+        nameEn: 'El Attaouia',
+        nameAr: 'العطاوية',
+        focus: 'agriculture',
+        airportEn: 'Marrakech Menara Airport (Nearest, ~80km)',
+        airportAr: 'مطار مراكش المنارة الدولي (الأقرب، ~80 كلم)',
+        highlights: ['Centre El Attaouia', 'Route N8', 'Souk Hebdomadaire', 'Plaine du Haouz']
     }
 };
