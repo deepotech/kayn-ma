@@ -1,13 +1,11 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 // GET /api/admin/listings
 export async function GET(request: NextRequest) {
     try {
-        await dbConnect();
-
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '20');
@@ -19,46 +17,59 @@ export async function GET(request: NextRequest) {
         const skip = (page - 1) * limit;
 
         // Build query
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const query: any = {};
+        const where: Prisma.ListingWhereInput = {};
 
         if (status && status !== 'all') {
-            query.status = status;
+            where.status = status;
         }
 
         if (city && city !== 'all') {
-            query['city.slug'] = city;
+            where.city = { slug: city };
         }
 
         if (reported === 'true') {
-            query.isReported = true;
+            where.isReported = true;
         }
 
-        if (search) {
-            query.$or = [
-                { title: { $regex: search, $options: 'i' } },
-                { 'brand.label': { $regex: search, $options: 'i' } },
-                { 'carModel.label': { $regex: search, $options: 'i' } },
-                { sellerName: { $regex: search, $options: 'i' } },
+        if (search && search.trim()) {
+            const s = search.trim();
+            where.OR = [
+                { id: s },
+                { title: { contains: s, mode: 'insensitive' } },
+                { brandLabel: { contains: s, mode: 'insensitive' } },
+                { carModelLabel: { contains: s, mode: 'insensitive' } },
+                { sellerName: { contains: s, mode: 'insensitive' } },
+                { agencyName: { contains: s, mode: 'insensitive' } },
             ];
         }
 
         const [listings, total] = await Promise.all([
-            Listing.find(query)
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            Listing.countDocuments(query),
+            prisma.listing.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit,
+                include: { city: true },
+            }),
+            prisma.listing.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
 
         return NextResponse.json({
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            listings: listings.map((l: any) => ({
+            listings: listings.map((l) => ({
                 ...l,
-                _id: l._id.toString(),
+                _id: l.id,
+                brand: { label: l.brandLabel, slug: l.brandSlug },
+                carModel: { label: l.carModelLabel, slug: l.carModelSlug },
+                city: { label: l.city?.name || '', slug: l.city?.slug || '' },
+                images: Array.isArray(l.images)
+                    ? (l.images as Array<any>).map((img) =>
+                          typeof img === 'string'
+                              ? { url: img, publicId: '' }
+                              : { url: img?.url || '', publicId: img?.publicId || '' }
+                      )
+                    : [],
             })),
             total,
             page,
@@ -73,3 +84,4 @@ export async function GET(request: NextRequest) {
         );
     }
 }
+

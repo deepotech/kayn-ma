@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import Listing from '@/models/Listing';
+import prisma from '@/lib/db';
 
 // PATCH /api/admin/listings/[id]/status
 export async function PATCH(
@@ -8,13 +7,10 @@ export async function PATCH(
     { params }: { params: { id: string } }
 ) {
     try {
-        await dbConnect();
-
         const { id } = params;
         const body = await request.json();
         const { status, visibility, rejectionReason } = body;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const updateData: any = {
             lastModeratedAt: new Date(),
         };
@@ -30,22 +26,15 @@ export async function PATCH(
             updateData.visibility = visibility;
         }
 
-        if (rejectionReason) {
+        if (rejectionReason !== undefined) {
             updateData.rejectionReason = rejectionReason;
         }
 
-        const listing = await Listing.findByIdAndUpdate(
-            id,
-            { $set: updateData },
-            { new: true }
-        ).lean();
-
-        if (!listing) {
-            return NextResponse.json(
-                { error: 'Listing not found' },
-                { status: 404 }
-            );
-        }
+        const listing = await prisma.listing.update({
+            where: { id },
+            data: updateData,
+            include: { city: true }
+        });
 
         console.log(`[Admin] Listing ${id} updated:`, updateData);
 
@@ -53,8 +42,17 @@ export async function PATCH(
             success: true,
             listing: {
                 ...listing,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                _id: (listing as any)._id.toString(),
+                _id: listing.id,
+                brand: { label: listing.brandLabel, slug: listing.brandSlug },
+                carModel: { label: listing.carModelLabel, slug: listing.carModelSlug },
+                city: { label: listing.city?.name || '', slug: listing.city?.slug || '' },
+                images: Array.isArray(listing.images)
+                    ? (listing.images as Array<any>).map((img) =>
+                          typeof img === 'string'
+                              ? { url: img, publicId: '' }
+                              : { url: img?.url || '', publicId: img?.publicId || '' }
+                      )
+                    : [],
             },
         });
     } catch (error) {
@@ -72,18 +70,11 @@ export async function DELETE(
     { params }: { params: { id: string } }
 ) {
     try {
-        await dbConnect();
-
         const { id } = params;
 
-        const result = await Listing.findByIdAndDelete(id);
-
-        if (!result) {
-            return NextResponse.json(
-                { error: 'Listing not found' },
-                { status: 404 }
-            );
-        }
+        await prisma.listing.delete({
+            where: { id }
+        });
 
         console.log(`[Admin] Listing ${id} deleted`);
 
@@ -96,3 +87,4 @@ export async function DELETE(
         );
     }
 }
+
