@@ -25,6 +25,7 @@ const CITIES = [
     { name: 'Tétouan', nameAr: 'تطوان', slug: 'tetouan', active: true, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&q=80&w=600' },
     { name: 'Kelaat Sraghna', nameAr: 'قلعة السراغنة', slug: 'kelaat-sraghna', active: true, image: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?auto=format&fit=crop&q=80&w=600' },
     { name: 'Beni Mellal', nameAr: 'بني ملال', slug: 'beni-mellal', active: true, image: 'https://images.unsplash.com/photo-1568849676085-51415703900f?auto=format&fit=crop&q=80&w=600' },
+    { name: 'El Attaouia', nameAr: 'العطاوية', slug: 'el-attaouia', active: true, image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=600' },
 ];
 
 import { useTranslations } from 'next-intl';
