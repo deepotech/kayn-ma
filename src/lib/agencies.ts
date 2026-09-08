@@ -1,6 +1,5 @@
-import { Agency } from '@/lib/rent-agencies/normalize';
+import { Agency, calculateScore, getDistance } from '@/lib/rent-agencies/normalize';
 import prisma from '@/lib/db';
-import { getDistance } from '@/lib/rent-agencies/normalize';
 
 export type { Agency };
 
@@ -28,7 +27,11 @@ export interface PaginatedResult {
 
 // Transform Prisma output to UI model
 function mapPrismaToAgency(dbBusiness: any): Agency {
-    return {
+    const validPhotos = (dbBusiness.photos || []).filter(
+        (p: string) => p && typeof p === 'string' && !p.includes('googleusercontent.com/gps-cs-s/')
+    );
+
+    const agency: Agency = {
         _id: dbBusiness.id,
         name: dbBusiness.name,
         slug: dbBusiness.slug,
@@ -38,14 +41,14 @@ function mapPrismaToAgency(dbBusiness: any): Agency {
         phone: dbBusiness.phone,
         rating: dbBusiness.rating,
         reviewsCount: dbBusiness.reviewsCount,
-        photos: dbBusiness.photos || [],
+        photos: validPhotos,
         categories: dbBusiness.categories?.map((c: any) => c.category.name) || [],
         location: {
             lat: dbBusiness.lat || 0,
             lng: dbBusiness.lng || 0
         },
         website: dbBusiness.website,
-        score: (dbBusiness.rating || 0) * 10,
+        score: 0,
         openingHours: dbBusiness.openingHours || [],
         reviews: [], // omitted for list views
         mixedServices: dbBusiness.mixedServices,
@@ -55,6 +58,9 @@ function mapPrismaToAgency(dbBusiness: any): Agency {
         noDeposit: dbBusiness.noDeposit,
         priceLevel: dbBusiness.priceLevel,
     };
+
+    agency.score = calculateScore(agency);
+    return agency;
 }
 
 export async function getAgencies(options: GetAgenciesOptions = {}): Promise<PaginatedResult> {
@@ -121,11 +127,14 @@ export async function getAgencies(options: GetAgenciesOptions = {}): Promise<Pag
     if (sortBy === 'reviews') {
         orderBy = [{ reviewsCount: 'desc' }];
     } else if (sortBy === 'rating') {
-        orderBy = [{ rating: 'desc' }];
+        orderBy = [
+            { rating: { sort: 'desc', nulls: 'last' } },
+            { reviewsCount: 'desc' }
+        ];
     } else {
         // recommended
         orderBy = [
-            { rating: 'desc' },
+            { rating: { sort: 'desc', nulls: 'last' } },
             { reviewsCount: 'desc' }
         ];
     }

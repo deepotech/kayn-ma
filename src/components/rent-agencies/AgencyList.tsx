@@ -113,11 +113,7 @@ export default function AgencyList({ initialAgencies, cityName }: AgencyListProp
                 break;
             case 'recommended':
             default:
-                // Already sorted by Score from backend, but we can re-score if needed
-                // Backend sent them sorted by score.
-                // If we want to strictly respect that order:
-                // sorted.sort((a, b) => (b.score || 0) - (a.score || 0)); 
-                // But filtered array preserves order usually.
+                sorted.sort((a, b) => (b.score || 0) - (a.score || 0));
                 break;
         }
         return sorted;

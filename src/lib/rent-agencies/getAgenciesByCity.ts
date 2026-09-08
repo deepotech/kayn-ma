@@ -1,4 +1,4 @@
-import { NormalizedAgency, ReviewNormalized } from './normalize';
+import { NormalizedAgency, ReviewNormalized, calculateScore } from './normalize';
 import prisma from '@/lib/db';
 import { SeoIntent } from './seo-intents';
 import { getDistance } from './normalize';
@@ -59,7 +59,11 @@ export function filterAgenciesByIntent(agencies: NormalizedAgency[], intent: Seo
 
 // Transform Prisma model to UI interface
 function mapPrismaToAgency(dbBusiness: any): NormalizedAgency {
-    return {
+    const validPhotos = (dbBusiness.photos || []).filter(
+        (p: string) => p && typeof p === 'string' && !p.includes('googleusercontent.com/gps-cs-s/')
+    );
+
+    const agency: NormalizedAgency = {
         _id: dbBusiness.id,
         name: dbBusiness.name,
         slug: dbBusiness.slug,
@@ -74,14 +78,14 @@ function mapPrismaToAgency(dbBusiness: any): NormalizedAgency {
         coverPhoto: dbBusiness.coverPhoto || null,
         rating: dbBusiness.rating,
         reviewsCount: dbBusiness.reviewsCount,
-        photos: dbBusiness.photos || [],
+        photos: validPhotos,
         categories: dbBusiness.categories?.map((c: any) => c.category.name) || [],
         location: {
             lat: dbBusiness.lat || 0,
             lng: dbBusiness.lng || 0
         },
         website: dbBusiness.website,
-        score: dbBusiness.rating * 10, // simplified scoring for now
+        score: 0,
         openingHours: dbBusiness.openingHours || [],
         reviews: dbBusiness.reviews?.map((r: any) => ({
             reviewId: r.id,
@@ -146,6 +150,9 @@ function mapPrismaToAgency(dbBusiness: any): NormalizedAgency {
         noDeposit: dbBusiness.noDeposit,
         priceLevel: dbBusiness.priceLevel,
     };
+
+    agency.score = calculateScore(agency);
+    return agency;
 }
 
 
@@ -164,7 +171,7 @@ export async function getAgenciesByCity(citySlug: string): Promise<NormalizedAge
             reviews: { take: 5, orderBy: { createdAt: 'desc' } }
         },
         orderBy: [
-            { rating: 'desc' },
+            { rating: { sort: 'desc', nulls: 'last' } },
             { reviewsCount: 'desc' }
         ]
     });

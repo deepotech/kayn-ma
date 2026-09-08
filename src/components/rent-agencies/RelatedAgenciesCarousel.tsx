@@ -14,11 +14,35 @@ interface RelatedAgenciesCarouselProps {
 
 const DEFAULT_COVER = '/images/agency-placeholder.jpg';
 
-function cleanUrl(url?: string | null): string {
-    if (!url || typeof url !== 'string') return DEFAULT_COVER;
+const FALLBACK_CAR_IMAGES = [
+    'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=800'
+];
+
+function getFallbackCarImage(identifier: string): string {
+    let hash = 0;
+    for (let i = 0; i < identifier.length; i++) {
+        hash = (hash << 5) - hash + identifier.charCodeAt(i);
+        hash |= 0;
+    }
+    const index = Math.abs(hash) % FALLBACK_CAR_IMAGES.length;
+    return FALLBACK_CAR_IMAGES[index];
+}
+
+function cleanUrl(url?: string | null, fallbackKey?: string): string {
+    if (!url || typeof url !== 'string') return getFallbackCarImage(fallbackKey || 'car');
     const trimmed = url.trim();
     if (!trimmed || trimmed.includes('googleusercontent.com/gps-cs-s/')) {
-        return DEFAULT_COVER;
+        return getFallbackCarImage(fallbackKey || 'car');
     }
     return trimmed;
 }
@@ -99,9 +123,8 @@ export default function RelatedAgenciesCarousel({
             >
                 {agencies.map((agency) => {
                     const detailHref = `/${locale}/rent-agencies/${agency.citySlug}/${agency.slug}`;
-                    const photoSrc = cleanUrl(
-                        agency.coverPhoto || (agency.photos && agency.photos.length > 0 ? agency.photos[0] : null)
-                    );
+                    const validPhoto = agency.coverPhoto || (agency.photos?.find(p => p && typeof p === 'string' && !p.includes('googleusercontent.com/gps-cs-s/')) || null);
+                    const photoSrc = cleanUrl(validPhoto, agency.slug || agency.name);
 
                     return (
                         <div
