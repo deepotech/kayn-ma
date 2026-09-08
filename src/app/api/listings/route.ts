@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         const [listings, total] = await Promise.all([
             prisma.listing.findMany({
                 where,
-                orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+                orderBy: { createdAt: 'desc' },
                 skip,
                 take: limit,
                 include: { city: true }
@@ -48,9 +48,18 @@ export async function GET(request: NextRequest) {
             prisma.listing.count({ where })
         ]);
 
+        const formattedListings = listings.map((l) => ({
+            ...l,
+            _id: l.id,
+            id: l.id,
+            brand: { label: l.brandLabel, slug: l.brandSlug },
+            carModel: { label: l.carModelLabel, slug: l.carModelSlug },
+            city: { label: l.city?.name || '', slug: l.city?.slug || '' }
+        }));
+
         return NextResponse.json({
             success: true,
-            data: listings,
+            data: formattedListings,
             pagination: { total, page, limit, pages: Math.ceil(total / limit) }
         });
     } catch (error) {
@@ -58,6 +67,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch listings' }, { status: 500 });
     }
 }
+
 
 export async function POST(request: NextRequest) {
     try {

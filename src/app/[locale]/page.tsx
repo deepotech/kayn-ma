@@ -35,14 +35,23 @@ async function getListingsByType(type: 'sale' | 'rent' | 'all') {
     const listings = await prisma.listing.findMany({
       where: query,
       orderBy: { createdAt: 'desc' },
-      take: 8
+      take: 8,
+      include: { city: true }
     });
-    return listings;
+    return listings.map((l) => ({
+      ...l,
+      _id: l.id,
+      id: l.id,
+      brand: { label: l.brandLabel, slug: l.brandSlug },
+      carModel: { label: l.carModelLabel, slug: l.carModelSlug },
+      city: { label: l.city?.name || '', slug: l.city?.slug || '' }
+    }));
   } catch (error) {
     console.error(`Failed to fetch ${type} listings:`, error);
     return [];
   }
 }
+
 
 import JsonLd from '@/components/seo/JsonLd';
 

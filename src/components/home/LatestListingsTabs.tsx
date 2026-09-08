@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import ListingCard from '@/components/listings/ListingCard';
 import ListingSkeleton from '@/components/listings/ListingSkeleton';
 import { IListingBase } from '@/models/Listing';
@@ -26,16 +26,17 @@ export default function LatestListingsTabs({
 }: LatestListingsTabsProps) {
     const t = useTranslations('Home.Tabs');
     const tHome = useTranslations('Home');
-    const tCommon = useTranslations('Common');
+    const locale = useLocale();
+    const isRtl = locale === 'ar';
 
     const [activeTab, setActiveTab] = useState<TabType>('sale');
 
     // State for managing listings and pagination per tab
     // Initialize with data passed from server (page 1)
     const [listingsState, setListingsState] = useState({
-        sale: { data: saleListings, page: 1, hasMore: true, loading: false },
-        rent: { data: rentListings, page: 1, hasMore: true, loading: false },
-        all: { data: allListings, page: 1, hasMore: true, loading: false }
+        sale: { data: saleListings || [], page: 1, hasMore: (saleListings?.length || 0) >= 8, loading: false },
+        rent: { data: rentListings || [], page: 1, hasMore: (rentListings?.length || 0) >= 8, loading: false },
+        all: { data: allListings || [], page: 1, hasMore: (allListings?.length || 0) >= 8, loading: false }
     });
 
     const activeState = listingsState[activeTab];
@@ -59,19 +60,22 @@ export default function LatestListingsTabs({
                 }
             });
 
-            const newListings: IListingBase[] = response.data.data;
+            const newListings: IListingBase[] = response.data.data || [];
             const pagination = response.data.pagination;
 
-            setListingsState(prev => ({
-                ...prev,
-                [activeTab]: {
-                    // Dedupe to ensure safety
-                    data: dedupeById([...prev[activeTab].data, ...newListings]) as IListingBase[],
-                    page: nextPage,
-                    hasMore: nextPage < pagination.pages,
-                    loading: false
-                }
-            }));
+            setListingsState(prev => {
+                const combined = dedupeById([...prev[activeTab].data, ...newListings]) as IListingBase[];
+                return {
+                    ...prev,
+                    [activeTab]: {
+                        // Guard: if combined is empty for any reason, preserve existing data
+                        data: combined.length > 0 ? combined : prev[activeTab].data,
+                        page: nextPage,
+                        hasMore: newListings.length > 0 && nextPage < (pagination?.pages || 1),
+                        loading: false
+                    }
+                };
+            });
         } catch (error) {
             console.error('Failed to load more listings:', error);
             setListingsState(prev => ({
@@ -110,7 +114,7 @@ export default function LatestListingsTabs({
                 {activeState.data.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {activeState.data.map((listing) => (
-                            <div key={listing._id} className="h-full">
+                            <div key={listing._id || (listing as any).id} className="h-full">
                                 <ListingCard listing={listing} />
                             </div>
                         ))}
@@ -136,31 +140,34 @@ export default function LatestListingsTabs({
                 )}
             </div>
 
-            {/* Load More Button or Link */}
+            {/* Load More Button and View All Cars */}
             {activeState.data.length > 0 && (
-                <div className="text-center pt-8 border-t border-gray-100 dark:border-zinc-800">
+                <div className="text-center pt-8 border-t border-gray-100 dark:border-zinc-800 flex flex-wrap items-center justify-center gap-4">
                     {!activeState.loading && activeState.hasMore ? (
                         <Button
                             variant="outline"
                             onClick={loadMore}
-                            className="rounded-xl px-8 py-6 text-base hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                            className="rounded-xl px-8 py-3.5 text-base font-semibold hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                            {tCommon('next')} <ChevronDown className="ml-2 h-4 w-4" />
+                            {isRtl ? 'عرض المزيد من السيارات' : 'Charger plus de voitures'}{' '}
+                            <ChevronDown className="mx-2 h-4 w-4" />
                         </Button>
                     ) : activeState.loading ? (
-                        <div className="flex justify-center">
+                        <div className="flex justify-center py-2">
                             <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
                         </div>
-                    ) : (
-                        <Link
-                            href={activeTab === 'all' ? '/cars' : `/cars?purpose=${activeTab}`}
-                            className="inline-flex items-center gap-1 font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-all"
-                        >
-                            {tHome('viewAll')} →
-                        </Link>
-                    )}
+                    ) : null}
+
+                    <Link
+                        href={activeTab === 'all' ? '/cars' : `/cars?purpose=${activeTab}`}
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all shadow-sm"
+                    >
+                        <span>{isRtl ? 'عرض جميع السيارات' : 'Voir toutes les voitures'}</span>
+                        <span className={isRtl ? 'rotate-180 inline-block' : 'inline-block'}>→</span>
+                    </Link>
                 </div>
             )}
         </div>
     );
 }
+
